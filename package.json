@@ -1,0 +1,12 @@
+{
+  "name": "crocodillon.com",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "iojs ./bin/www"
+  },
+  "dependencies": {
+    "koa": "^0.19.1",
+    "koa-router": "^4.3.2"
+  }
+}
