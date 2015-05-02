@@ -1,5 +1,6 @@
 ---
 created: 2014-07-30 21:02:00
+updated: 2015-05-02 14:57:00
 slug: how-to-install-sassc-and-libsass-on-ubuntu
 title: How to install SassC and LibSass on Ubuntu
 description: Install guide of SassC and LibSass, from cloning their repositories to a working setup.
@@ -31,11 +32,8 @@ Now you need to download SassC and LibSass by cloning their repositories. But in
 
 ~~~ .language-bash
 cd /usr/local/lib/
-git clone git@github.com:sass/sassc.git
-git clone git@github.com:sass/libsass.git
-# Initialize and update the submodule sass2scss…
-cd libsass/
-git submodule update –-init
+git clone https://github.com/sass/sassc.git --branch 3.2.1 --depth 1
+git clone https://github.com/sass/libsass.git --branch 3.2.1 --depth 1
 ~~~
 
 To make SassC you need to let it know where to find LibSass, by using the `SASS_LIBSASS_PATH` variable. I’m putting this variable in `/etc/environment` so it’s available to all users. If you are installing SassC for a specific user only, it makes more sense to put it in `~/.profile`.
@@ -49,6 +47,13 @@ echo $SASS_LIBSASS_PATH
 # Now you can make SassC…
 cd /usr/local/lib/sassc/
 make
+~~~
+
+Declaring the `SASS_LIBSASS_PATH` variable in a persistent way is convenient for when you need to update SassC. However this doesn’t seem to work for everyone. An alternative could be declaring the variable just before running `make`.
+
+~~~ .language-bash
+cd /usr/local/lib/sassc/
+SASS_LIBSASS_PATH="/usr/local/lib/libsass"; make
 ~~~
 
 The final step is to make sure the `sassc` command is in your `PATH` by creating a symbolic link in `/usr/local/bin/`.
