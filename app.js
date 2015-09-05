@@ -2,7 +2,8 @@
  * Module dependencies.
  */
 
-var koa = require('koa');
+var koa = require('koa'),
+    static = require('koa-static');
 
 /**
  * Koa app.
@@ -17,5 +18,7 @@ app.port = config.port;
 
 // bootstrap routes
 routes(app);
+
+app.use(static('public'));
 
 module.exports = app;
