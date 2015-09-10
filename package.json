@@ -2,9 +2,12 @@
   "name": "crocodillon.com",
   "private": true,
   "scripts": {
-    "start": "iojs ./bin/www",
+    "start": "node ./bin/www",
     "build": "./node_modules/webpack/bin/webpack.js --progress --profile --colors",
     "watch": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --hot --inline --progress --colors"
+  },
+  "engines": {
+    "node": ">=4.0.0"
   },
   "dependencies": {
     "koa": "^0.19.1",
