@@ -15,7 +15,11 @@ module.exports = {
   },
   module: {
     loaders: [
-      {test: /\.jsx$/, loader: 'babel-loader?stage=0'}
+      {
+        test: /\.jsx$/,
+        loader: 'babel-loader?stage=0',
+        exclude: /node_modules/
+      }
     ]
   },
   externals: {
