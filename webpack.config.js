@@ -19,13 +19,13 @@ module.exports = {
     ]
   },
   externals: {
-    root: {
-      'react': 'React',
-      'react-router': 'ReactRouter'
+    'react': {
+      root: 'React',
+      commonjs2: 'react'
     },
-    commonjs2: [
-      'react',
-      'react-router'
-    ]
+    'react-router': {
+      root: 'ReactRouter',
+      commonjs2: 'react-router'
+    }
   }
 };
