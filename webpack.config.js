@@ -10,6 +10,7 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, './public/js/build'),
+    publicPath: '/js/build/',
     filename: 'bundle.js',
     libraryTarget: 'umd'
   },
@@ -31,5 +32,18 @@ module.exports = {
       root: 'ReactRouter',
       commonjs2: 'react-router'
     }
+  },
+  devServer: {
+    publicPath: '/js/build/',
+    proxy: {
+      '*': 'http://localhost:8080'
+    },
+    hot: true,
+    inline: true,
+    noInfo: true,
+    stats: {
+      colors: true
+    },
+    port: 9090
   }
 };

@@ -2,9 +2,11 @@
   "name": "crocodillon.com",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
-    "build": "./node_modules/webpack/bin/webpack.js --progress --profile --colors",
-    "watch": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --hot --inline --progress --colors"
+    "start": "./bin/www",
+    "build": "./node_modules/webpack/bin/webpack.js --progress --colors",
+    "watch": "node webpack.server.js",
+    "dev": "npm run start & npm run watch",
+    "clean": "rm -rf public/js/build"
   },
   "engines": {
     "node": ">=4.0.0"

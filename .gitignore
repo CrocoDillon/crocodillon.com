@@ -1,3 +1,4 @@
 data/drafts
 node_modules
 public/js/build
+npm-debug.log
