@@ -1,5 +1,5 @@
 import React from 'react';
-import {default as Router, HistoryLocation} from 'react-router';
+import Router, {HistoryLocation} from 'react-router';
 
 import routes from './routes';
 import PageBuilder from './components/PageBuilder';
