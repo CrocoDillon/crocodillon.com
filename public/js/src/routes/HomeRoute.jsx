@@ -1,6 +1,6 @@
 import React from 'react';
 
-class PageHomeComponent extends React.Component {
+class HomeRoute extends React.Component {
   render() {
     return (
       <main>
@@ -10,4 +10,4 @@ class PageHomeComponent extends React.Component {
   }
 }
 
-export default PageHomeComponent;
+export default HomeRoute;

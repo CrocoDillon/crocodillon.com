@@ -1,6 +1,6 @@
 import React from 'react';
 
-class PageAboutComponent extends React.Component {
+class AboutRoute extends React.Component {
   render() {
     return (
       <main>
@@ -10,4 +10,4 @@ class PageAboutComponent extends React.Component {
   }
 }
 
-export default PageAboutComponent;
+export default AboutRoute;

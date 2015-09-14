@@ -3,7 +3,8 @@ var webpack = require('webpack'),
 
 module.exports = {
   entry: {
-    app: './public/js/src/app.jsx'
+    app: './public/js/src/app.jsx',
+    // vendors: ['react', 'react-dom', 'react-router']
   },
   resolve: {
     extensions: ['', '.js', '.jsx']
@@ -11,28 +12,20 @@ module.exports = {
   output: {
     path: path.join(__dirname, './public/js/build'),
     publicPath: '/js/build/',
-    filename: 'bundle.js',
+    filename: 'app.js',
     libraryTarget: 'umd'
   },
   module: {
     loaders: [
       {
-        test: /\.jsx$/,
-        loader: 'babel-loader?stage=0',
-        exclude: /node_modules/
+        test: /\.jsx?$/,
+        loader: 'babel-loader?stage=0'
       }
     ]
   },
-  externals: {
-    'react': {
-      root: 'React',
-      commonjs2: 'react'
-    },
-    'react-router': {
-      root: 'ReactRouter',
-      commonjs2: 'react-router'
-    }
-  },
+  // plugins: [
+  //   new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js')
+  // ],
   devServer: {
     publicPath: '/js/build/',
     proxy: {

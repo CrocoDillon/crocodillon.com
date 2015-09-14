@@ -1,6 +1,6 @@
 import React from 'react';
 
-class PageBuilderComponent extends React.Component {
+class HtmlTemplate extends React.Component {
   render() {
     let getAppMarkup = () => {
           return {__html: this.props.markup};
@@ -19,14 +19,12 @@ class PageBuilderComponent extends React.Component {
         </head>
         <body>
           <div id="app" dangerouslySetInnerHTML={getAppMarkup()} />
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react.min.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router/0.13.3/ReactRouter.min.js"></script>
-          <script id="app-state" type="application/json" dangerouslySetInnerHTML={getAppState()} />
-          <script src="/js/build/bundle.js"></script>
+          <script id="app-initial-state" type="application/json" dangerouslySetInnerHTML={getAppState()} />
+          <script src="/js/build/app.js"></script>
         </body>
       </html>
     );
   }
 }
 
-export default PageBuilderComponent;
+export default HtmlTemplate;

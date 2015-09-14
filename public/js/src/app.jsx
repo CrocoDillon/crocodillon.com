@@ -1,22 +1,27 @@
 import React from 'react';
-import Router, {HistoryLocation} from 'react-router';
+import ReactDOM from 'react-dom';
+import ReactDOMServer from 'react-dom/server';
+import Router, { RoutingContext, match } from 'react-router';
+import createBrowserHistory from 'history/lib/createBrowserHistory';
+import createLocation from 'history/lib/createLocation';
 
 import routes from './routes';
-import PageBuilder from './components/PageBuilder';
+import Template from './Template';
 
 if (typeof window !== 'undefined') {
-  Router.run(routes, HistoryLocation, (Page) => {
-      React.render(<Page/>, document.getElementById('app'));
-  });
+  let history = createBrowserHistory();
+  ReactDOM.render(<Router routes={routes} history={history} />, document.getElementById('app'));
 }
 
 export function run(path, callback) {
-  Router.run(routes, path, (Page) => {
-    let markup = React.renderToString(<Page/>);
+    let location = createLocation(path);
 
-    callback(
-      '<!DOCTYPE html>' +
-      React.renderToStaticMarkup(<PageBuilder title="CrocoDillon" markup={markup} state={{}} />)
-    );
-  });
-}
+    match({routes, location}, (err, redirectLocation, renderProps) => {
+      let markup = ReactDOMServer.renderToString(<RoutingContext {...renderProps} />);
+
+      callback(
+        '<!DOCTYPE html>\n' +
+        ReactDOMServer.renderToStaticMarkup(<Template title="CrocoDillon" markup={markup} state={{}} />)
+      );
+    });
+};
