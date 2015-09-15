@@ -3,8 +3,7 @@ var webpack = require('webpack'),
 
 module.exports = {
   entry: {
-    app: './public/js/src/app.jsx',
-    // vendors: ['react', 'react-dom', 'react-router']
+    app: './public/js/src/app.jsx'
   },
   resolve: {
     extensions: ['', '.js', '.jsx']
@@ -19,13 +18,37 @@ module.exports = {
     loaders: [
       {
         test: /\.jsx?$/,
-        loader: 'babel-loader?stage=0'
+        loader: 'babel-loader?stage=0',
+        // exclude: /node_modules/
       }
     ]
   },
-  // plugins: [
-  //   new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js')
-  // ],
+  // externals: {
+  //   'history': {
+  //     root: 'History',
+  //     commonjs2: 'history',
+  //     commonjs: 'history',
+  //     amd: 'history'
+  //   },
+  //   'react': {
+  //     root: 'React',
+  //     commonjs2: 'react',
+  //     commonjs: 'react',
+  //     amd: 'react'
+  //   },
+  //   'react-dom': {
+  //     root: 'ReactDOM',
+  //     commonjs2: 'react-dom',
+  //     commonjs: 'react-dom',
+  //     amd: 'react-dom'
+  //   },
+  //   'react-router': {
+  //     root: 'ReactRouter',
+  //     commonjs2: 'react-router',
+  //     commonjs: 'react-router',
+  //     amd: 'react-router'
+  //   }
+  // },
   devServer: {
     publicPath: '/js/build/',
     proxy: {

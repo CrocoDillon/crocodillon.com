@@ -7,7 +7,7 @@ class HtmlTemplate extends React.Component {
         },
         getAppState = () => {
           let json = JSON.stringify(this.props.state).replace('</', '<\\/');
-          return {__html: json};
+          return {__html: `window.__INITIAL_STATE__=${json}`};
         };
 
     return (
@@ -19,7 +19,7 @@ class HtmlTemplate extends React.Component {
         </head>
         <body>
           <div id="app" dangerouslySetInnerHTML={getAppMarkup()} />
-          <script id="app-initial-state" type="application/json" dangerouslySetInnerHTML={getAppState()} />
+          <script dangerouslySetInnerHTML={getAppState()} />
           <script src="/js/build/app.js"></script>
         </body>
       </html>
