@@ -1,6 +1,6 @@
 import React from 'react';
 
-class HtmlTemplate extends React.Component {
+class Template extends React.Component {
   render() {
     let getAppMarkup = () => {
           return {__html: this.props.markup};
@@ -27,4 +27,4 @@ class HtmlTemplate extends React.Component {
   }
 }
 
-export default HtmlTemplate;
+export default Template;
