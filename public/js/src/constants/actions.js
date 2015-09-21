@@ -1,8 +1,12 @@
-const actions = {};
+function mirror(keys) {
+  var m = {};
+  keys.forEach(k => {
+    m[k] = k;
+  });
+  return m;
+}
 
-[
-  'ROUTER_STATE_CHANGE',
-
+export default mirror([
   'FETCH_POSTS',
   'FETCH_POSTS_SUCCESS',
   'FETCH_POSTS_FAILURE',
@@ -10,8 +14,4 @@ const actions = {};
   'FETCH_POST',
   'FETCH_POST_SUCCESS',
   'FETCH_POST_FAILURE'
-].forEach(action => {
-  actions[action] = action;
-});
-
-export default actions;
+]);

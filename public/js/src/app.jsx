@@ -1,48 +1,52 @@
+import createLocation from 'history/lib/createLocation';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
-import Router, { RoutingContext, match } from 'react-router';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
-import createBrowserHistory from 'history/lib/createBrowserHistory';
-import createLocation from 'history/lib/createLocation';
+import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
+import ReduxRouter from 'redux-router';
+import { match } from 'redux-router/server';
 
-import reducers from './reducers';
-import { routerStateChange } from './actions/router';
-import routes from './routes';
+import createStore from './store';
 import Template from './Template';
 
 if (typeof window !== 'undefined') {
   let initialState = window.__INITIAL_STATE__,
-      store = createStore(reducers, initialState),
-      history = createBrowserHistory();
+      store = createStore(initialState);
 
   ReactDOM.render(
-    <Provider store={store}>
-      <Router routes={routes} history={history} onUpdate={function () {
-        store.dispatch(routerStateChange(this.state));
-      }} />
-    </Provider>,
+    <div>
+      <Provider store={store}>
+        <ReduxRouter />
+      </Provider>
+      <DebugPanel top right bottom>
+        <DevTools store={store} monitor={LogMonitor} />
+      </DebugPanel>
+    </div>,
   document.getElementById('app'));
 }
 
 export function run(path, callback) {
-    let location = createLocation(path),
-        store = createStore(reducers);
+  let location = createLocation(path),
+      store = createStore(),
+      onMatch = store.dispatch(match(location));
 
-    match({routes, location}, (err, redirectLocation, renderProps) => {
-      store.dispatch(routerStateChange(renderProps))
-
-      let markup = ReactDOMServer.renderToString(
+  onMatch((error, redirectLocation) => {
+    let markup = ReactDOMServer.renderToString(
+          <div>
             <Provider store={store}>
-              <RoutingContext {...renderProps} />
+              <ReduxRouter />
             </Provider>
-          ),
-          state = store.getState();
+            <DebugPanel top right bottom>
+              <DevTools store={store} monitor={LogMonitor} />
+            </DebugPanel>
+          </div>
+        ),
+        state = store.getState();
 
-      callback(
-        '<!DOCTYPE html>\n' +
-        ReactDOMServer.renderToStaticMarkup(<Template title="CrocoDillon" markup={markup} state={state} />)
-      );
-    });
+    callback(
+      '<!DOCTYPE html>\n' +
+      ReactDOMServer.renderToStaticMarkup(<Template title="CrocoDillon" markup={markup} state={state} />)
+    );
+  });
 };
