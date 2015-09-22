@@ -1,4 +1,3 @@
-import createLocation from 'history/lib/createLocation';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
@@ -27,26 +26,26 @@ if (typeof window !== 'undefined') {
 }
 
 export function run(path, callback) {
-  let location = createLocation(path),
-      store = createStore(),
-      onMatch = store.dispatch(match(location));
+  let store = createStore(),
+      onMatch = (error, redirectLocation, routerState) => {
+        let markup = ReactDOMServer.renderToString(
+              <div>
+                <Provider store={store}>
+                  <ReduxRouter />
+                </Provider>
+                <DebugPanel top right bottom>
+                  <DevTools store={store} monitor={LogMonitor} />
+                </DebugPanel>
+              </div>
+            ),
+            state = store.getState();
 
-  onMatch((error, redirectLocation) => {
-    let markup = ReactDOMServer.renderToString(
-          <div>
-            <Provider store={store}>
-              <ReduxRouter />
-            </Provider>
-            <DebugPanel top right bottom>
-              <DevTools store={store} monitor={LogMonitor} />
-            </DebugPanel>
-          </div>
-        ),
-        state = store.getState();
+        callback(
+          '<!DOCTYPE html>\n' +
+          ReactDOMServer.renderToStaticMarkup(<Template title="CrocoDillon" markup={markup} state={state} />)
+        );
+      },
+      action = match(path, onMatch);
 
-    callback(
-      '<!DOCTYPE html>\n' +
-      ReactDOMServer.renderToStaticMarkup(<Template title="CrocoDillon" markup={markup} state={state} />)
-    );
-  });
+  store.dispatch(action);
 };
