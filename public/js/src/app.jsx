@@ -3,10 +3,11 @@ import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
 import { Provider } from 'react-redux';
 import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
-import ReduxRouter from 'redux-router';
+import { ReduxRouter } from 'redux-router';
 import { match } from 'redux-router/server';
 
 import createStore from './store';
+import routes from './routes';
 import Template from './Template';
 
 if (typeof window !== 'undefined') {
@@ -16,7 +17,7 @@ if (typeof window !== 'undefined') {
   ReactDOM.render(
     <div>
       <Provider store={store}>
-        <ReduxRouter />
+        <ReduxRouter routes={routes} />
       </Provider>
       <DebugPanel top right bottom>
         <DevTools store={store} monitor={LogMonitor} />
@@ -31,7 +32,7 @@ export function run(path, callback) {
         let markup = ReactDOMServer.renderToString(
               <div>
                 <Provider store={store}>
-                  <ReduxRouter />
+                  <ReduxRouter routes={routes} />
                 </Provider>
                 <DebugPanel top right bottom>
                   <DevTools store={store} monitor={LogMonitor} />
