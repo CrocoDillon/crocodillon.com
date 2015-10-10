@@ -1,16 +1,16 @@
 import createHistory from 'history/lib/createBrowserHistory';
 import { compose, createStore, applyMiddleware } from 'redux';
 import { devTools } from 'redux-devtools';
-import { reduxReactRouter as reduxReactRouterClient } from 'redux-router';
-import { reduxReactRouter as reduxReactRouterServer } from 'redux-router/server';
+import { reduxReactRouter as clientRouter } from 'redux-router';
+import { reduxReactRouter as serverRouter } from 'redux-router/server';
 import thunk from 'redux-thunk';
 
 import reducer from './reducers';
 import routes from './routes';
 
 let router = typeof window !== 'undefined' ?
-  reduxReactRouterClient({routes, createHistory}):
-  reduxReactRouterServer({routes});
+  clientRouter({routes, createHistory}):
+  serverRouter({routes});
 
 const composedStore = compose(
   applyMiddleware(thunk),

@@ -6,13 +6,13 @@ import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
 import { ReduxRouter } from 'redux-router';
 import { match } from 'redux-router/server';
 
-import createStore from './store';
+import configureStore from './store';
 import routes from './routes';
 import Template from './Template';
 
 if (typeof window !== 'undefined') {
   let initialState = window.__INITIAL_STATE__,
-      store = createStore(initialState);
+      store = configureStore(initialState);
 
   ReactDOM.render(
     <div>
@@ -27,7 +27,7 @@ if (typeof window !== 'undefined') {
 }
 
 export function run(path, callback) {
-  let store = createStore(),
+  let store = configureStore(),
       onMatch = (error, redirectLocation, routerState) => {
         let markup = ReactDOMServer.renderToString(
               <div>

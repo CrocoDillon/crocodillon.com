@@ -23,6 +23,7 @@ module.exports = {
       }
     ]
   },
+  devtool: 'eval',
   // externals: {
   //   'history': {
   //     root: 'History',

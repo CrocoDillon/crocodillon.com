@@ -16,7 +16,7 @@
     "koa": "1.0.0",
     "koa-router": "5.2.3",
     "koa-static": "1.4.9",
-    "react": "0.14.0-rc1",
+    "react": "0.14.0",
     "react-dom": "0.14.0",
     "react-redux": "3.1.0",
     "react-router": "1.0.0-rc3",
