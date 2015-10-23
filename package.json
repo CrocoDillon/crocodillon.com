@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "history": "1.12.5",
-    "koa": "1.1.0",
+    "koa": "1.1.1",
     "koa-router": "5.2.3",
     "koa-static": "1.5.1",
     "react": "0.14.0",
