@@ -28,7 +28,7 @@
     "babel-core": "6.1.2",
     "babel-loader": "6.0.1",
     "redux-devtools": "2.1.5",
-    "webpack": "1.12.2",
+    "webpack": "1.12.3",
     "webpack-dev-server": "1.12.1"
   }
 }
