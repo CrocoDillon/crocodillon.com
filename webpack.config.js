@@ -3,7 +3,17 @@ var webpack = require('webpack'),
 
 module.exports = {
   entry: {
-    app: './public/js/src/app.jsx'
+    app: './public/js/src/app.jsx',
+    // vendor: [
+    //   'history',
+    //   'react',
+    //   'react-dom',
+    //   'react-redux',
+    //   'react-router',
+    //   'redux',
+    //   'redux-router',
+    //   'redux-thunk'
+    // ]
   },
   resolve: {
     extensions: ['', '.js', '.jsx']
@@ -18,11 +28,17 @@ module.exports = {
     loaders: [
       {
         test: /\.jsx?$/,
-        loader: 'babel-loader?stage=0',
-        // exclude: /node_modules/
+        exclude: /node_modules/,
+        loader: 'babel',
+        query: {
+          presets: ['react', 'es2015']
+        }
       }
     ]
   },
+  // plugins: [
+  //   new webpack.optimize.CommonsChunkPlugin('vendor', 'vendor.js')
+  // ],
   devtool: 'eval',
   // externals: {
   //   'history': {
