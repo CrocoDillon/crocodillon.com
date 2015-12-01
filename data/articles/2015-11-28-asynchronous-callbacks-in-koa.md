@@ -2,11 +2,13 @@
 created: 2015-11-28 18:56:00
 slug: asynchronous-callbacks-in-koa
 title: Asynchronous callbacks in Koa
-description: Sending asynchronous response in Koa without getting “Error: Can't set headers after they are sent.”.
-excerpt: Koa is an awesome framework created by the team behind Express, but unlike Express if you simply try to set the response body asynchronously in Koa you get an “Can't set headers after they are sent.” error.
+description: Trying to send an asynchronous response in Koa but all you get is “Error: Can't set headers after they are sent.”?
+excerpt: Koa is an awesome framework created by the team behind Express. Unlike Express however, in Koa if you simply try to set the response body asynchronously you get an “Can't set headers after they are sent.” error.
 ---
 
-<p class="intro">Koa is an awesome framework created by the team behind Express, but unlike Express if you simply try to set the response body asynchronously in Koa you get an “Can't set headers after they are sent.” error.</p>
+<p class="intro">Koa is an awesome framework created by the team behind Express. Unlike Express however, in Koa if you simply try to set the response body asynchronously you get an “Can't set headers after they are sent.” error.</p>
+
+I’ve been there and couldn’t easily find what I did wrong so decided to write down the solution. Keep in mind though, in Koa 2 everything will be different again.
 
 ## Differences between Express and Koa
 
@@ -24,7 +26,7 @@ app.use(function (req, res) {
 app.listen(3000);
 ~~~
 
-In Koa you can try basically the same thing:
+In Koa you can try the same thing basically:
 
 ~~~ .language-javascript
 const app = require('koa')();
@@ -38,7 +40,7 @@ app.use(function* () {
 app.listen(3000);
 ~~~
 
-But that would get you nothing more than “Error: Can't set headers after they are sent.”. This error message is the result of Koa’s default 404 response when middleware didn’t alter the response.
+But that would get you not much more than “Error: Can't set headers after they are sent.”. This error message is the result of Koa’s default 404 response when your middleware didn’t alter the response.
 
 ## Yielding promises with co
 
@@ -59,7 +61,7 @@ app.use(function* () {
 app.listen(3000);
 ~~~
 
-In this case we create the promise ourselves but this works as well with promises from other libraries. And example with axios[^axios]:
+In this case we create the promise ourselves but this works as well with promises from other libraries. An example with axios[^axios]:
 
 ~~~ .language-javascript
 const axios = require('axios');
@@ -104,7 +106,6 @@ You can also use an async[^async] function, but those are not supported in Node 
 
 ~~~ .language-javascript
 const Koa = require('koa');
-const co = require('co');
 
 const app = new Koa();
 
@@ -120,13 +121,13 @@ app.use(async (ctx, next) => {
 app.listen(3000);
 ~~~
 
-Koa 2 added asynchronous examples to the README meaning this article will one day be obsolete. Until then, I hope it can help prevent some headaches.
+Koa 2 added asynchronous examples to the README meaning this article will one day be obsolete. Until then, I hope it can help prevent some headaches!
 
 [^co]:
-    [co](https://www.npmjs.com/package/co) is used to handle the control flow based on generators in Koa, for now.
+    [co](https://www.npmjs.com/package/co) is based on generators and used to handle the control flow in Koa... for now.
 [^promise]:
     [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) are used to represent an asynchronous operation that may or may not have already been completed.
 [^axios]:
     [axios](https://www.npmjs.com/package/axios) is a promise based HTTP client that works in Node and the browser. Nice to have in your toolkit until the fetch API is well supported.
 [^async]:
-    Async functions (ES7) are not yet very well supported but soon they will be and apparently they are so brilliant [Jake Archibald wants to marry them](https://jakearchibald.com/2014/es7-async-functions/).
+    Async functions (ES7) are not yet very well supported but some day they will be and apparently they are so brilliant [Jake Archibald wants to marry them](https://jakearchibald.com/2014/es7-async-functions/).
