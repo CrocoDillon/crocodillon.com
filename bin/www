@@ -1,7 +1,0 @@
-#!/usr/bin/env node
-var app = require('../app'),
-    server;
-
-server = app.listen(app.port, function () {
-  console.log('Koa server listening on port ' + server.address().port);
-});
