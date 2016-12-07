@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "babel-core": "6.1.21",
-    "babel-loader": "6.1.0",
+    "babel-loader": "6.2.9",
     "babel-preset-es2015": "6.1.18",
     "babel-preset-react": "6.1.18",
     "redux-devtools": "2.1.5",
