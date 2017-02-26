@@ -15,7 +15,7 @@
     "history": "1.13.1",
     "koa": "1.1.2",
     "koa-router": "5.2.3",
-    "koa-static": "1.5.2",
+    "koa-static": "3.0.0",
     "react": "0.14.2",
     "react-dom": "0.14.2",
     "react-redux": "4.0.0",
