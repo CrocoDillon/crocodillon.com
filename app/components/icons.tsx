@@ -31,11 +31,14 @@ export function RssIcon(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-export function CrocodileMark(props: SVGProps<SVGSVGElement>) {
+export function CrocodileMark({
+  eyeFill = 'var(--color-paper)',
+  ...props
+}: SVGProps<SVGSVGElement> & { eyeFill?: string }) {
   return (
     <svg viewBox="0 0 40 40" fill="currentColor" aria-hidden="true" {...props}>
       <path d="M5 18h4v-4h4v-4h4v4h4v-4h4v4h4v4h8v7H21v4H10v-4H5z" />
-      <path d="M24 18h3v3h-3z" fill="var(--color-paper)" />
+      <path d="M24 18h3v3h-3z" fill={eyeFill} />
     </svg>
   )
 }

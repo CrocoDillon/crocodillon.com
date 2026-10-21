@@ -31,13 +31,13 @@ export async function generateMetadata({
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
       authors: [site.author],
-      images: [post.image ?? '/opengraph-image'],
+      images: [{ url: post.image, width: 2400, height: 1260, alt: post.title }],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.description,
-      images: [post.image ?? '/opengraph-image'],
+      images: [{ url: post.image, alt: post.title }],
     },
   }
 }
@@ -95,7 +95,7 @@ export default async function Article({
             tools and APIs may have changed since publication.
           </p>
         </header>
-        <div className="article-prose prose mt-10 max-w-none prose-neutral sm:mt-12">
+        <div className="prose mt-10 max-w-none article-prose prose-neutral sm:mt-12">
           <Content />
         </div>
         {post.updatedAt ? (

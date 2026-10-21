@@ -4,8 +4,10 @@ title: "MongoDB for DBAs: CRUD"
 description: "Summary of the “MongoDB for DBAs” course at MongoDB University. Week 2 is about basic CRUD operations and administrative commands."
 publishedAt: "2013-12-31T14:56:00Z"
 excerpt: "Week 2: CRUD operations and administrative commands."
-image: "/images/articles/mongodb-for-dbas-crud/mongodb-for-dbas-crud--og.png"
 ---
+
+import articleImage1 from '../../../public/images/articles/mongodb-for-dbas-introduction/mongodb-for-dbas__structure.png'
+import articleImage2 from '../../../public/images/articles/mongodb-for-dbas-introduction/mongodb-for-dbas__data-files.png'
 
 Week 2 of “MongoDB for DBAs” is about <abbr title="Create Read Update Delete">CRUD</abbr>, mainly write operations like inserts and updates, but also a little bit about administrative commands in the shell.
 
@@ -38,7 +40,7 @@ Now you’re ready to go!
 Let’s start with “create” or, in MongoDB, insert data. Take a look at the following figure, inserting data means inserting documents into collections.
 
 <figure>
-  <img src="/images/articles/mongodb-for-dbas-introduction/mongodb-for-dbas__structure.png" alt="Mongo clusters contain databases, databases contain collections and collections contain documents." />
+  <ArticleImage src={articleImage1} alt="Mongo clusters contain databases, databases contain collections and collections contain documents." />
 </figure>
 
 In the shell the basic syntax for inserting is:
@@ -213,7 +215,7 @@ This removes _all_ documents from the collection, but does not remove the collec
 It’s important to keep in mind that documents in MongoDB don’t have any particular order. The reason for this is the way documents are stored in data files. If you would store documents in order, and one of the documents increases in size, all following documents would have to be shifted to make more room for that document. That wouldn’t be very efficient, that’s why MongoDB stores documents in records, which are part of extends. Extends only contain documents from a single collection, to keep some degree of continuousness so collection scans are fast.
 
 <figure>
-  <img src="/images/articles/mongodb-for-dbas-introduction/mongodb-for-dbas__data-files.png" alt="Data files containing extends in which documents are stored in records." />
+  <ArticleImage src={articleImage2} alt="Data files containing extends in which documents are stored in records." />
   <figcaption>Structure of data files where documents are stored in records.</figcaption>
 </figure>
 

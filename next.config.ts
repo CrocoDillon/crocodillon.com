@@ -19,6 +19,7 @@ const withMDX = createMDX({
 
 const config: NextConfig = {
   poweredByHeader: false,
+  images: { qualities: [75, 90] },
   async redirects() {
     return [
       { source: '/contact', destination: '/', permanent: true },

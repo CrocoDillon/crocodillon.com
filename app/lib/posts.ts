@@ -11,7 +11,7 @@ export interface Post {
   publishedAt: string
   updatedAt?: string
   excerpt: string
-  image?: string
+  image: string
   readingMinutes: number
 }
 
@@ -69,7 +69,7 @@ export const getPosts = cache(async (): Promise<Post[]> => {
           publishedAt: data.publishedAt,
           updatedAt: data.updatedAt,
           excerpt: data.excerpt,
-          image: data.image,
+          image: data.image ?? `/blog/${data.slug}/share.png`,
           readingMinutes: Math.max(
             1,
             Math.ceil(content.split(/\s+/).length / 220)

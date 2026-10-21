@@ -29,6 +29,8 @@ The pnpm workspace configuration follows Reeflings and Carely: exact versions, a
 - `public/demo/`: reviewed public assets for the legacy demos.
 - `mdx-components.tsx`: the framework-required MDX component registry, at the project root.
 
+See [STYLE.md](STYLE.md) for Dillon's writing voice and the article/social-image conventions.
+
 ## Writing an article
 
 Create `content/articles/my-article/index.mdx`:
@@ -49,19 +51,21 @@ Article text, Markdown, and React components go here.
 </Callout>
 ```
 
-Required frontmatter: `slug`, `title`, `description`, `publishedAt`, and `excerpt`. Optional: `updatedAt`, `image` (a local `/images/…` URL), and `draft: true`. Quote timestamps and use UTC. Folder and slug must match. Published slugs are permanent.
+Required frontmatter: `slug`, `title`, `description`, `publishedAt`, and `excerpt`. Optional: `updatedAt`, `image` (an explicit local sharing-image override), and `draft: true`. Quote timestamps and use UTC. Folder and slug must match. Published slugs are permanent. Sharing images are generated automatically at `/blog/<slug>/share.png`, so normally omit `image`.
 
 Use standard fenced code blocks such as ` ```javascript `. GFM tables and footnotes are supported. Code highlighting happens during compilation. MDX uses JSX: write `className`, self-close images, and use React style objects. Only trusted, reviewed repository content is compiled, because MDX can execute JavaScript.
 
 Add global article components to `mdx-components.tsx`, or import components directly in an individual MDX file. Most components should remain Server Components; add `'use client'` only when browser state or APIs are needed.
 
-Article images can be referenced as `/images/articles/my-article/diagram.png`. Keep descriptive alt text. For a React image with explicit dimensions, import and use `next/image` directly in MDX.
+Use static image imports with the shared `<ArticleImage>` component in MDX for responsive loading, dimensions, and automatic blur placeholders. See the example in [STYLE.md](STYLE.md). Keep descriptive alt text and editable source assets alongside each article's images.
 
 ## Appearance
 
 The site follows the system color scheme by default. The header toggle saves a light or dark preference; **Auto** restores the system preference. `next-themes` applies the theme with a synchronous inline script before visible content, and the toggle uses CSS-controlled icons to keep server and client markup identical. Pages remain statically generated.
 
 Theme colors live in `app/globals.css`. Code blocks use GitHub Light and GitHub Dark palettes generated together at build time, with CSS selecting the matching token colors.
+
+OG and Twitter cards share a 2400 × 1260 lossless PNG template in `app/lib/social-image.tsx`, with locally bundled fonts. All article cards are generated at build time; the site-wide fallback is `/opengraph-image`.
 
 ## Legacy compatibility
 

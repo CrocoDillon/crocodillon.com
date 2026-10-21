@@ -1,22 +1,22 @@
 [
   {
     "source": "/images/blog/2013/mongodb-for-dbas-crud--og.png",
-    "destination": "/images/articles/mongodb-for-dbas-crud/mongodb-for-dbas-crud--og.png",
+    "destination": "/blog/mongodb-for-dbas-crud/share.png",
     "permanent": true
   },
   {
     "source": "/images/blog/2013/mongodb-for-dbas-crud--twitter.png",
-    "destination": "/images/articles/mongodb-for-dbas-crud/mongodb-for-dbas-crud--twitter.png",
+    "destination": "/blog/mongodb-for-dbas-crud/share.png",
     "permanent": true
   },
   {
     "source": "/images/blog/2013/mongodb-for-dbas-introduction--og.png",
-    "destination": "/images/articles/mongodb-for-dbas-introduction/mongodb-for-dbas-introduction--og.png",
+    "destination": "/blog/mongodb-for-dbas-introduction/share.png",
     "permanent": true
   },
   {
     "source": "/images/blog/2013/mongodb-for-dbas-introduction--twitter.png",
-    "destination": "/images/articles/mongodb-for-dbas-introduction/mongodb-for-dbas-introduction--twitter.png",
+    "destination": "/blog/mongodb-for-dbas-introduction/share.png",
     "permanent": true
   },
   {
@@ -51,22 +51,22 @@
   },
   {
     "source": "/images/blog/2014/always-catch-localstorage-security-and-quota-exceeded-errors--og.png",
-    "destination": "/images/articles/always-catch-localstorage-security-and-quota-exceeded-errors/always-catch-localstorage-security-and-quota-exceeded-errors--og.png",
+    "destination": "/blog/always-catch-localstorage-security-and-quota-exceeded-errors/share.png",
     "permanent": true
   },
   {
     "source": "/images/blog/2014/always-catch-localstorage-security-and-quota-exceeded-errors--twitter.png",
-    "destination": "/images/articles/always-catch-localstorage-security-and-quota-exceeded-errors/always-catch-localstorage-security-and-quota-exceeded-errors--twitter.png",
+    "destination": "/blog/always-catch-localstorage-security-and-quota-exceeded-errors/share.png",
     "permanent": true
   },
   {
     "source": "/images/blog/2014/non-blocking-web-fonts-using-localstorage--og.png",
-    "destination": "/images/articles/non-blocking-web-fonts-using-localstorage/non-blocking-web-fonts-using-localstorage--og.png",
+    "destination": "/blog/non-blocking-web-fonts-using-localstorage/share.png",
     "permanent": true
   },
   {
     "source": "/images/blog/2014/non-blocking-web-fonts-using-localstorage--twitter.png",
-    "destination": "/images/articles/non-blocking-web-fonts-using-localstorage/non-blocking-web-fonts-using-localstorage--twitter.png",
+    "destination": "/blog/non-blocking-web-fonts-using-localstorage/share.png",
     "permanent": true
   },
   {
@@ -76,12 +76,12 @@
   },
   {
     "source": "/images/blog/2014/parsing-emoji-unicode-in-javascript--og.png",
-    "destination": "/images/articles/parsing-emoji-unicode-in-javascript/parsing-emoji-unicode-in-javascript--og.png",
+    "destination": "/blog/parsing-emoji-unicode-in-javascript/share.png",
     "permanent": true
   },
   {
     "source": "/images/blog/2014/parsing-emoji-unicode-in-javascript--twitter.png",
-    "destination": "/images/articles/parsing-emoji-unicode-in-javascript/parsing-emoji-unicode-in-javascript--twitter.png",
+    "destination": "/blog/parsing-emoji-unicode-in-javascript/share.png",
     "permanent": true
   },
   {
@@ -91,12 +91,72 @@
   },
   {
     "source": "/images/blog/2015/asynchronous-callbacks-in-koa--og.png",
-    "destination": "/images/articles/asynchronous-callbacks-in-koa/asynchronous-callbacks-in-koa--og.png",
+    "destination": "/blog/asynchronous-callbacks-in-koa/share.png",
     "permanent": true
   },
   {
     "source": "/images/blog/2015/asynchronous-callbacks-in-koa--twitter.png",
-    "destination": "/images/articles/asynchronous-callbacks-in-koa/asynchronous-callbacks-in-koa--twitter.png",
+    "destination": "/blog/asynchronous-callbacks-in-koa/share.png",
+    "permanent": true
+  },
+  {
+    "source": "/images/articles/mongodb-for-dbas-crud/mongodb-for-dbas-crud--og.png",
+    "destination": "/blog/mongodb-for-dbas-crud/share.png",
+    "permanent": true
+  },
+  {
+    "source": "/images/articles/mongodb-for-dbas-crud/mongodb-for-dbas-crud--twitter.png",
+    "destination": "/blog/mongodb-for-dbas-crud/share.png",
+    "permanent": true
+  },
+  {
+    "source": "/images/articles/mongodb-for-dbas-introduction/mongodb-for-dbas-introduction--og.png",
+    "destination": "/blog/mongodb-for-dbas-introduction/share.png",
+    "permanent": true
+  },
+  {
+    "source": "/images/articles/mongodb-for-dbas-introduction/mongodb-for-dbas-introduction--twitter.png",
+    "destination": "/blog/mongodb-for-dbas-introduction/share.png",
+    "permanent": true
+  },
+  {
+    "source": "/images/articles/always-catch-localstorage-security-and-quota-exceeded-errors/always-catch-localstorage-security-and-quota-exceeded-errors--og.png",
+    "destination": "/blog/always-catch-localstorage-security-and-quota-exceeded-errors/share.png",
+    "permanent": true
+  },
+  {
+    "source": "/images/articles/always-catch-localstorage-security-and-quota-exceeded-errors/always-catch-localstorage-security-and-quota-exceeded-errors--twitter.png",
+    "destination": "/blog/always-catch-localstorage-security-and-quota-exceeded-errors/share.png",
+    "permanent": true
+  },
+  {
+    "source": "/images/articles/non-blocking-web-fonts-using-localstorage/non-blocking-web-fonts-using-localstorage--og.png",
+    "destination": "/blog/non-blocking-web-fonts-using-localstorage/share.png",
+    "permanent": true
+  },
+  {
+    "source": "/images/articles/non-blocking-web-fonts-using-localstorage/non-blocking-web-fonts-using-localstorage--twitter.png",
+    "destination": "/blog/non-blocking-web-fonts-using-localstorage/share.png",
+    "permanent": true
+  },
+  {
+    "source": "/images/articles/parsing-emoji-unicode-in-javascript/parsing-emoji-unicode-in-javascript--og.png",
+    "destination": "/blog/parsing-emoji-unicode-in-javascript/share.png",
+    "permanent": true
+  },
+  {
+    "source": "/images/articles/parsing-emoji-unicode-in-javascript/parsing-emoji-unicode-in-javascript--twitter.png",
+    "destination": "/blog/parsing-emoji-unicode-in-javascript/share.png",
+    "permanent": true
+  },
+  {
+    "source": "/images/articles/asynchronous-callbacks-in-koa/asynchronous-callbacks-in-koa--og.png",
+    "destination": "/blog/asynchronous-callbacks-in-koa/share.png",
+    "permanent": true
+  },
+  {
+    "source": "/images/articles/asynchronous-callbacks-in-koa/asynchronous-callbacks-in-koa--twitter.png",
+    "destination": "/blog/asynchronous-callbacks-in-koa/share.png",
     "permanent": true
   }
 ]
