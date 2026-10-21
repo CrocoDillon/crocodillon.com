@@ -1,0 +1,6 @@
+allowBuilds:
+  '@tailwindcss/oxide': true
+  sharp: true
+  unrs-resolver: true
+minimumReleaseAge: 2880 # 48 hrs, matching Reeflings and Carely.
+saveExact: true

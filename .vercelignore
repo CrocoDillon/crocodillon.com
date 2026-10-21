@@ -1,0 +1,14 @@
+backup
+backup.sql
+.git
+.next
+node_modules
+.pnpm-store
+.qa
+.env*
+docs
+scripts
+data
+*.tmp
+*.tsbuildinfo
+next-env.d.ts

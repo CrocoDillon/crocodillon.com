@@ -1,0 +1,8 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.gif binary
+*.woff binary
+*.woff2 binary
+# Preserve the archived, exported demo artwork without formatting it.
+public/demo/** -whitespace linguist-vendored

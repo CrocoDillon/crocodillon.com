@@ -1,0 +1,152 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@theme {
+  --color-paper: #f8f9f5;
+  --color-ink: #20291e;
+  --color-moss: #3a643f;
+  --color-muted: #677061;
+  --color-line: #dce1d6;
+  --color-leaf: #e9efdf;
+  --font-sans: 'Inter', 'Segoe UI', Arial, sans-serif;
+  --font-display:
+    'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 2rem;
+  }
+  ::selection {
+    background: #d0dfbd;
+    color: #20291e;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-moss);
+    outline-offset: 5px;
+  }
+  a,
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    line-height: 1.6;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .article-prose {
+    --tw-prose-body: var(--color-ink);
+    --tw-prose-headings: var(--color-ink);
+    --tw-prose-links: var(--color-moss);
+    --tw-prose-quotes: var(--color-muted);
+    font-size: 1.0625rem;
+    line-height: 1.85;
+  }
+  .article-prose :where(h2, h3) {
+    scroll-margin-top: 2rem;
+    letter-spacing: -0.025em;
+  }
+  .article-prose :where(h2) {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 2rem;
+    margin-top: 2.2em;
+  }
+  .article-prose :where(a) {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+  }
+  .article-prose :where(p, li) {
+    overflow-wrap: break-word;
+  }
+  .article-prose :where(.intro) {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: var(--color-muted);
+  }
+  .article-prose :where(.note--info) {
+    border-left: 2px solid var(--color-moss);
+    padding: 1rem 1.5rem;
+    background: var(--color-leaf);
+  }
+  .article-prose :where(pre) {
+    border: 1px solid var(--color-line);
+    border-radius: 3px;
+    background: #f0f2eb;
+    color: var(--color-ink);
+    padding: 1.5rem;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+  .article-prose :where(pre code) {
+    display: grid;
+    min-width: max-content;
+  }
+  .article-prose :where(pre code .line) {
+    padding-right: 1rem;
+  }
+  .article-prose :where(code):not(pre code) {
+    border-radius: 2px;
+    padding: 0.12em 0.3em;
+    background: #edf0e7;
+    font-weight: 400;
+    font-size: 0.85em;
+  }
+  .article-prose :where(code)::before,
+  .article-prose :where(code)::after {
+    content: none;
+  }
+  .article-prose :where(figure) {
+    margin-block: 2rem;
+  }
+  .article-prose :where(img) {
+    max-width: 100%;
+    height: auto;
+  }
+  .article-prose :where(img[style]) {
+    display: inline;
+    margin: 0;
+  }
+  .article-prose :where(figcaption) {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--color-muted);
+  }
+  .article-prose :where(table) {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  .article-prose :where(.footnotes) {
+    margin-top: 4rem;
+    border-top: 1px solid var(--color-line);
+    padding-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

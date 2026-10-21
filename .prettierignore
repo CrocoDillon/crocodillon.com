@@ -1,0 +1,10 @@
+backup/
+backup.sql
+.next/
+.vercel/
+.qa/
+node_modules/
+pnpm-lock.yaml
+next-env.d.ts
+public/demo/
+*.tmp
