@@ -42,9 +42,15 @@
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.2",
     "eslint-config-prettier": "10.1.8",
+    "jiti": "2.7.0",
     "prettier": "3.9.10",
     "prettier-plugin-tailwindcss": "0.8.1",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3"
+  },
+  "postcss": {
+    "plugins": {
+      "@tailwindcss/postcss": {}
+    }
   }
 }

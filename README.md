@@ -29,7 +29,8 @@ The pnpm workspace configuration follows Reeflings and Carely: exact versions, a
 - `public/demo/`: reviewed public assets for the legacy demos.
 - `mdx-components.tsx`: the framework-required MDX component registry, at the project root.
 - `docs/`: content comparison and hosting-backup inventory.
-- `scripts/migrate-content.mjs`: one-time, database-first importer for the local backup.
+
+The completed one-time importer was removed after verification. Its source is retained in Git history at `357c9d0`; the comparison and migration reports remain in `docs/`.
 
 ## Writing an article
 
@@ -63,7 +64,7 @@ Article images can be referenced as `/images/articles/my-article/diagram.png`. K
 
 `/blog/<slug>`, `/blog/rss`, and `/blog/atom` are preserved. Old illustration URLs and the original emoji-demo routes redirect to their new locations. `/contact` and `/webdesign` redirect home. Feeds retain historical entry IDs to avoid duplicate subscriptions.
 
-Disqus uses the existing `crocodillon` forum, original slug identifiers, and historical thread URLs. Comments load after a visitor selects **Load comments**. The contact form and old financial/contact details are removed.
+Disqus uses the existing `crocodillon` forum, original slug identifiers, and historical thread URLs. Comments load automatically when the discussion approaches the viewport. The contact form and old financial/contact details are removed.
 
 ## Deployment
 
@@ -74,5 +75,9 @@ Use the Vercel Git integration for subsequent pushes. Domain registration can st
 ## Backup handling
 
 This is a public repository. Raw hosting files and SQL exports remain local, ignored by Git and Vercel uploads. They contain credentials and visitor data. The deployment includes only the migrated public articles and reviewed assets.
+
+Git deployments use the committed repository. `.vercelignore` is optional, but this checkout contains private local backups, so a small file excludes those and other local-only files from any future CLI upload. Vercel already ignores standard build output and dependency directories.
+
+Configuration files use TypeScript where supported. ESLint uses `eslint.config.ts` with `jiti`; Next.js and Prettier also use TypeScript. The installed Next.js version does not discover `postcss.config.ts`, so the small PostCSS configuration lives in `package.json` instead.
 
 See [the content migration](docs/content-migration.md), [the comparison hashes](docs/content-comparison.json), and [the other backed-up sites](docs/backup-inventory.md).
