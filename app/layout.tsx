@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
+import { ThemeProvider } from '@/components/theme-provider'
 import { site } from '@/lib/site'
 import './globals.css'
 
@@ -33,19 +34,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="bg-paper font-sans text-ink antialiased">
-        <a
-          href="#main"
-          className="sr-only z-50 bg-ink px-5 py-3 text-paper focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
-        >
-          Skip to content
-        </a>
-        <SiteHeader />
-        <main id="main" className="mx-auto max-w-6xl px-6 sm:px-10">
-          {children}
-        </main>
-        <SiteFooter />
+        <ThemeProvider>
+          <a
+            href="#main"
+            className="sr-only z-50 bg-ink px-5 py-3 text-paper focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+          >
+            Skip to content
+          </a>
+          <SiteHeader />
+          <main id="main" className="mx-auto max-w-6xl px-6 sm:px-10">
+            {children}
+          </main>
+          <SiteFooter />
+        </ThemeProvider>
       </body>
     </html>
   )

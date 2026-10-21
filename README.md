@@ -60,6 +60,12 @@ Add global article components to `mdx-components.tsx`, or import components dire
 
 Article images can be referenced as `/images/articles/my-article/diagram.png`. Keep descriptive alt text. For a React image with explicit dimensions, import and use `next/image` directly in MDX.
 
+## Appearance
+
+The site follows the system color scheme by default. The header toggle saves a light or dark preference; **Auto** restores the system preference. `next-themes` applies the theme with a synchronous inline script before visible content, and the toggle uses CSS-controlled icons to keep server and client markup identical. Pages remain statically generated.
+
+Theme colors live in `app/globals.css`. Code blocks use GitHub Light and GitHub Dark palettes generated together at build time, with CSS selecting the matching token colors.
+
 ## Legacy compatibility
 
 `/blog/<slug>`, `/blog/rss`, and `/blog/atom` are preserved. Old illustration URLs and the original emoji-demo routes redirect to their new locations. `/contact` and `/webdesign` redirect home. Feeds retain historical entry IDs to avoid duplicate subscriptions.

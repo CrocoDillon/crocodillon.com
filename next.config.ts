@@ -6,7 +6,13 @@ const withMDX = createMDX({
   options: {
     remarkPlugins: ['remark-frontmatter', 'remark-gfm'],
     rehypePlugins: [
-      ['rehype-pretty-code', { theme: 'github-light', keepBackground: false }],
+      [
+        'rehype-pretty-code',
+        {
+          theme: { light: 'github-light', dark: 'github-dark' },
+          keepBackground: false,
+        },
+      ],
     ],
   },
 })

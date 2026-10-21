@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --color-paper: #f8f9f5;
@@ -8,6 +9,9 @@
   --color-muted: #677061;
   --color-line: #dce1d6;
   --color-leaf: #e9efdf;
+  --color-code: #f0f2eb;
+  --color-code-inline: #edf0e7;
+  --color-selection: #d0dfbd;
   --font-sans: 'Inter', 'Segoe UI', Arial, sans-serif;
   --font-display:
     'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
@@ -16,12 +20,26 @@
 
 @layer base {
   html {
+    color-scheme: light;
+    background: var(--color-paper);
     scroll-behavior: smooth;
     scroll-padding-top: 2rem;
   }
+  html.dark {
+    color-scheme: dark;
+    --color-paper: #151c17;
+    --color-ink: #e5eadf;
+    --color-moss: #a6c991;
+    --color-muted: #a6b19f;
+    --color-line: #344136;
+    --color-leaf: #222f24;
+    --color-code: #1d261f;
+    --color-code-inline: #253228;
+    --color-selection: #3b5335;
+  }
   ::selection {
-    background: #d0dfbd;
-    color: #20291e;
+    background: var(--color-selection);
+    color: var(--color-ink);
   }
   :focus-visible {
     outline: 2px solid var(--color-moss);
@@ -46,10 +64,6 @@
     color: var(--color-muted);
   }
   .article-prose {
-    --tw-prose-body: var(--color-ink);
-    --tw-prose-headings: var(--color-ink);
-    --tw-prose-links: var(--color-moss);
-    --tw-prose-quotes: var(--color-muted);
     font-size: 1.0625rem;
     line-height: 1.85;
   }
@@ -99,7 +113,7 @@
   .article-prose :where(code):not(pre code) {
     border-radius: 2px;
     padding: 0.12em 0.3em;
-    background: #edf0e7;
+    background: var(--color-code-inline);
     font-weight: 400;
     font-size: 0.85em;
   }
@@ -137,12 +151,42 @@
   }
 }
 
-/* Typography is generated in the utilities layer; keep its background aligned
-   with the light syntax highlighting theme in that same layer. */
+/* Typography is generated in the utilities layer, so its color overrides
+   belong here too. The compound selector also wins over prose-neutral. */
 @utility article-prose {
+  &.prose {
+    --tw-prose-body: var(--color-ink);
+    --tw-prose-headings: var(--color-ink);
+    --tw-prose-lead: var(--color-muted);
+    --tw-prose-links: var(--color-moss);
+    --tw-prose-bold: var(--color-ink);
+    --tw-prose-counters: var(--color-muted);
+    --tw-prose-bullets: var(--color-muted);
+    --tw-prose-hr: var(--color-line);
+    --tw-prose-quotes: var(--color-ink);
+    --tw-prose-quote-borders: var(--color-line);
+    --tw-prose-captions: var(--color-muted);
+    --tw-prose-kbd: var(--color-ink);
+    --tw-prose-kbd-shadows: 103 112 97;
+    --tw-prose-code: var(--color-ink);
+    --tw-prose-pre-code: var(--color-ink);
+    --tw-prose-pre-bg: var(--color-code);
+    --tw-prose-th-borders: var(--color-line);
+    --tw-prose-td-borders: var(--color-line);
+  }
   & pre {
-    background: #f0f2eb;
+    background: var(--color-code);
     color: var(--color-ink);
+  }
+  & code[data-theme],
+  & code[data-theme] span {
+    color: var(--shiki-light, var(--color-ink));
+  }
+  @variant dark {
+    & code[data-theme],
+    & code[data-theme] span {
+      color: var(--shiki-dark, var(--color-ink));
+    }
   }
 }
 

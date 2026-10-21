@@ -19,7 +19,7 @@ export function EmojiDemo() {
         value={text}
         onChange={event => setText(event.target.value)}
         rows={4}
-        className="w-full resize-y rounded-sm border border-line bg-white/60 px-5 py-4 leading-relaxed focus:border-moss"
+        className="w-full resize-y rounded-sm border border-line bg-paper px-5 py-4 leading-relaxed focus:border-moss"
       />
       <div className="mt-6 rounded-sm border border-line bg-leaf p-6">
         <p className="eyebrow mb-4">Rendered with the original sprites</p>
