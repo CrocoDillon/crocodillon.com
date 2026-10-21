@@ -29,8 +29,6 @@ The pnpm workspace configuration follows Reeflings and Carely: exact versions, a
 - `public/demo/`: reviewed public assets for the legacy demos.
 - `mdx-components.tsx`: the framework-required MDX component registry, at the project root.
 
-The completed one-time importer was removed after verification. Its source is retained in Git history at `357c9d0`.
-
 ## Writing an article
 
 Create `content/articles/my-article/index.mdx`:

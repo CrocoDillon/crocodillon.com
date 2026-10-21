@@ -1,6 +1,4 @@
-data/drafts
 node_modules
-public/js/build
 npm-debug.log
 
 # Raw hosting backups contain private configuration and account data.
