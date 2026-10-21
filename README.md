@@ -79,6 +79,8 @@ Deploy this repository as a Next.js project on Vercel, using Node.js 24 and pnpm
 
 Use the Vercel Git integration for subsequent pushes. Domain registration can stay at VDX: hosting migration requires DNS changes, not a registrar transfer. Configure the apex domain as canonical and redirect `www` to it when connecting domains.
 
+Vercel Web Analytics is mounted once in the root layout and tracks page views, including client-side navigation. Enable Web Analytics for the Vercel project before deploying; no analytics keys or environment variables are needed.
+
 ## Backup handling
 
 This is a public repository. Raw hosting files and SQL exports remain local, ignored by Git and Vercel uploads. They contain credentials and visitor data. The deployment includes only the migrated public articles and reviewed assets.
