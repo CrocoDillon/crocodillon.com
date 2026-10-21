@@ -70,7 +70,7 @@ Theme colors live in `app/globals.css`. Code blocks use GitHub Light and GitHub 
 
 `/blog/<slug>`, `/blog/rss`, and `/blog/atom` are preserved. Old illustration URLs and the original emoji-demo routes redirect to their new locations. `/contact` and `/webdesign` redirect home. Feeds retain historical entry IDs to avoid duplicate subscriptions.
 
-Disqus uses the existing `crocodillon` forum, original slug identifiers, and historical thread URLs. Comments load automatically when the discussion approaches the viewport. The contact form and old financial/contact details are removed.
+Disqus uses the existing `crocodillon` forum, original slug identifiers, and historical thread URLs. Comments load automatically when the discussion approaches the viewport. Once loaded, the comment frame refreshes when the resolved color theme changes. The contact form and old financial/contact details are removed.
 
 ## Deployment
 

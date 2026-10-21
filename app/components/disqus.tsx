@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useTheme } from 'next-themes'
 
 type DisqusConfig = { page: { identifier: string; url: string; title: string } }
 declare global {
@@ -16,33 +17,16 @@ declare global {
 }
 
 export function Disqus({ slug, title }: { slug: string; title: string }) {
+  const { resolvedTheme } = useTheme()
   const sectionRef = useRef<HTMLElement>(null)
+  const scriptRef = useRef<HTMLScriptElement>(null)
+  const [visible, setVisible] = useState(false)
   const [failed, setFailed] = useState(false)
+
   useEffect(() => {
     const section = sectionRef.current
     if (!section) return
-    let started = false
-    let script: HTMLScriptElement | undefined
-    function config(this: DisqusConfig) {
-      this.page.identifier = slug
-      this.page.url = `http://crocodillon.com/blog/${slug}`
-      this.page.title = title
-    }
-    function load() {
-      if (started) return
-      started = true
-      if (window.DISQUS) {
-        window.DISQUS.reset({ reload: true, config })
-        return
-      }
-      window.disqus_config = config
-      script = document.createElement('script')
-      script.src = 'https://crocodillon.disqus.com/embed.js'
-      script.async = true
-      script.onerror = () => setFailed(true)
-      document.body.appendChild(script)
-    }
-
+    let fallbackFrame: number | undefined
     const observer =
       typeof IntersectionObserver === 'undefined'
         ? undefined
@@ -50,22 +34,58 @@ export function Disqus({ slug, title }: { slug: string; title: string }) {
             entries => {
               if (entries.some(entry => entry.isIntersecting)) {
                 observer?.disconnect()
-                load()
+                setVisible(true)
               }
             },
             { rootMargin: '200px 0px' }
           )
     if (observer) observer.observe(section)
-    else load()
+    else fallbackFrame = requestAnimationFrame(() => setVisible(true))
 
     return () => {
       observer?.disconnect()
+      if (fallbackFrame !== undefined) cancelAnimationFrame(fallbackFrame)
+      const script = scriptRef.current
       if (script) {
         script.onerror = null
         script.remove()
+        scriptRef.current = null
       }
     }
-  }, [slug, title])
+  }, [])
+
+  useEffect(() => {
+    if (!visible || !resolvedTheme) return
+
+    // next-themes applies its DOM styles in an effect. Wait until they are
+    // applied before Disqus samples the inherited colors again.
+    const frame = requestAnimationFrame(() => {
+      function config(this: DisqusConfig) {
+        this.page.identifier = slug
+        this.page.url = `http://crocodillon.com/blog/${slug}`
+        this.page.title = title
+      }
+      window.disqus_config = config
+      if (window.DISQUS) {
+        window.DISQUS.reset({ reload: true, config })
+        return
+      }
+      // Reuse an in-flight script if the theme changes before it finishes.
+      if (scriptRef.current) return
+      setFailed(false)
+      const script = document.createElement('script')
+      scriptRef.current = script
+      script.src = 'https://crocodillon.disqus.com/embed.js'
+      script.async = true
+      script.onerror = () => {
+        setFailed(true)
+        scriptRef.current = null
+        script.remove()
+      }
+      document.body.appendChild(script)
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [visible, resolvedTheme, slug, title])
 
   return (
     <section
