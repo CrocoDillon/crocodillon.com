@@ -84,8 +84,6 @@
   .article-prose :where(pre) {
     border: 1px solid var(--color-line);
     border-radius: 3px;
-    background: #f0f2eb;
-    color: var(--color-ink);
     padding: 1.5rem;
     font-size: 0.8rem;
     line-height: 1.8;
@@ -136,6 +134,15 @@
     padding-top: 1rem;
     font-size: 0.85rem;
     color: var(--color-muted);
+  }
+}
+
+/* Typography is generated in the utilities layer; keep its background aligned
+   with the light syntax highlighting theme in that same layer. */
+@utility article-prose {
+  & pre {
+    background: #f0f2eb;
+    color: var(--color-ink);
   }
 }
 
