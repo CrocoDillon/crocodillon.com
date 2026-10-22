@@ -55,7 +55,7 @@ Required frontmatter: `slug`, `title`, `description`, `publishedAt`, and `excerp
 
 ### Draft review and scheduled publication
 
-Both the public blog and the protected preview blog build from the default branch (`master`). Keep drafts in the repository alongside published articles:
+Both the public blog and the protected preview blog build from the default branch (`main`). Keep drafts in the repository alongside published articles:
 
 - `draft: true`: visible only in preview, regardless of the date.
 - `draft: false` (or omitted) with a future `publishedAt`: scheduled; visible only in preview until its date arrives.
@@ -67,11 +67,11 @@ Review articles at `https://preview.crocodillon.com`. The preview includes every
 
 Both deployments use the existing `crocodillon` Vercel project and its built-in **Production** and **Preview** environments. Set `ARTICLE_PREVIEW=true` only in Preview; production leaves it unset or false. Production cron secrets are scoped only to production. No separate project or custom environment is needed.
 
-Vercel does not allow the Production branch to be assigned to a Preview domain. `.github/workflows/preview.yml` therefore fast-forwards a deployment-only `preview` branch to the same commit whenever `master` changes. It creates no commits and uses the short-lived GitHub workflow token with repository contents permission; no stored deployment credentials are needed. The workflow skips superseded runs and refuses non-fast-forward updates. Keep all editing and approvals on `master`; do not commit directly to `preview`.
+Vercel does not allow the Production branch to be assigned to a Preview domain. `.github/workflows/preview.yml` therefore fast-forwards a deployment-only `preview` branch to the same commit whenever `main` changes. It creates no commits and uses the short-lived GitHub workflow token with repository contents permission; no stored deployment credentials are needed. The workflow skips superseded runs and refuses non-fast-forward updates. Keep all editing and approvals on `main`; do not commit directly to `preview`.
 
-Vercel's Git integration builds Production from `master` and Preview from the mirrored `preview` branch. `preview.crocodillon.com` follows that branch's latest Preview deployment. PR branches still get their own Preview deployments, but do not replace this domain. The branch sync is event-driven; all daily publication scheduling stays in Vercel Cron. To review locally, set `ARTICLE_PREVIEW=true` in `.env.local` and run `pnpm dev`. Restart after changing the flag.
+Vercel's Git integration builds Production from `main` and Preview from the mirrored `preview` branch. `preview.crocodillon.com` follows that branch's latest Preview deployment. PR branches still get their own Preview deployments, but do not replace this domain. The branch sync is event-driven; all daily publication scheduling stays in Vercel Cron. To review locally, set `ARTICLE_PREVIEW=true` in `.env.local` and run `pnpm dev`. Restart after changing the flag.
 
-The production environment runs Vercel Cron daily at **07:00 UTC** (`0 7 * * *` in `vercel.ts`). Its authenticated `/api/cron/publish` endpoint requests a fresh production build through a deploy hook targeting `master`. Preview has no cron jobs. The handler disables deploy-hook build caching so publication dates are evaluated again even when the commit has not changed.
+The production environment runs Vercel Cron daily at **07:00 UTC** (`0 7 * * *` in `vercel.ts`). Its authenticated `/api/cron/publish` endpoint requests a fresh production build through a deploy hook targeting `main`. Preview has no cron jobs. The handler disables deploy-hook build caching so publication dates are evaluated again even when the commit has not changed.
 
 For a daily batch, use **04:00 UTC** on each intended publication day:
 
@@ -84,7 +84,7 @@ The article becomes eligible three hours before the scheduled rebuild. In Amster
 
 Vercel Cron is best effort and does not retry failed invocations. Publication happens when the resulting deployment succeeds, so the three-hour gap is the normal lag rather than a guaranteed maximum. Check Vercel's cron and deployment logs if an article is late; run the job manually or redeploy after fixing a failure. Choosing a publication time after the daily cron can defer publication until the next day.
 
-Production requires two Vercel-only secrets: `CRON_SECRET` (a random bearer secret Vercel adds to cron requests) and `PUBLISH_DEPLOY_HOOK_URL` (the public project's deploy hook for `master`). Keep both out of Git and preview environments. The endpoint rejects requests when its secret is missing and never returns the hook URL. `.env.example` documents the keys without values.
+Production requires two Vercel-only secrets: `CRON_SECRET` (a random bearer secret Vercel adds to cron requests) and `PUBLISH_DEPLOY_HOOK_URL` (the public project's deploy hook for `main`). Keep both out of Git and preview environments. The endpoint rejects requests when its secret is missing and never returns the hook URL. `.env.example` documents the keys without values.
 
 This repository is public: drafts committed here are publicly readable as source, even though the preview website requires authentication.
 

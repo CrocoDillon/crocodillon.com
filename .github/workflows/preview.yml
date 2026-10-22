@@ -2,7 +2,7 @@ name: Update Preview
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   mirror:
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -23,13 +23,13 @@ jobs:
       GH_REPO: ${{ github.repository }}
       SOURCE_SHA: ${{ github.sha }}
     steps:
-      - name: Fast-forward preview to master
+      - name: Fast-forward preview to main
         shell: bash
         run: |
           set -euo pipefail
-          latest=$(gh api "repos/$GH_REPO/git/ref/heads/master" --jq '.object.sha')
+          latest=$(gh api "repos/$GH_REPO/git/ref/heads/main" --jq '.object.sha')
           if [[ "$SOURCE_SHA" != "$latest" ]]; then
-            echo 'A newer master commit exists; its run will update Preview.'
+            echo 'A newer main commit exists; its run will update Preview.'
             exit 0
           fi
           gh api --method PATCH "repos/$GH_REPO/git/refs/heads/preview" \
