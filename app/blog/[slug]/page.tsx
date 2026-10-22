@@ -90,10 +90,13 @@ export default async function Article({
             <span aria-hidden="true">/</span>
             <span>{post.readingMinutes} min read</span>
           </div>
-          <p className="mt-8 border-y border-line py-4 text-xs leading-relaxed text-muted">
-            A note from the archive. Written in {post.publishedAt.slice(0, 4)};
-            tools and APIs may have changed since publication.
-          </p>
+          {/* The legacy archive contains articles from 2013–2016. */}
+          {post.publishedAt < '2017-01-01T00:00:00Z' ? (
+            <p className="mt-8 border-y border-line py-4 text-xs leading-relaxed text-muted">
+              A note from the archive. Written in {post.publishedAt.slice(0, 4)}
+              ; tools and APIs may have changed since publication.
+            </p>
+          ) : null}
         </header>
         <div className="prose mt-10 max-w-none article-prose prose-neutral sm:mt-12">
           <Content />
