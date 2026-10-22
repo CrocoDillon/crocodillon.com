@@ -1,0 +1,89 @@
+---
+slug: 'markdown-lead-paragraph-with-remark'
+title: 'Giving Markdown a lead paragraph with remark'
+description: 'A tiny remark plugin that adds Tailwind Typography’s lead class to the first paragraph of Markdown rendered with react-markdown.'
+publishedAt: '2026-10-22T01:17:45Z'
+excerpt: 'Tailwind Typography already knows how to style a lead paragraph. I just needed a way to give the first paragraph in my Markdown the right class.'
+---
+
+<p className="intro">Tailwind Typography already knows how to style a lead paragraph. I just needed a way to give the first paragraph in my Markdown the right class.</p>
+
+I was using `react-markdown`[^react-markdown] together with Tailwind’s Typography plugin[^typography] in one of my projects. Wrapping the rendered content in an element with the `prose` class took care of most of the styling. For the opening paragraph, though, I wanted something a little more prominent.
+
+Typography supports that through the `lead` class: put it on a paragraph inside your `prose` container and it gets a larger font size and its own spacing. I couldn’t find a built-in option to add that class to the first paragraph automatically, so I wrote a tiny remark plugin.
+
+If you just inspected the first paragraph of this article: nope, I admit I haven’t eaten my own dog food on this blog. That one has a manually added `intro` class. I do use the plugin on [Reeflings](https://reeflings.com), though!
+
+## The plugin
+
+Anyway, without further ado, here it is. Save this as `remark-lead-paragraph.ts`:
+
+```typescript
+import type { Root } from 'mdast'
+import type { Plugin } from 'unified'
+import { visit } from 'unist-util-visit'
+
+const remarkLeadParagraph: Plugin<[], Root> = () => tree => {
+  let foundFirstParagraph = false
+
+  visit(tree, 'paragraph', node => {
+    if (!foundFirstParagraph) {
+      node.data ??= {}
+      node.data.hProperties ??= {}
+      node.data.hProperties.className = 'lead'
+
+      foundFirstParagraph = true
+    }
+  })
+}
+
+export default remarkLeadParagraph
+```
+
+Remark plugins work on the Markdown syntax tree. Here, `visit` finds paragraph nodes, and the flag makes sure we only change the first one. The flag lives inside the transformer, so it starts fresh for each document.
+
+The useful bit is `data.hProperties`. When `remark-rehype` converts the Markdown tree into an HTML tree, it carries these properties over to the resulting element.[^hproperties] By the time React renders the paragraph, it has `className="lead"`. There’s no need for a separate rehype plugin.
+
+## Using it with react-markdown
+
+Assuming you already have `react-markdown` and Tailwind Typography set up, add the visitor utility and the types used by the plugin:
+
+```sh
+pnpm add unist-util-visit
+pnpm add -D @types/mdast unified
+```
+
+Then pass the plugin through `remarkPlugins`:
+
+```tsx
+import ReactMarkdown from 'react-markdown'
+import remarkLeadParagraph from './remark-lead-paragraph'
+
+const content = `## A little introduction
+
+This paragraph gets the lead class.
+
+This one is a regular paragraph.`
+
+export default function Article() {
+  return (
+    <div className="prose">
+      <ReactMarkdown remarkPlugins={[remarkLeadParagraph]}>
+        {content}
+      </ReactMarkdown>
+    </div>
+  )
+}
+```
+
+The heading stays a heading, the first paragraph gets `lead`, and the second paragraph stays as it is. Tailwind Typography handles the styling. If you’ve supplied a custom `p` component through `components`, make sure it passes `className` through to the rendered paragraph too.
+
+One detail to keep in mind: this finds the first paragraph anywhere in the tree, including inside a blockquote or list. If you only want the first paragraph directly under the document root, you’ll want to check the node’s parent as well. It also replaces any existing `hProperties.className`, so merge classes instead if another plugin adds them.
+
+If this helped you, let me know in the comments!
+
+[^react-markdown]: [react-markdown](https://github.com/remarkjs/react-markdown#architecture) renders Markdown as React elements. Under the hood it uses remark for the Markdown tree, `remark-rehype` to convert that to an HTML tree, and rehype plugins before rendering.
+
+[^typography]: [Tailwind CSS Typography](https://github.com/tailwindlabs/tailwindcss-typography) provides the `prose` class for styling rendered content. Its [styles for `lead`](https://github.com/tailwindlabs/tailwindcss-typography/blob/main/src/styles.js) set the introductory text’s size, line height, and spacing.
+
+[^hproperties]: The [mdast-util-to-hast documentation](https://github.com/syntax-tree/mdast-util-to-hast#hproperties) explains how `data.hProperties` supplies properties for the resulting HTML element. This is the conversion utility used by `remark-rehype`.
