@@ -7,11 +7,15 @@ excerpt: 'Datepicker, Timepicker, and both together as a datetime control. The u
 draft: true
 ---
 
+import demo from './demo/codepen.lock.json'
+
 <p className="intro">On a project I worked on, our forms were generated dynamically. We had form groups, controls, and components deciding which fields to render. Date, time, and datetime fields needed a reusable home in that hierarchy.</p>
 
 The part I liked about the solution was how little the consuming template needed to know. A field could use `formControlName`, just like a regular input. We didn’t have to pass the `FormControl` through every component between the form and the field.
 
 For this example, we’ll use Angular Material’s Datepicker for dates, Timepicker for times, and both pickers together for a datetime field. The datetime component has two inputs, but exposes one value to the parent form.
+
+<ArticleDemo title="Date, time and datetime controls" penUrl={demo.editorUrl} />
 
 ## Let the form own the controls
 

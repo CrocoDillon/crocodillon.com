@@ -96,6 +96,66 @@ Import diagrams as React components, for example `import RequestFlow from './ima
 
 For photos and screenshots, use relative static raster imports with `<ArticleImage>` for responsive loading, dimensions, and automatic blur placeholders. Images don't need to live in `public/`. See [STYLE.md](STYLE.md) for examples of both.
 
+## Interactive article examples
+
+Demo sources live beside their article in `content/articles/<slug>/demo/`.
+`codepen.json` lists the source files and Pen metadata; `codepen.lock.json` records
+the Pen ID, saved version, URLs, and hashes of the last sync. Commit both with
+the source and article. Edit the repository sources, then sync while preparing
+the draft:
+
+```sh
+pnpm demo:sync angular-date-time-controls-with-ngcontrol --dry-run
+pnpm demo:sync angular-date-time-controls-with-ngcontrol
+```
+
+Set `CODEPEN_API_KEY` in the local shell first. Keep it out of Git, command-line
+arguments, article frontmatter, browser code, and Vercel. The website and its
+builds need no CodePen key and make no CodePen API calls.
+
+The first creation requires `--create`. Before creating, the command searches
+for the demo’s stable identity tag to recover a Pen whose ID was not recorded
+after an interrupted request. Once a Pen exists, updates reuse its ID. Unchanged
+sources and versions need one read and no write. Changes outside Git stop the
+sync for reconciliation; writes use `expected_version_id` to reject concurrent
+edits. Each update sends all changed source files in one version, waits for its
+build, and reads back the compiler’s resulting files. A failed build retains the
+Pen ID so fixing it does not consume another creation.
+
+Sync is an explicit writing step, independent of pushes, preview builds, and the
+daily publication cron. Batch the initial creations across days to stay within
+the account’s allowance; use updates for revisions. A free Pen is public even
+when its article is still a draft.
+
+`content/demos/theme.css` supplies the blog palette, typography, spacing,
+light/dark colors, and Material system-token overrides. It is copied into each
+Pen during sync, so published demos use a snapshot of the shared style. Re-sync
+an example to adopt later theme changes. Local demo styles cover only that
+example’s layout. Pin its package versions independently of the blog.
+
+The Angular demo uses `compact: true` to fit the free plan’s three-file limit:
+TypeScript stays editable in Git, but sync transpiles it to JavaScript, inlines
+the combined CSS in HTML, and uploads HTML, JavaScript, and `package.json`.
+Demo TypeScript is excluded from the blog’s type checker because it runs in a
+separate framework project. Type-check it against its own pinned dependencies
+when changing its logic. The compact compiler checks syntax; it is not a full
+Angular type checker.
+
+Embed a synced demo with the registered MDX component:
+
+```mdx
+import demo from './demo/codepen.lock.json'
+
+<ArticleDemo title="A working example" penUrl={demo.editorUrl} />
+```
+
+The article renders a static placeholder and link. Its iframe is added only
+after “Run example” is pressed, keeping sandbox startup out of initial article
+loading. CodePen hosts the execution and editor; the blog supplies the frame.
+
+See CodePen’s [API documentation](https://blog.codepen.io/docs/api/api-v2/)
+for current limits, build behavior, and key rotation.
+
 ## Appearance
 
 The site follows the system color scheme by default. The header toggle saves a light or dark preference; **Auto** restores the system preference. `next-themes` applies the theme with a synchronous inline script before visible content, and the toggle uses CSS-controlled icons to keep server and client markup identical. Pages remain statically generated.

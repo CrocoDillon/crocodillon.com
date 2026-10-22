@@ -13,6 +13,7 @@
     "start": "next start --hostname 127.0.0.1",
     "lint": "eslint --max-warnings 0",
     "check-types": "next typegen && tsc --noEmit",
+    "demo:sync": "node scripts/sync-codepen.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

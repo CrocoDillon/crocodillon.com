@@ -1,0 +1,14 @@
+{
+  "key": "angular-date-time-controls",
+  "compact": true,
+  "title": "Angular date, time and datetime controls with NgControl",
+  "description": "Angular Material Datepicker and Timepicker in reusable controls for nested dynamic reactive forms. Datetime combines both into one control.",
+  "tags": ["angular", "angular-material", "crocodillon-demo"],
+  "files": [
+    "index.html",
+    "style.css",
+    "script.ts",
+    "package.json",
+    "tsconfig.json"
+  ]
+}

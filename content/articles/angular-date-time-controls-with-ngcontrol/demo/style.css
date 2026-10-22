@@ -1,0 +1,25 @@
+/* The shared content/demos/theme.css is prepended by the sync command. */
+app-dynamic-fields {
+  display: grid;
+  gap: 8px;
+}
+app-date-control,
+app-time-control,
+app-datetime-control {
+  display: block;
+  min-width: 0;
+}
+mat-form-field {
+  width: 100%;
+}
+.picker-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 12px 0 28px;
+}

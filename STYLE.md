@@ -40,6 +40,19 @@ New images follow the current site branding. Historical screenshots and diagrams
 - Use the site's CSS color variables with light fallbacks, for example `var(--color-moss, #3a643f)`, so inline diagrams follow the selected theme before hydration. `--color-diagram-panel` provides light and dark panel fills. Standalone SVGs use `:root.article-diagram` inside a dark media query as a system-theme fallback; this must not override the manual theme when inline. Photos, screenshots, and sharing cards keep their original colors.
 - Scope SVG styles to `svg.article-diagram`, prefix IDs with the diagram name (including title/description, markers, and patterns), and include a meaningful `<title>`, `<desc>`, and `aria-labelledby`. Use the existing diagrams as references. Only import reviewed repository SVGs: they become inline page markup.
 
+### Interactive examples
+
+Use `content/demos/theme.css` for the shared demo palette, typography, spacing,
+and light/dark colors. Keep example-specific layout in the article’s demo folder.
+For component libraries, map their theme tokens to this palette instead of
+restyling individual internal elements. The sync command copies the shared
+stylesheet into each Pen; re-sync examples when adopting a shared style change.
+
+Use `<ArticleDemo>` for the article frame and explicit “Run example” interaction.
+Keep runnable source and pinned dependencies in Git beside the article. CodePen
+provides the execution and editor; a successful build must also be checked in
+the browser before embedding it.
+
 ### OG and Twitter cards
 
 - The shared template is `app/lib/social-image.tsx`: the crocodile mark and Inter wordmark/labels, a large Libre Baskerville title, restrained circular outlines, publication information, author, and domain. Preserve generous margins and readable type at thumbnail size; wrap the full title rather than truncating it.
