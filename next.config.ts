@@ -1,10 +1,15 @@
 import createMDX from '@next/mdx'
+import { resolve } from 'node:path'
 import type { NextConfig } from 'next'
 import legacyRedirects from './app/lib/legacy-redirects.json'
 
 const withMDX = createMDX({
   options: {
-    remarkPlugins: ['remark-frontmatter', 'remark-gfm'],
+    remarkPlugins: [
+      'remark-frontmatter',
+      'remark-gfm',
+      resolve('app/lib/remark-site-links.ts'),
+    ],
     rehypePlugins: [
       [
         'rehype-pretty-code',
