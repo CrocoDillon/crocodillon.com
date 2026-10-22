@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
+import Link from 'next/link'
 import { Analytics } from '@vercel/analytics/next'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { ThemeProvider } from '@/components/theme-provider'
-import { site } from '@/lib/site'
+import { site } from '@/lib/site-server'
+import { isArticlePreview } from '@/lib/publication'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -30,7 +32,7 @@ export const metadata: Metadata = {
     images: ['/opengraph-image'],
   },
   twitter: { card: 'summary_large_image', creator: '@CrocoDillon' },
-  robots: { index: true, follow: true },
+  robots: { index: !isArticlePreview, follow: !isArticlePreview },
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -44,13 +46,24 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           >
             Skip to content
           </a>
+          {isArticlePreview ? (
+            <div className="border-b border-line bg-leaf px-6 py-3 text-center text-sm text-ink">
+              Preview blog · Includes drafts and scheduled articles.{' '}
+              <Link
+                href="/drafts"
+                className="font-medium text-moss underline underline-offset-4"
+              >
+                Review the queue →
+              </Link>
+            </div>
+          ) : null}
           <SiteHeader />
           <main id="main" className="mx-auto max-w-6xl px-6 sm:px-10">
             {children}
           </main>
           <SiteFooter />
         </ThemeProvider>
-        <Analytics />
+        {isArticlePreview ? null : <Analytics />}
       </body>
     </html>
   )

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowIcon } from '@/components/icons'
 import type { Post } from '@/lib/posts'
 import { formatDate } from '@/lib/site'
+import { PublicationStatusLabel } from '@/components/publication-status'
 
 export function PostList({ posts }: { posts: Post[] }) {
   return (
@@ -25,8 +26,9 @@ export function PostList({ posts }: { posts: Post[] }) {
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
                 {post.description}
               </p>
-              <p className="mt-3 font-mono text-[11px] text-muted">
-                {post.readingMinutes} min read
+              <p className="mt-3 flex items-center gap-3 font-mono text-[11px] text-muted">
+                <span>{post.readingMinutes} min read</span>
+                <PublicationStatusLabel status={post.status} />
               </p>
             </div>
             <ArrowIcon className="hidden size-5 self-center text-muted transition-transform group-hover:translate-x-1 group-hover:text-moss sm:block" />

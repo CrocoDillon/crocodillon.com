@@ -3,7 +3,9 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Disqus } from '@/components/disqus'
 import { getPost, getPosts } from '@/lib/posts'
-import { formatDate, site } from '@/lib/site'
+import { formatDate, site } from '@/lib/site-server'
+import { PublicationStatusLabel } from '@/components/publication-status'
+import { formatPublicationDate, isArticlePreview } from '@/lib/publication'
 
 export const dynamicParams = false
 
@@ -89,7 +91,21 @@ export default async function Article({
             </time>
             <span aria-hidden="true">/</span>
             <span>{post.readingMinutes} min read</span>
+            <PublicationStatusLabel status={post.status} />
           </div>
+          {isArticlePreview && post.status !== 'published' ? (
+            <p className="mt-6 rounded-sm border border-line bg-leaf p-4 text-sm leading-relaxed text-ink">
+              {post.status === 'draft'
+                ? 'This draft stays unpublished until draft is removed or set to false in its frontmatter.'
+                : 'This article becomes eligible for publication at the time below and goes live after a successful production build.'}
+              <br />
+              Planned publication:{' '}
+              <time dateTime={post.publishedAt}>
+                {formatPublicationDate(post.publishedAt)}
+              </time>{' '}
+              (Europe/Amsterdam).
+            </p>
+          ) : null}
           {/* The legacy archive contains articles from 2013–2016. */}
           {post.publishedAt < '2017-01-01T00:00:00Z' ? (
             <p className="mt-8 border-y border-line py-4 text-xs leading-relaxed text-muted">
@@ -108,7 +124,9 @@ export default async function Article({
           </p>
         ) : null}
       </article>
-      <Disqus key={slug} slug={slug} title={post.title} />
+      {isArticlePreview ? null : (
+        <Disqus key={slug} slug={slug} title={post.title} />
+      )}
       <aside className="mt-14 border-t border-line pt-8">
         <p className="eyebrow mb-3">Another rabbit hole</p>
         <Link

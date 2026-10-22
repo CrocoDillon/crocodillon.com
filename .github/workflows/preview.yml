@@ -1,0 +1,36 @@
+name: Update Preview
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-mirror
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      SOURCE_SHA: ${{ github.sha }}
+    steps:
+      - name: Fast-forward preview to master
+        shell: bash
+        run: |
+          set -euo pipefail
+          latest=$(gh api "repos/$GH_REPO/git/ref/heads/master" --jq '.object.sha')
+          if [[ "$SOURCE_SHA" != "$latest" ]]; then
+            echo 'A newer master commit exists; its run will update Preview.'
+            exit 0
+          fi
+          gh api --method PATCH "repos/$GH_REPO/git/refs/heads/preview" \
+            --raw-field sha="$SOURCE_SHA" --field force=false --silent

@@ -3,6 +3,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { cache } from 'react'
 import matter from 'gray-matter'
+import { isArticlePreview, type PublicationStatus } from '@/lib/publication'
 
 export interface Post {
   slug: string
@@ -13,11 +14,13 @@ export interface Post {
   excerpt: string
   image: string
   readingMinutes: number
+  status: PublicationStatus
 }
 
 const directory = path.join(process.cwd(), 'content/articles')
 
 export const getPosts = cache(async (): Promise<Post[]> => {
+  const now = Date.now()
   const entries = await fs.readdir(directory, { withFileTypes: true })
   const posts = await Promise.all(
     entries
@@ -61,7 +64,15 @@ export const getPosts = cache(async (): Promise<Post[]> => {
             throw new Error(`Invalid image: ${entry.name}`)
           await fs.access(path.join(process.cwd(), 'public', data.image))
         }
-        if (data.draft === true) return null
+        if (data.draft !== undefined && typeof data.draft !== 'boolean')
+          throw new Error(`${entry.name}: draft must be a boolean`)
+        const status: PublicationStatus =
+          data.draft === true
+            ? 'draft'
+            : Date.parse(data.publishedAt) > now
+              ? 'scheduled'
+              : 'published'
+        if (!isArticlePreview && status !== 'published') return null
         return {
           slug: data.slug,
           title: data.title,
@@ -70,6 +81,7 @@ export const getPosts = cache(async (): Promise<Post[]> => {
           updatedAt: data.updatedAt,
           excerpt: data.excerpt,
           image: data.image ?? `/blog/${data.slug}/share.png`,
+          status,
           readingMinutes: Math.max(
             1,
             Math.ceil(content.split(/\s+/).length / 220)

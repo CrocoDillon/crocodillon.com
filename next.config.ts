@@ -25,6 +25,16 @@ const withMDX = createMDX({
 const config: NextConfig = {
   poweredByHeader: false,
   images: { qualities: [75, 90] },
+  async headers() {
+    return process.env.ARTICLE_PREVIEW === 'true'
+      ? [
+          {
+            source: '/:path*',
+            headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+          },
+        ]
+      : []
+  },
   turbopack: {
     rules: {
       '*.svg': {

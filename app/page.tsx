@@ -4,6 +4,7 @@ import { ArrowIcon } from '@/components/icons'
 import { PostList } from '@/components/post-list'
 import { getPosts } from '@/lib/posts'
 import { formatDate } from '@/lib/site'
+import { PublicationStatusLabel } from '@/components/publication-status'
 
 export const metadata: Metadata = { alternates: { canonical: '/' } }
 
@@ -63,6 +64,7 @@ export default async function Home() {
                 </time>{' '}
                 · {latest.readingMinutes} min read
               </span>
+              <PublicationStatusLabel status={latest.status} />
             </div>
           </Link>
         </div>

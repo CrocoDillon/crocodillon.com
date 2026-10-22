@@ -1,10 +1,10 @@
 import 'server-only'
 import { Feed } from 'feed'
 import { getPosts } from '@/lib/posts'
-import { site } from '@/lib/site'
+import { site } from '@/lib/site-server'
 
 export async function getFeed() {
-  const posts = await getPosts()
+  const posts = (await getPosts()).filter(post => post.status === 'published')
   const feed = new Feed({
     id: site.url,
     title: `${site.name}’s Blog`,
