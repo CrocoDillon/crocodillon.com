@@ -1,0 +1,168 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="2000"
+  height="1200"
+  viewBox="0 0 800 480"
+  role="img"
+  aria-labelledby="title desc"
+>
+  <title id="title">Two ways to scale</title>
+  <desc id="desc">
+    Vertical scaling increases the capacity of one server. Horizontal scaling
+    adds servers that communicate over a network.
+  </desc>
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="9"
+      refY="5"
+      markerWidth="8"
+      markerHeight="8"
+      orient="auto-start-reverse"
+    >
+      <path d="M1 1L9 5L1 9" fill="none" stroke="#3a643f" stroke-width="1.5" />
+    </marker>
+    <marker
+      id="gray-arrow"
+      viewBox="0 0 10 10"
+      refX="9"
+      refY="5"
+      markerWidth="8"
+      markerHeight="8"
+      orient="auto-start-reverse"
+    >
+      <path d="M1 1L9 5L1 9" fill="none" stroke="#677061" stroke-width="1.5" />
+    </marker>
+    <pattern id="padding" width="8" height="8" patternUnits="userSpaceOnUse">
+      <path d="M0 8L8 0" stroke="#dce1d6" stroke-width="2" />
+    </pattern>
+  </defs>
+  <style>
+    text{font-family:Inter,Arial,sans-serif;font-size:24px;fill:#20291e}.title{font-size:32px;font-weight:600;letter-spacing:-.5px}.section{font-size:26px;font-weight:600}.small{font-size:21px}.tiny{font-size:19px}.muted{fill:#677061}.green{fill:#3a643f}.mono{font-family:Consolas,'Liberation Mono',monospace;font-size:23px}.bold{font-weight:600}.light{fill:#f8f9f5}
+  </style>
+  <rect width="800" height="480" fill="#f8f9f5" />
+  <!-- prettier-ignore -->
+  <text x="40" y="61" class="title" text-anchor="start" xml:space="preserve">Two ways to scale</text>
+  <path d="M40 88H760" stroke="#dce1d6" stroke-width="2" />
+  <!-- prettier-ignore -->
+  <text x="40" y="137" class="section" text-anchor="start" xml:space="preserve">Vertical</text>
+  <!-- prettier-ignore -->
+  <text x="40" y="171" class="small muted" text-anchor="start" xml:space="preserve">A bigger server</text>
+  <rect
+    x="50"
+    y="300"
+    width="62"
+    height="65"
+    rx="8"
+    fill="#e9efdf"
+    stroke="#3a643f"
+    stroke-width="2"
+  />
+  <path d="M62 316h38" stroke="#3a643f" stroke-width="2" />
+  <path d="M62 330h38" stroke="#3a643f" stroke-width="2" />
+  <path d="M62 344h38" stroke="#3a643f" stroke-width="2" />
+  <path
+    d="M140 350V215"
+    fill="none"
+    stroke="#3a643f"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    marker-end="url(#arrow)"
+  />
+  <rect
+    x="180"
+    y="215"
+    width="94"
+    height="150"
+    rx="8"
+    fill="#e9efdf"
+    stroke="#3a643f"
+    stroke-width="2"
+  />
+  <path d="M192 231h70" stroke="#3a643f" stroke-width="2" />
+  <path d="M192 245h70" stroke="#3a643f" stroke-width="2" />
+  <path d="M192 259h70" stroke="#3a643f" stroke-width="2" />
+  <path d="M322 122V410" stroke="#dce1d6" stroke-width="2" />
+  <!-- prettier-ignore -->
+  <text x="370" y="137" class="section" text-anchor="start" xml:space="preserve">Horizontal</text>
+  <!-- prettier-ignore -->
+  <text x="370" y="171" class="small muted" text-anchor="start" xml:space="preserve">More servers</text>
+  <rect
+    x="380"
+    y="300"
+    width="65"
+    height="65"
+    rx="8"
+    fill="#e9efdf"
+    stroke="#3a643f"
+    stroke-width="2"
+  />
+  <path d="M392 316h41" stroke="#3a643f" stroke-width="2" />
+  <path d="M392 330h41" stroke="#3a643f" stroke-width="2" />
+  <path d="M392 344h41" stroke="#3a643f" stroke-width="2" />
+  <rect
+    x="480"
+    y="300"
+    width="65"
+    height="65"
+    rx="8"
+    fill="#e9efdf"
+    stroke="#3a643f"
+    stroke-width="2"
+  />
+  <path d="M492 316h41" stroke="#3a643f" stroke-width="2" />
+  <path d="M492 330h41" stroke="#3a643f" stroke-width="2" />
+  <path d="M492 344h41" stroke="#3a643f" stroke-width="2" />
+  <rect
+    x="580"
+    y="300"
+    width="65"
+    height="65"
+    rx="8"
+    fill="#e9efdf"
+    stroke="#3a643f"
+    stroke-width="2"
+  />
+  <path d="M592 316h41" stroke="#3a643f" stroke-width="2" />
+  <path d="M592 330h41" stroke="#3a643f" stroke-width="2" />
+  <path d="M592 344h41" stroke="#3a643f" stroke-width="2" />
+  <rect
+    x="680"
+    y="300"
+    width="65"
+    height="65"
+    rx="8"
+    fill="#e9efdf"
+    stroke="#3a643f"
+    stroke-width="2"
+  />
+  <path d="M692 316h41" stroke="#3a643f" stroke-width="2" />
+  <path d="M692 330h41" stroke="#3a643f" stroke-width="2" />
+  <path d="M692 344h41" stroke="#3a643f" stroke-width="2" />
+  <path
+    d="M408 284Q560 202 710 284"
+    fill="none"
+    stroke="#3a643f"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    marker-end="url(#arrow)"
+  />
+  <path
+    d="M510 287Q560 256 610 287"
+    fill="none"
+    stroke="#3a643f"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    marker-end="url(#arrow)"
+  />
+  <!-- prettier-ignore -->
+  <text x="560" y="225" class="small green" text-anchor="middle" xml:space="preserve">Network communication</text>
+  <!-- prettier-ignore -->
+  <text x="40" y="435" class="small muted" text-anchor="start" xml:space="preserve">Add capacity to one machine.</text>
+  <!-- prettier-ignore -->
+  <text x="370" y="435" class="small muted" text-anchor="start" xml:space="preserve">Spread work across machines.</text>
+</svg>

@@ -1,0 +1,283 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="2000"
+  height="2125"
+  viewBox="0 0 800 850"
+  role="img"
+  aria-labelledby="title desc"
+>
+  <title id="title">Documents inside data files</title>
+  <desc id="desc">
+    Historical MMAPv1 storage layout: data files contain extents; an extent
+    holds records from one collection. A record contains a document and padding.
+    A document that outgrows its record moves to a larger record.
+  </desc>
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="9"
+      refY="5"
+      markerWidth="8"
+      markerHeight="8"
+      orient="auto-start-reverse"
+    >
+      <path d="M1 1L9 5L1 9" fill="none" stroke="#3a643f" stroke-width="1.5" />
+    </marker>
+    <marker
+      id="gray-arrow"
+      viewBox="0 0 10 10"
+      refX="9"
+      refY="5"
+      markerWidth="8"
+      markerHeight="8"
+      orient="auto-start-reverse"
+    >
+      <path d="M1 1L9 5L1 9" fill="none" stroke="#677061" stroke-width="1.5" />
+    </marker>
+    <pattern id="padding" width="8" height="8" patternUnits="userSpaceOnUse">
+      <path d="M0 8L8 0" stroke="#dce1d6" stroke-width="2" />
+    </pattern>
+  </defs>
+  <style>
+    text{font-family:Inter,Arial,sans-serif;font-size:24px;fill:#20291e}.title{font-size:32px;font-weight:600;letter-spacing:-.5px}.section{font-size:26px;font-weight:600}.small{font-size:21px}.tiny{font-size:19px}.muted{fill:#677061}.green{fill:#3a643f}.mono{font-family:Consolas,'Liberation Mono',monospace;font-size:23px}.bold{font-weight:600}.light{fill:#f8f9f5}
+  </style>
+  <rect width="800" height="850" fill="#f8f9f5" />
+  <!-- prettier-ignore -->
+  <text x="40" y="61" class="title" text-anchor="start" xml:space="preserve">Documents inside data files</text>
+  <!-- prettier-ignore -->
+  <text x="40" y="104" class="small muted" text-anchor="start" xml:space="preserve">Historical MMAPv1 storage model · 2013 course</text>
+  <!-- prettier-ignore -->
+  <text x="40" y="154" class="section" text-anchor="start" xml:space="preserve">Data file</text>
+  <rect
+    x="40"
+    y="176"
+    width="240"
+    height="70"
+    rx="0"
+    fill="white"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="160" y="220" class="small" text-anchor="middle" xml:space="preserve">Extent</text>
+  <rect
+    x="280"
+    y="176"
+    width="240"
+    height="70"
+    rx="0"
+    fill="#e9efdf"
+    stroke="#3a643f"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="400" y="220" class="small" text-anchor="middle" xml:space="preserve">Extent</text>
+  <rect
+    x="520"
+    y="176"
+    width="240"
+    height="70"
+    rx="0"
+    fill="white"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="640" y="220" class="small" text-anchor="middle" xml:space="preserve">Extent</text>
+  <path
+    d="M280 246L40 325M520 246L760 325"
+    fill="none"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="40" y="301" class="small muted" text-anchor="start" xml:space="preserve">One extent · one collection</text>
+  <rect
+    x="40"
+    y="325"
+    width="720"
+    height="148"
+    rx="0"
+    fill="white"
+    stroke="#3a643f"
+    stroke-width="2"
+  />
+  <rect
+    x="58"
+    y="345"
+    width="132"
+    height="108"
+    rx="0"
+    fill="#f8f9f5"
+    stroke="#3a643f"
+    stroke-width="2"
+  />
+  <rect
+    x="66"
+    y="353"
+    width="80"
+    height="92"
+    rx="0"
+    fill="#e9efdf"
+    stroke="none"
+    stroke-width="2"
+  />
+  <rect
+    x="146"
+    y="353"
+    width="36"
+    height="92"
+    rx="0"
+    fill="url(#padding)"
+    stroke="none"
+    stroke-width="2"
+  />
+  <rect
+    x="208"
+    y="345"
+    width="210"
+    height="108"
+    rx="0"
+    fill="#f8f9f5"
+    stroke="#3a643f"
+    stroke-width="2"
+  />
+  <rect
+    x="216"
+    y="353"
+    width="150"
+    height="92"
+    rx="0"
+    fill="#e9efdf"
+    stroke="none"
+    stroke-width="2"
+  />
+  <rect
+    x="366"
+    y="353"
+    width="44"
+    height="92"
+    rx="0"
+    fill="url(#padding)"
+    stroke="none"
+    stroke-width="2"
+  />
+  <rect
+    x="436"
+    y="345"
+    width="170"
+    height="108"
+    rx="0"
+    fill="#f8f9f5"
+    stroke="#3a643f"
+    stroke-width="2"
+  />
+  <rect
+    x="444"
+    y="353"
+    width="118"
+    height="92"
+    rx="0"
+    fill="#e9efdf"
+    stroke="none"
+    stroke-width="2"
+  />
+  <rect
+    x="562"
+    y="353"
+    width="36"
+    height="92"
+    rx="0"
+    fill="url(#padding)"
+    stroke="none"
+    stroke-width="2"
+  />
+  <rect
+    x="624"
+    y="345"
+    width="118"
+    height="108"
+    rx="0"
+    fill="#f8f9f5"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="683" y="409" class="small muted" text-anchor="middle" xml:space="preserve">Free</text>
+  <!-- prettier-ignore -->
+  <text x="117" y="507" class="small" text-anchor="middle" xml:space="preserve">Record</text>
+  <!-- prettier-ignore -->
+  <text x="311" y="507" class="small" text-anchor="middle" xml:space="preserve">Record</text>
+  <!-- prettier-ignore -->
+  <text x="520" y="507" class="small" text-anchor="middle" xml:space="preserve">Record</text>
+  <path
+    d="M313 518C313 553 400 570 480 590"
+    fill="none"
+    stroke="#3a643f"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    marker-end="url(#arrow)"
+  />
+  <rect
+    x="500"
+    y="558"
+    width="240"
+    height="108"
+    rx="0"
+    fill="#f8f9f5"
+    stroke="#3a643f"
+    stroke-width="2"
+  />
+  <rect
+    x="508"
+    y="566"
+    width="185"
+    height="92"
+    rx="0"
+    fill="#e9efdf"
+    stroke="none"
+    stroke-width="2"
+  />
+  <rect
+    x="693"
+    y="566"
+    width="39"
+    height="92"
+    rx="0"
+    fill="url(#padding)"
+    stroke="none"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="40" y="624" class="small green" text-anchor="start" xml:space="preserve">Outgrown its record?</text>
+  <!-- prettier-ignore -->
+  <text x="40" y="656" class="small green" text-anchor="start" xml:space="preserve">Move to a larger one.</text>
+  <rect
+    x="40"
+    y="714"
+    width="26"
+    height="26"
+    rx="0"
+    fill="#e9efdf"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="80" y="735" class="small" text-anchor="start" xml:space="preserve">Document</text>
+  <rect
+    x="250"
+    y="714"
+    width="26"
+    height="26"
+    rx="0"
+    fill="url(#padding)"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="290" y="735" class="small" text-anchor="start" xml:space="preserve">Padding</text>
+  <!-- prettier-ignore -->
+  <text x="40" y="800" class="small muted" text-anchor="start" xml:space="preserve">Moving a document can change the order of a collection scan.</text>
+</svg>

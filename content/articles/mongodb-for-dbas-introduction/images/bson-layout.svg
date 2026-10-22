@@ -1,0 +1,218 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="2000"
+  height="2175"
+  viewBox="0 0 800 870"
+  role="img"
+  aria-labelledby="title desc"
+>
+  <title id="title">Inside a BSON document</title>
+  <desc id="desc">
+    The document {a: 3, b: xyz}, with a stored as int32, occupies 23 bytes. The
+    diagram lists every byte in little-endian hexadecimal order, including
+    lengths, types, null-terminated keys, string and final document terminator.
+  </desc>
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="9"
+      refY="5"
+      markerWidth="8"
+      markerHeight="8"
+      orient="auto-start-reverse"
+    >
+      <path d="M1 1L9 5L1 9" fill="none" stroke="#3a643f" stroke-width="1.5" />
+    </marker>
+    <marker
+      id="gray-arrow"
+      viewBox="0 0 10 10"
+      refX="9"
+      refY="5"
+      markerWidth="8"
+      markerHeight="8"
+      orient="auto-start-reverse"
+    >
+      <path d="M1 1L9 5L1 9" fill="none" stroke="#677061" stroke-width="1.5" />
+    </marker>
+    <pattern id="padding" width="8" height="8" patternUnits="userSpaceOnUse">
+      <path d="M0 8L8 0" stroke="#dce1d6" stroke-width="2" />
+    </pattern>
+  </defs>
+  <style>
+    text{font-family:Inter,Arial,sans-serif;font-size:24px;fill:#20291e}.title{font-size:32px;font-weight:600;letter-spacing:-.5px}.section{font-size:26px;font-weight:600}.small{font-size:21px}.tiny{font-size:19px}.muted{fill:#677061}.green{fill:#3a643f}.mono{font-family:Consolas,'Liberation Mono',monospace;font-size:23px}.bold{font-weight:600}.light{fill:#f8f9f5}
+  </style>
+  <rect width="800" height="870" fill="#f8f9f5" />
+  <!-- prettier-ignore -->
+  <text x="40" y="61" class="title" text-anchor="start" xml:space="preserve">Inside a BSON document</text>
+  <!-- prettier-ignore -->
+  <text x="40" y="111" class="small muted" text-anchor="start" xml:space="preserve">JSON values → BSON (a stored as int32)</text>
+  <rect
+    x="40"
+    y="137"
+    width="720"
+    height="72"
+    rx="10"
+    fill="#e9efdf"
+    stroke="none"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="62" y="182" class="mono" text-anchor="start" xml:space="preserve">{ &quot;a&quot;: 3, &quot;b&quot;: &quot;xyz&quot; }</text>
+  <!-- prettier-ignore -->
+  <text x="737" y="182" class="mono green" text-anchor="end" xml:space="preserve">23 bytes</text>
+  <!-- prettier-ignore -->
+  <text x="56" y="256" class="small bold" text-anchor="start" xml:space="preserve">Field</text>
+  <!-- prettier-ignore -->
+  <text x="415" y="256" class="small bold" text-anchor="end" xml:space="preserve">Bytes</text>
+  <!-- prettier-ignore -->
+  <text x="464" y="256" class="small bold" text-anchor="start" xml:space="preserve">Hexadecimal</text>
+  <rect
+    x="40"
+    y="279"
+    width="720"
+    height="51"
+    rx="0"
+    fill="#e9efdf"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="56" y="312" class="small" text-anchor="start" xml:space="preserve">Document length</text>
+  <!-- prettier-ignore -->
+  <text x="415" y="312" class="mono" text-anchor="end" xml:space="preserve">4</text>
+  <!-- prettier-ignore -->
+  <text x="464" y="312" class="mono" text-anchor="start" xml:space="preserve">17 00 00 00</text>
+  <rect
+    x="40"
+    y="330"
+    width="720"
+    height="51"
+    rx="0"
+    fill="white"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="56" y="363" class="small" text-anchor="start" xml:space="preserve">Type: int32</text>
+  <!-- prettier-ignore -->
+  <text x="415" y="363" class="mono" text-anchor="end" xml:space="preserve">1</text>
+  <!-- prettier-ignore -->
+  <text x="464" y="363" class="mono" text-anchor="start" xml:space="preserve">10</text>
+  <rect
+    x="40"
+    y="381"
+    width="720"
+    height="51"
+    rx="0"
+    fill="white"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="56" y="414" class="small" text-anchor="start" xml:space="preserve">Key: a + null</text>
+  <!-- prettier-ignore -->
+  <text x="415" y="414" class="mono" text-anchor="end" xml:space="preserve">2</text>
+  <!-- prettier-ignore -->
+  <text x="464" y="414" class="mono" text-anchor="start" xml:space="preserve">61 00</text>
+  <rect
+    x="40"
+    y="432"
+    width="720"
+    height="51"
+    rx="0"
+    fill="white"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="56" y="465" class="small" text-anchor="start" xml:space="preserve">Value: 3</text>
+  <!-- prettier-ignore -->
+  <text x="415" y="465" class="mono" text-anchor="end" xml:space="preserve">4</text>
+  <!-- prettier-ignore -->
+  <text x="464" y="465" class="mono" text-anchor="start" xml:space="preserve">03 00 00 00</text>
+  <rect
+    x="40"
+    y="483"
+    width="720"
+    height="51"
+    rx="0"
+    fill="white"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="56" y="516" class="small" text-anchor="start" xml:space="preserve">Type: string</text>
+  <!-- prettier-ignore -->
+  <text x="415" y="516" class="mono" text-anchor="end" xml:space="preserve">1</text>
+  <!-- prettier-ignore -->
+  <text x="464" y="516" class="mono" text-anchor="start" xml:space="preserve">02</text>
+  <rect
+    x="40"
+    y="534"
+    width="720"
+    height="51"
+    rx="0"
+    fill="white"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="56" y="567" class="small" text-anchor="start" xml:space="preserve">Key: b + null</text>
+  <!-- prettier-ignore -->
+  <text x="415" y="567" class="mono" text-anchor="end" xml:space="preserve">2</text>
+  <!-- prettier-ignore -->
+  <text x="464" y="567" class="mono" text-anchor="start" xml:space="preserve">62 00</text>
+  <rect
+    x="40"
+    y="585"
+    width="720"
+    height="51"
+    rx="0"
+    fill="white"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="56" y="618" class="small" text-anchor="start" xml:space="preserve">String length: 4</text>
+  <!-- prettier-ignore -->
+  <text x="415" y="618" class="mono" text-anchor="end" xml:space="preserve">4</text>
+  <!-- prettier-ignore -->
+  <text x="464" y="618" class="mono" text-anchor="start" xml:space="preserve">04 00 00 00</text>
+  <rect
+    x="40"
+    y="636"
+    width="720"
+    height="51"
+    rx="0"
+    fill="white"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="56" y="669" class="small" text-anchor="start" xml:space="preserve">Value: xyz + null</text>
+  <!-- prettier-ignore -->
+  <text x="415" y="669" class="mono" text-anchor="end" xml:space="preserve">4</text>
+  <!-- prettier-ignore -->
+  <text x="464" y="669" class="mono" text-anchor="start" xml:space="preserve">78 79 7a 00</text>
+  <rect
+    x="40"
+    y="687"
+    width="720"
+    height="51"
+    rx="0"
+    fill="#e9efdf"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="56" y="720" class="small" text-anchor="start" xml:space="preserve">Document terminator</text>
+  <!-- prettier-ignore -->
+  <text x="415" y="720" class="mono" text-anchor="end" xml:space="preserve">1</text>
+  <!-- prettier-ignore -->
+  <text x="464" y="720" class="mono" text-anchor="start" xml:space="preserve">00</text>
+  <!-- prettier-ignore -->
+  <text x="40" y="784" class="small muted" text-anchor="start" xml:space="preserve">Lengths include their terminators; multi-byte integers</text>
+  <!-- prettier-ignore -->
+  <text x="40" y="816" class="small muted" text-anchor="start" xml:space="preserve">are stored least-significant byte first (little endian).</text>
+</svg>

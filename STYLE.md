@@ -36,7 +36,8 @@ New images follow the current site branding. Historical screenshots and diagrams
 - Article images should explain one thing: a sequence, relationship, data structure, comparison, or real interface state. Prefer clear diagrams and genuine screenshots. Avoid stock developer imagery, decorative code, invented charts, neon gradients, 3D effects, and ornamental detail.
 - Keep diagram labels short and readable at the actual article width. Use consistent strokes, arrows, spacing, and alignment. Distinguish concepts with labels or shapes as well as color. Add accurate alt text and a caption when interpretation or attribution is needed.
 - For new diagrams, keep an editable SVG source and export a crisp PNG at roughly twice its intended display width, typically 1600–2400 pixels. Choose the aspect ratio to fit the explanation. Don't enlarge old screenshots and describe that as improved detail.
-- Store source and display assets under `public/images/articles/<slug>/` with descriptive names. Keep diagram backgrounds intentional and opaque so dark mode doesn't make labels disappear. `ArticleImage` uses a light paper background for archived transparent diagrams.
+- Co-locate source and display assets under `content/articles/<slug>/images/` with descriptive names. Diagrams have light (`name.svg` / `name.png`) and dark (`name.dark.svg` / `name.dark.png`) variants with identical layout and dimensions. Use the existing diagrams as references for typography, spacing, and strokes.
+- Use the site's dark palette for the dark variant: paper `#151c17`, ink `#e5eadf`, moss `#a6c991`, muted `#a6b19f`, leaf `#222f24`, rules `#344136`, and panel `#1d261f` (white in light diagrams). Keep backgrounds opaque and recolor the source, rather than applying an inversion filter. Genuine screenshots and photos keep their original colors.
 
 ### OG and Twitter cards
 
@@ -50,12 +51,13 @@ New images follow the current site branding. Historical screenshots and diagrams
 Use a static import with the shared component so Next.js supplies dimensions and a small blur placeholder automatically:
 
 ```mdx
-import diagram from '../../../public/images/articles/my-article/request-flow.png'
+import diagram from './images/request-flow.png'
+import diagramDark from './images/request-flow.dark.png'
 
 <figure>
-  <ArticleImage src={diagram} alt="The browser sends a request through the cache to the server." />
+  <ArticleImage src={diagram} darkSrc={diagramDark} alt="The browser sends a request through the cache to the server." />
   <figcaption>A cache miss continues to the server.</figcaption>
 </figure>
 ```
 
-`ArticleImage` uses responsive image loading at quality 90 and reserves the original aspect ratio. Keep small inline SVG icons as ordinary images. Blur placeholders apply to images on the blog; social platforms control loading of the sharing cards they fetch.
+`ArticleImage` uses responsive image loading at quality 90 and reserves the original aspect ratio. Optional `darkSrc` switches variants through the site's theme class, before hydration, with a blur placeholder for each. Omit it for screenshots and photos. Keep small inline SVG icons as ordinary images. Blur placeholders apply to images on the blog; social platforms control loading of the sharing cards they fetch.

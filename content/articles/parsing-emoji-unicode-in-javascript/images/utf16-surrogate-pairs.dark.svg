@@ -1,0 +1,206 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="2000"
+  height="2550"
+  viewBox="0 0 800 1020"
+  role="img"
+  aria-labelledby="title desc"
+>
+  <title id="title">From a code point to a pair</title>
+  <desc id="desc">
+    Subtract hexadecimal 10000, split the 20-bit offset into high and low ten
+    bits, and add D800 and DC00 respectively. U+10000 becomes D800 DC00;
+    U+10FFFF becomes DBFF DFFF.
+  </desc>
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="9"
+      refY="5"
+      markerWidth="8"
+      markerHeight="8"
+      orient="auto-start-reverse"
+    >
+      <path d="M1 1L9 5L1 9" fill="none" stroke="#a6c991" stroke-width="1.5" />
+    </marker>
+    <marker
+      id="gray-arrow"
+      viewBox="0 0 10 10"
+      refX="9"
+      refY="5"
+      markerWidth="8"
+      markerHeight="8"
+      orient="auto-start-reverse"
+    >
+      <path d="M1 1L9 5L1 9" fill="none" stroke="#a6b19f" stroke-width="1.5" />
+    </marker>
+    <pattern id="padding" width="8" height="8" patternUnits="userSpaceOnUse">
+      <path d="M0 8L8 0" stroke="#344136" stroke-width="2" />
+    </pattern>
+  </defs>
+  <style>
+    text{font-family:Inter,Arial,sans-serif;font-size:24px;fill:#e5eadf}.title{font-size:32px;font-weight:600;letter-spacing:-.5px}.section{font-size:26px;font-weight:600}.small{font-size:21px}.tiny{font-size:19px}.muted{fill:#a6b19f}.green{fill:#a6c991}.mono{font-family:Consolas,'Liberation Mono',monospace;font-size:23px}.bold{font-weight:600}.light{fill:#151c17}
+  </style>
+  <rect width="800" height="1020" fill="#151c17" />
+  <!-- prettier-ignore -->
+  <text x="40" y="61" class="title" text-anchor="start" xml:space="preserve">From a code point to a pair</text>
+  <!-- prettier-ignore -->
+  <text x="40" y="107" class="small muted" text-anchor="start" xml:space="preserve">UTF-16 · lowest and highest supplementary code points</text>
+  <rect
+    x="40"
+    y="140"
+    width="720"
+    height="349"
+    rx="10"
+    fill="#1d261f"
+    stroke="#344136"
+    stroke-width="2"
+  />
+  <rect
+    x="62"
+    y="160"
+    width="170"
+    height="42"
+    rx="21"
+    fill="#222f24"
+    stroke="none"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="147" y="188" class="small green" text-anchor="middle" xml:space="preserve">U+10000</text>
+  <!-- prettier-ignore -->
+  <text x="62" y="241" class="mono" text-anchor="start" xml:space="preserve">0x10000 − 0x10000 = 0x00000</text>
+  <!-- prettier-ignore -->
+  <text x="62" y="287" class="small muted" text-anchor="start" xml:space="preserve">20-bit offset, split into two 10-bit values</text>
+  <rect
+    x="62"
+    y="305"
+    width="326"
+    height="45"
+    rx="4"
+    fill="#222f24"
+    stroke="none"
+    stroke-width="2"
+  />
+  <rect
+    x="412"
+    y="305"
+    width="326"
+    height="45"
+    rx="4"
+    fill="#151c17"
+    stroke="#344136"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="225" y="335" class="mono" text-anchor="middle" xml:space="preserve">0000000000</text>
+  <!-- prettier-ignore -->
+  <text x="575" y="335" class="mono" text-anchor="middle" xml:space="preserve">0000000000</text>
+  <path
+    d="M225 357V380"
+    fill="none"
+    stroke="#a6c991"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    marker-end="url(#arrow)"
+  />
+  <path
+    d="M575 357V380"
+    fill="none"
+    stroke="#a6c991"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    marker-end="url(#arrow)"
+  />
+  <!-- prettier-ignore -->
+  <text x="225" y="412" class="mono" text-anchor="middle" xml:space="preserve">0xD800 + 0x000</text>
+  <!-- prettier-ignore -->
+  <text x="575" y="412" class="mono" text-anchor="middle" xml:space="preserve">0xDC00 + 0x000</text>
+  <!-- prettier-ignore -->
+  <text x="225" y="456" class="mono green" text-anchor="middle" xml:space="preserve">Lead: 0xD800</text>
+  <!-- prettier-ignore -->
+  <text x="575" y="456" class="mono green" text-anchor="middle" xml:space="preserve">Trail: 0xDC00</text>
+  <rect
+    x="40"
+    y="511"
+    width="720"
+    height="349"
+    rx="10"
+    fill="#1d261f"
+    stroke="#344136"
+    stroke-width="2"
+  />
+  <rect
+    x="62"
+    y="531"
+    width="170"
+    height="42"
+    rx="21"
+    fill="#222f24"
+    stroke="none"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="147" y="559" class="small green" text-anchor="middle" xml:space="preserve">U+10FFFF</text>
+  <!-- prettier-ignore -->
+  <text x="62" y="612" class="mono" text-anchor="start" xml:space="preserve">0x10FFFF − 0x10000 = 0xFFFFF</text>
+  <!-- prettier-ignore -->
+  <text x="62" y="658" class="small muted" text-anchor="start" xml:space="preserve">20-bit offset, split into two 10-bit values</text>
+  <rect
+    x="62"
+    y="676"
+    width="326"
+    height="45"
+    rx="4"
+    fill="#222f24"
+    stroke="none"
+    stroke-width="2"
+  />
+  <rect
+    x="412"
+    y="676"
+    width="326"
+    height="45"
+    rx="4"
+    fill="#151c17"
+    stroke="#344136"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="225" y="706" class="mono" text-anchor="middle" xml:space="preserve">1111111111</text>
+  <!-- prettier-ignore -->
+  <text x="575" y="706" class="mono" text-anchor="middle" xml:space="preserve">1111111111</text>
+  <path
+    d="M225 728V751"
+    fill="none"
+    stroke="#a6c991"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    marker-end="url(#arrow)"
+  />
+  <path
+    d="M575 728V751"
+    fill="none"
+    stroke="#a6c991"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    marker-end="url(#arrow)"
+  />
+  <!-- prettier-ignore -->
+  <text x="225" y="783" class="mono" text-anchor="middle" xml:space="preserve">0xD800 + 0x3FF</text>
+  <!-- prettier-ignore -->
+  <text x="575" y="783" class="mono" text-anchor="middle" xml:space="preserve">0xDC00 + 0x3FF</text>
+  <!-- prettier-ignore -->
+  <text x="225" y="827" class="mono green" text-anchor="middle" xml:space="preserve">Lead: 0xDBFF</text>
+  <!-- prettier-ignore -->
+  <text x="575" y="827" class="mono green" text-anchor="middle" xml:space="preserve">Trail: 0xDFFF</text>
+  <!-- prettier-ignore -->
+  <text x="40" y="915" class="mono" text-anchor="start" xml:space="preserve">Lead prefix: 110110 · Trail prefix: 110111</text>
+  <!-- prettier-ignore -->
+  <text x="40" y="960" class="small muted" text-anchor="start" xml:space="preserve">Each prefix + 10 payload bits forms one 16-bit code unit.</text>
+</svg>

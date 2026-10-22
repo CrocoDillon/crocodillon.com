@@ -1,0 +1,131 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="2000"
+  height="1500"
+  viewBox="0 0 800 600"
+  role="img"
+  aria-labelledby="title desc"
+>
+  <title id="title">Features and scalability</title>
+  <desc id="desc">
+    The 2013 course illustrates a conceptual trade-off: Memcached at the
+    high-scalability end, MongoDB near the knee, and a high-feature RDBMS at the
+    feature-rich end. This is not measured benchmark data.
+  </desc>
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="9"
+      refY="5"
+      markerWidth="8"
+      markerHeight="8"
+      orient="auto-start-reverse"
+    >
+      <path d="M1 1L9 5L1 9" fill="none" stroke="#3a643f" stroke-width="1.5" />
+    </marker>
+    <marker
+      id="gray-arrow"
+      viewBox="0 0 10 10"
+      refX="9"
+      refY="5"
+      markerWidth="8"
+      markerHeight="8"
+      orient="auto-start-reverse"
+    >
+      <path d="M1 1L9 5L1 9" fill="none" stroke="#677061" stroke-width="1.5" />
+    </marker>
+    <pattern id="padding" width="8" height="8" patternUnits="userSpaceOnUse">
+      <path d="M0 8L8 0" stroke="#dce1d6" stroke-width="2" />
+    </pattern>
+  </defs>
+  <style>
+    text{font-family:Inter,Arial,sans-serif;font-size:24px;fill:#20291e}.title{font-size:32px;font-weight:600;letter-spacing:-.5px}.section{font-size:26px;font-weight:600}.small{font-size:21px}.tiny{font-size:19px}.muted{fill:#677061}.green{fill:#3a643f}.mono{font-family:Consolas,'Liberation Mono',monospace;font-size:23px}.bold{font-weight:600}.light{fill:#f8f9f5}
+  </style>
+  <rect width="800" height="600" fill="#f8f9f5" />
+  <!-- prettier-ignore -->
+  <text x="40" y="61" class="title" text-anchor="start" xml:space="preserve">Features and scalability</text>
+  <!-- prettier-ignore -->
+  <text x="40" y="99" class="small muted" text-anchor="start" xml:space="preserve">Conceptual model from the 2013 course · not a benchmark</text>
+  <path
+    d="M104 470V150"
+    fill="none"
+    stroke="#677061"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    marker-end="url(#gray-arrow)"
+  />
+  <path
+    d="M104 470H740"
+    fill="none"
+    stroke="#677061"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    marker-end="url(#gray-arrow)"
+  />
+  <!-- prettier-ignore -->
+  <text x="40" y="138" class="small" text-anchor="start" xml:space="preserve">Scale &amp; speed</text>
+  <!-- prettier-ignore -->
+  <text x="740" y="520" class="small" text-anchor="end" xml:space="preserve">Features</text>
+  <path
+    d="M135 194C295 191 450 210 542 279S668 359 700 441"
+    stroke="#3a643f"
+    stroke-width="4"
+    fill="none"
+  />
+  <circle
+    cx="135"
+    cy="194"
+    r="7"
+    fill="#3a643f"
+    stroke="#f8f9f5"
+    stroke-width="3"
+  />
+  <circle
+    cx="542"
+    cy="279"
+    r="7"
+    fill="#3a643f"
+    stroke="#f8f9f5"
+    stroke-width="3"
+  />
+  <circle
+    cx="700"
+    cy="441"
+    r="7"
+    fill="#3a643f"
+    stroke="#f8f9f5"
+    stroke-width="3"
+  />
+  <!-- prettier-ignore -->
+  <text x="155" y="168" class="section" text-anchor="start" xml:space="preserve">Memcached</text>
+  <rect
+    x="531"
+    y="209"
+    width="165"
+    height="42"
+    rx="21"
+    fill="#e9efdf"
+    stroke="none"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="613.5" y="237" class="small green" text-anchor="middle" xml:space="preserve">MongoDB</text>
+  <path
+    d="M570 252L550 270"
+    fill="none"
+    stroke="#3a643f"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    marker-end="url(#arrow)"
+  />
+  <!-- prettier-ignore -->
+  <text x="670" y="389" class="small" text-anchor="end" xml:space="preserve">High-feature</text>
+  <!-- prettier-ignore -->
+  <text x="670" y="420" class="small" text-anchor="end" xml:space="preserve">RDBMS</text>
+  <!-- prettier-ignore -->
+  <text x="40" y="563" class="small muted" text-anchor="start" xml:space="preserve">The course positions MongoDB near the “knee” of the curve.</text>
+</svg>

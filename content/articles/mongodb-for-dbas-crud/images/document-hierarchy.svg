@@ -1,0 +1,125 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="2000"
+  height="1525"
+  viewBox="0 0 800 610"
+  role="img"
+  aria-labelledby="title desc"
+>
+  <title id="title">Where a document belongs</title>
+  <desc id="desc">
+    A MongoDB deployment contains databases. Each database contains collections,
+    and each collection contains documents. A new document is inserted into a
+    collection.
+  </desc>
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="9"
+      refY="5"
+      markerWidth="8"
+      markerHeight="8"
+      orient="auto-start-reverse"
+    >
+      <path d="M1 1L9 5L1 9" fill="none" stroke="#3a643f" stroke-width="1.5" />
+    </marker>
+    <marker
+      id="gray-arrow"
+      viewBox="0 0 10 10"
+      refX="9"
+      refY="5"
+      markerWidth="8"
+      markerHeight="8"
+      orient="auto-start-reverse"
+    >
+      <path d="M1 1L9 5L1 9" fill="none" stroke="#677061" stroke-width="1.5" />
+    </marker>
+    <pattern id="padding" width="8" height="8" patternUnits="userSpaceOnUse">
+      <path d="M0 8L8 0" stroke="#dce1d6" stroke-width="2" />
+    </pattern>
+  </defs>
+  <style>
+    text{font-family:Inter,Arial,sans-serif;font-size:24px;fill:#20291e}.title{font-size:32px;font-weight:600;letter-spacing:-.5px}.section{font-size:26px;font-weight:600}.small{font-size:21px}.tiny{font-size:19px}.muted{fill:#677061}.green{fill:#3a643f}.mono{font-family:Consolas,'Liberation Mono',monospace;font-size:23px}.bold{font-weight:600}.light{fill:#f8f9f5}
+  </style>
+  <rect width="800" height="610" fill="#f8f9f5" />
+  <!-- prettier-ignore -->
+  <text x="40" y="61" class="title" text-anchor="start" xml:space="preserve">Where a document belongs</text>
+  <path d="M40 90H760" stroke="#dce1d6" stroke-width="2" />
+  <rect
+    x="40"
+    y="120"
+    width="720"
+    height="440"
+    rx="12"
+    fill="#e9efdf"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="64" y="160" class="section" text-anchor="start" xml:space="preserve">MongoDB deployment / cluster</text>
+  <rect
+    x="80"
+    y="188"
+    width="650"
+    height="342"
+    rx="10"
+    fill="#f8f9f5"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="104" y="229" class="section" text-anchor="start" xml:space="preserve">Database</text>
+  <rect
+    x="122"
+    y="257"
+    width="578"
+    height="244"
+    rx="10"
+    fill="white"
+    stroke="#3a643f"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="146" y="298" class="section" text-anchor="start" xml:space="preserve">Collection</text>
+  <rect
+    x="155"
+    y="337"
+    width="140"
+    height="115"
+    rx="6"
+    fill="#e9efdf"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="225" y="404" class="small" text-anchor="middle" xml:space="preserve">Document</text>
+  <rect
+    x="320"
+    y="337"
+    width="140"
+    height="115"
+    rx="6"
+    fill="#e9efdf"
+    stroke="#dce1d6"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="390" y="404" class="small" text-anchor="middle" xml:space="preserve">Document</text>
+  <rect
+    x="510"
+    y="337"
+    width="158"
+    height="115"
+    rx="6"
+    fill="#f8f9f5"
+    stroke="#3a643f"
+    stroke-width="2"
+  />
+  <!-- prettier-ignore -->
+  <text x="589" y="380" class="small green" text-anchor="middle" xml:space="preserve">New</text>
+  <!-- prettier-ignore -->
+  <text x="589" y="412" class="small green" text-anchor="middle" xml:space="preserve">document</text>
+  <!-- prettier-ignore -->
+  <text x="484" y="485" class="small green" text-anchor="middle" xml:space="preserve">Insert into the collection</text>
+</svg>

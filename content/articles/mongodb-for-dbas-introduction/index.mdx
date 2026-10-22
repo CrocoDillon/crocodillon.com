@@ -6,10 +6,14 @@ publishedAt: "2013-12-19T13:21:00Z"
 excerpt: "First article in a series of articles covering what I learn each week during MongoDB University’s course “MongoDB for DBAs”.\r\n\r\nWeek 1: An introduction to MongoDB, not just how but also why."
 ---
 
-import articleImage1 from '../../../public/images/articles/mongodb-for-dbas-introduction/mongodb-for-dbas__scaling.png'
-import articleImage2 from '../../../public/images/articles/mongodb-for-dbas-introduction/mongodb-for-dbas__features.png'
-import articleImage3 from '../../../public/images/articles/mongodb-for-dbas-introduction/mongodb-for-dbas__joins-vs-nesting.png'
-import articleImage4 from '../../../public/images/articles/mongodb-for-dbas-introduction/mongodb-for-dbas__bson.png'
+import scaling from './images/scaling.png'
+import scalingDark from './images/scaling.dark.png'
+import features from './images/features-and-scalability.png'
+import featuresDark from './images/features-and-scalability.dark.png'
+import joinsAndNesting from './images/joins-and-nesting.png'
+import joinsAndNestingDark from './images/joins-and-nesting.dark.png'
+import bsonLayout from './images/bson-layout.png'
+import bsonLayoutDark from './images/bson-layout.dark.png'
 
 <p className="intro">MongoDB is so awesome to offer free training at their MongoDB University, so I joined their course “MongoDB for DBAs” or MongoDB for database administrators.</p>
 
@@ -22,14 +26,14 @@ I’m definitely not a database administrator, but their “MongoDB for Node.js 
 Why would you want to use MongoDB while we have relational databases? One reason could be because relational databases were developed in ancient times and didn’t scale well with modern technology. MongoDB however is designed to work with modern technology. Think about parallelism, lots of cores, networking, lots of servers, cloud computing. Traditional ways to scale an application is to scale vertically, or <q>buy a bigger box</q>. But big boxes are expensive, and what if there is no bigger box? MongoDB scales horizontally, you just <q>buy more boxes</q> instead.
 
 <figure>
-  <ArticleImage src={articleImage1} alt="Scaling vertically vs scaling horizontally." />
+  <ArticleImage src={scaling} darkSrc={scalingDark} alt="Vertical scaling adds capacity to one server. Horizontal scaling adds servers that communicate over a network." />
   <figcaption>“Buy more boxes instead of a bigger one”</figcaption>
 </figure>
 
 The problem is all those boxes are separate servers and need to communicate over the network, which introduces latency, which makes things slow. MongoDB’s approach is to sacrifice features to keep things manageable and fast, but at the same time keep enough features to do interesting stuff. Take a look at the following graph:
 
 <figure>
-  <ArticleImage src={articleImage2} alt="MongoDB features compared to Memcached and high feature RDBMS." />
+  <ArticleImage src={features} darkSrc={featuresDark} alt="The 2013 course's conceptual trade-off between features and scalability: Memcached at the scalable end, MongoDB at the knee, and a high-feature RDBMS at the feature-rich end. This is not benchmark data." />
 </figure>
 
 The idea is if a product doesn’t have any features it might scale really well, but if it has lots of features that becomes hard. All the way to the left you might have something like Memcached, and all the way to the right some super high feature <abbr title="Relational Database Management System">RDBMS</abbr>. The people behind MongoDB observed that this curve is not linear and so they try to push features up till the “knee”, but no further. The result should be a scalable and fast product, while still keeping about 80% of the features.
@@ -41,7 +45,7 @@ Another reason to use MongoDB is it makes development easier. These documents ar
 Because MongoDB doesn’t have joins, an alternative is to not break up the data. While relational databases have joins, MongoDB has nested or embedded documents which makes querying easier as you can see in the following comparison.
 
 <figure>
-  <ArticleImage src={articleImage3} alt="Storage and querying of data in relational databases vs MongoDB." />
+  <ArticleImage src={joinsAndNesting} darkSrc={joinsAndNestingDark} alt="Relational tables join matching rows on p. The MongoDB example keeps the same fields in one document, with z stored as the array [1, 2]." />
   <figcaption>Comparison between querying in relational databases using joins, versus MongoDB using nesting.</figcaption>
 </figure>
 
@@ -95,7 +99,7 @@ Internally MongoDB stores its data in BSON, or “Binary JSON”, format.[^bson-
 Why BSON? One of the reasons is because it’s fast scannable. Considering JSON is just a string, in order to find a specific key you need to scan every single character in that string, keeping track of the level of nesting, until you found that specific key. That could be tons of data that needs to be scanned. BSON, however, stores the length of values so in order to find that specific key you can just skip past values and read the next key.
 
 <figure>
-  <ArticleImage src={articleImage4} alt="Example of how a JSON object would be stored as BSON." />
+  <ArticleImage src={bsonLayout} darkSrc={bsonLayoutDark} alt="BSON byte layout for a document with a stored as int32 value 3 and b as string xyz: 23 bytes including lengths, type tags, null-terminated keys, values and the final terminator." />
 </figure>
 
 As you can see in the image, a BSON document starts with the document length, in this case 23 bytes. Lengths are stored as 32-bit integers, little endian, so “23” would actually be stored as `\x17\x00\x00\x00`. While for readability I wrote “23”, note lengths are 4 bytes long since they are 32-bit integers. Then for each `key: value` pair BSON specifies the value type as a single byte, key as `null` terminated string, value length as 32-bit integer if applicable and the value itself. Documents, arrays and strings are `null` terminated. For arrays I believe indexes are stored as well.

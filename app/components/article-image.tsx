@@ -2,20 +2,37 @@ import Image, { type StaticImageData } from 'next/image'
 
 export function ArticleImage({
   src,
+  darkSrc,
   alt,
 }: {
   src: StaticImageData
+  darkSrc?: StaticImageData
   alt: string
 }) {
+  const shared = {
+    placeholder: 'blur' as const,
+    quality: 90,
+    sizes:
+      '(max-width: 639px) calc(100vw - 48px), (max-width: 848px) calc(100vw - 80px), 768px',
+    style: { width: '100%', height: 'auto' },
+  }
+
   return (
-    <Image
-      src={src}
-      alt={alt}
-      placeholder="blur"
-      quality={90}
-      sizes={`(max-width: ${src.width + 48}px) calc(100vw - 48px), ${src.width}px`}
-      className="rounded-sm bg-[#f8f9f5]"
-      style={{ width: src.width, maxWidth: '100%', height: 'auto' }}
-    />
+    <>
+      <Image
+        {...shared}
+        src={src}
+        alt={alt}
+        className={darkSrc ? 'rounded-sm dark:hidden' : 'rounded-sm'}
+      />
+      {darkSrc && (
+        <Image
+          {...shared}
+          src={darkSrc}
+          alt={alt}
+          className="hidden rounded-sm dark:inline"
+        />
+      )}
+    </>
   )
 }

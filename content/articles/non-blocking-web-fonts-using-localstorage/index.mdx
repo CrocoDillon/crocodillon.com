@@ -7,7 +7,8 @@ updatedAt: "2015-01-07T20:46:00Z"
 excerpt: "Web fonts, without the performance drawback. By using a simple script to load base64 encoded web fonts in a non-blocking way and cache them in LocalStorage."
 ---
 
-import articleImage1 from '../../../public/images/articles/non-blocking-web-fonts-using-localstorage/non-blocking-web-fonts-using-localstorage__the-guardian.png'
+import fontLoadingFlow from './images/font-loading-flow.png'
+import fontLoadingFlowDark from './images/font-loading-flow.dark.png'
 
 <p className="intro">I work at a game publishing company called SpilGames and in the past 6 months or so we redesigned some of our game portals, a part of that redesign was a custom web font. At the same time we were constantly trying to improving page load times and we had to remove the web font because this was a blocking request.</p>
 
@@ -23,7 +24,7 @@ I was dedicated to bring that font back, with the following requirements:
 Obviously we are not the only one trying to improve web font performance. During an in-house workshop Vitaly Friedman showed how The Guardian uses JavaScript to load and store their web fonts. Using JavaScript you have more control over when to retrieve the web fonts and how to cache them, independent of what browser your user is using. Their logic is divided in pre-render and post-render.
 
 <figure>
-  <ArticleImage src={articleImage1} alt="The Guardian divides their web font loading logic in pre-render and post-render." />
+  <ArticleImage src={fontLoadingFlow} darkSrc={fontLoadingFlowDark} alt="The Guardian's 2014 font-loading strategy: before rendering, check browser capabilities, WOFF support and cached fonts. After rendering, if storage is available, download fonts as base64 in JSON, cache them and display them." />
 </figure>
 
 “Cut the mustard” is a simple test to detect whether or not the browser is reasonably modern and looks something like:
