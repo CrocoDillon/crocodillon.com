@@ -83,10 +83,6 @@ Use the Vercel Git integration for subsequent pushes. Domain registration can st
 
 Vercel Web Analytics is mounted once in the root layout and tracks page views, including client-side navigation. Enable Web Analytics for the Vercel project before deploying; no analytics keys or environment variables are needed.
 
-## Backup handling
-
-This is a public repository. Raw hosting files and SQL exports remain local, ignored by Git and Vercel uploads. They contain credentials and visitor data. The deployment includes only the migrated public articles and reviewed assets.
-
-Git deployments use the committed repository. `.vercelignore` is optional, but this checkout contains private local backups, so a small file excludes those and other local-only files from any future CLI upload. Vercel already ignores standard build output and dependency directories.
+Git deployments use the committed repository. `.vercelignore` keeps local QA artifacts, environment files, and temporary files out of CLI uploads. Vercel already ignores standard build output and dependency directories.
 
 Configuration files use TypeScript where supported. ESLint uses `eslint.config.ts` with `jiti`; Next.js and Prettier also use TypeScript. The installed Next.js version does not discover `postcss.config.ts`, so the small PostCSS configuration lives in `package.json` instead.

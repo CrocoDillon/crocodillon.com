@@ -1,10 +1,6 @@
 node_modules
 npm-debug.log
 
-# Raw hosting backups contain private configuration and account data.
-/backup/
-/backup.sql
-
 .next/
 .vercel/
 .pnpm-store/
