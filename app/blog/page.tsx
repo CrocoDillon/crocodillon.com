@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 export default async function Blog() {
   const posts = await getPosts()
   const years = [...new Set(posts.map(post => post.publishedAt.slice(0, 4)))]
+  const yearRange = years.length > 1 ? `${years.at(-1)}–${years[0]}` : years[0]
   return (
     <>
       <header className="pt-16 pb-14 sm:pt-24">
@@ -24,7 +25,8 @@ export default async function Blog() {
           figuring out.
         </p>
         <p className="mt-5 font-mono text-xs text-muted">
-          {posts.length} articles · 2013–2016
+          {posts.length} {posts.length === 1 ? 'article' : 'articles'}
+          {yearRange ? ` · ${yearRange}` : ''}
         </p>
       </header>
       {years.map(year => (
