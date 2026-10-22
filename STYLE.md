@@ -13,6 +13,7 @@ Based on all ten published articles, from _Welcome to my blog!_ (2013) through _
 - Move supporting references and tangents into footnotes when they would interrupt the explanation. Link to the relevant primary documentation. State version and environment limits where they matter.
 - Finish when the useful explanation is complete: a practical caveat, a thing to try, or a brief invitation to share a better approach. No obligatory recap, sales pitch, or engagement prompt.
 - Keep spelling and grammar clean. Preserve the direct, slightly informal voice without imitating old typos or repeating outdated browser advice. Use current APIs and verify current technical claims for new articles.
+- Use proper typographic punctuation in article prose: curly apostrophes (’), curly quotation marks (“…” and ‘…’), em dashes (—) for asides or breaks, and en dashes (–) for ranges where appropriate. These are normal writing conventions; don’t avoid them because they might be associated with AI writing. Keep straight quotes and hyphens where code, JSX attributes, frontmatter syntax, URLs, or literal output require them.
 
 ### Useful reference articles
 

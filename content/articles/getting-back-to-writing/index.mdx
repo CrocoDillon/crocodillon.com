@@ -1,0 +1,39 @@
+---
+slug: 'getting-back-to-writing'
+title: 'Getting back to writing'
+description: 'After years away, a PHP security advisory finally pushed me to migrate this blog and make publishing something I might actually do again.'
+publishedAt: '2026-10-22T10:00:00Z'
+excerpt: 'I always liked writing for this blog. Everything involved in getting an article published had become a bit of a problem.'
+---
+
+<p className="intro">It’s been a long time since I wrote anything here. I always liked the writing part, but everything around it had become a hurdle. And that hurdle kept getting steeper.</p>
+
+An article needed images, which took me a long time to create. I’m a developer, and my design skills reflect that. Then I had to log into the database and add the article by hand, because I’d never built a CMS. The backend ran on a PHP framework I’d long since forgotten how to use.
+
+So publishing meant finding the time to write, make images, and reacquaint myself with a setup that became less familiar every time I opened it. Eventually I lost the database credentials—and that was that. I gave up.
+
+The blog stayed online, but I stopped adding to it.
+
+## A slightly urgent fresh start
+
+Yesterday (October 21, 2026), the news about two critical PHP vulnerabilities[^php] finally forced me to do something about it. For me, that meant either taking the blog down or migrating it to something I wanted to work with again.
+
+I was sure about one thing: I didn’t want to build it in PHP again. I love working with Next.js and React, so I had Codex migrate the legacy codebase to those and freshen up the styling a little along the way. If you’ve been here before, you’ll probably notice a few changes.
+
+I also took the opportunity to get rid of the database entirely. The articles now live in Markdown files, with frontmatter for things like the title, description, and publication date. More precisely, they’re MDX files, which let me use React components alongside the Markdown when I need to.[^mdx]
+
+Next.js generates the pages at build time. Publishing a new article now means adding a file and deploying the site. That’s a workflow I can remember without having to rediscover how my own blog works first.
+
+## Writing again
+
+There are still images to make when an article needs them, but getting the words onto the website is finally easy. This post is a start.
+
+Hopefully you can expect a lot more from me! I still like figuring things out and writing down what I learned. Although these days, I’m not entirely sure people still read blog posts 😄
+
+If you’re here reading this one, I’m glad you are.
+
+Happy reading!
+
+[^php]: PHP’s [security advisory from October 21, 2026](https://www.php.net/archive/2026.php#2026-10-21-5) covers two critical vulnerabilities that can allow unauthenticated remote code execution.
+
+[^mdx]: The Next.js guide to [Markdown and MDX](https://nextjs.org/docs/app/guides/mdx) explains how to use local content files, React components, and frontmatter. Frontmatter needs additional parsing; it isn’t supported by `@next/mdx` by default.
