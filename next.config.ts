@@ -20,6 +20,15 @@ const withMDX = createMDX({
 const config: NextConfig = {
   poweredByHeader: false,
   images: { qualities: [75, 90] },
+  turbopack: {
+    rules: {
+      '*.svg': {
+        condition: { path: /content\/articles\// },
+        loaders: [{ loader: '@svgr/webpack', options: { svgo: false } }],
+        as: '*.js',
+      },
+    },
+  },
   async redirects() {
     return [
       { source: '/contact', destination: '/', permanent: true },

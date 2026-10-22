@@ -1,20 +1,21 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  width="2000"
-  height="2550"
+  width="800"
+  height="1020"
   viewBox="0 0 800 1020"
+  class="article-diagram"
   role="img"
-  aria-labelledby="title desc"
+  aria-labelledby="utf16-surrogate-pairs-title utf16-surrogate-pairs-desc"
 >
-  <title id="title">From a code point to a pair</title>
-  <desc id="desc">
+  <title id="utf16-surrogate-pairs-title">From a code point to a pair</title>
+  <desc id="utf16-surrogate-pairs-desc">
     Subtract hexadecimal 10000, split the 20-bit offset into high and low ten
     bits, and add D800 and DC00 respectively. U+10000 becomes D800 DC00;
     U+10FFFF becomes DBFF DFFF.
   </desc>
   <defs>
     <marker
-      id="arrow"
+      id="utf16-surrogate-pairs-arrow"
       viewBox="0 0 10 10"
       refX="9"
       refY="5"
@@ -22,10 +23,15 @@
       markerHeight="8"
       orient="auto-start-reverse"
     >
-      <path d="M1 1L9 5L1 9" fill="none" stroke="#3a643f" stroke-width="1.5" />
+      <path
+        d="M1 1L9 5L1 9"
+        fill="none"
+        stroke="var(--color-moss, #3a643f)"
+        stroke-width="1.5"
+      />
     </marker>
     <marker
-      id="gray-arrow"
+      id="utf16-surrogate-pairs-gray-arrow"
       viewBox="0 0 10 10"
       refX="9"
       refY="5"
@@ -33,16 +39,33 @@
       markerHeight="8"
       orient="auto-start-reverse"
     >
-      <path d="M1 1L9 5L1 9" fill="none" stroke="#677061" stroke-width="1.5" />
+      <path
+        d="M1 1L9 5L1 9"
+        fill="none"
+        stroke="var(--color-muted, #677061)"
+        stroke-width="1.5"
+      />
     </marker>
-    <pattern id="padding" width="8" height="8" patternUnits="userSpaceOnUse">
-      <path d="M0 8L8 0" stroke="#dce1d6" stroke-width="2" />
+    <pattern
+      id="utf16-surrogate-pairs-padding"
+      width="8"
+      height="8"
+      patternUnits="userSpaceOnUse"
+    >
+      <path d="M0 8L8 0" stroke="var(--color-line, #dce1d6)" stroke-width="2" />
     </pattern>
   </defs>
   <style>
-    text{font-family:Inter,Arial,sans-serif;font-size:24px;fill:#20291e}.title{font-size:32px;font-weight:600;letter-spacing:-.5px}.section{font-size:26px;font-weight:600}.small{font-size:21px}.tiny{font-size:19px}.muted{fill:#677061}.green{fill:#3a643f}.mono{font-family:Consolas,'Liberation Mono',monospace;font-size:23px}.bold{font-weight:600}.light{fill:#f8f9f5}
+    svg.article-diagram text{font-family:Inter,Arial,sans-serif;font-size:24px;fill:var(--color-ink, #20291e)}svg.article-diagram .title{font-size:32px;font-weight:600;letter-spacing:-.5px}svg.article-diagram .section{font-size:26px;font-weight:600}svg.article-diagram .small{font-size:21px}svg.article-diagram .tiny{font-size:19px}svg.article-diagram .muted{fill:var(--color-muted, #677061)}svg.article-diagram .green{fill:var(--color-moss, #3a643f)}svg.article-diagram .mono{font-family:Consolas,'Liberation Mono',monospace;font-size:23px}svg.article-diagram .bold{font-weight:600}svg.article-diagram .light{fill:var(--color-paper, #f8f9f5)}
+          @media (prefers-color-scheme: dark) {
+            :root.article-diagram {
+              --color-paper: #151c17; --color-ink: #e5eadf; --color-moss: #a6c991;
+              --color-muted: #a6b19f; --color-leaf: #222f24; --color-line: #344136;
+              --color-diagram-panel: #1d261f;
+            }
+          }
   </style>
-  <rect width="800" height="1020" fill="#f8f9f5" />
+  <rect width="800" height="1020" fill="var(--color-paper, #f8f9f5)" />
   <!-- prettier-ignore -->
   <text x="40" y="61" class="title" text-anchor="start" xml:space="preserve">From a code point to a pair</text>
   <!-- prettier-ignore -->
@@ -53,8 +76,8 @@
     width="720"
     height="349"
     rx="10"
-    fill="white"
-    stroke="#dce1d6"
+    fill="var(--color-diagram-panel, #ffffff)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <rect
@@ -63,7 +86,7 @@
     width="170"
     height="42"
     rx="21"
-    fill="#e9efdf"
+    fill="var(--color-leaf, #e9efdf)"
     stroke="none"
     stroke-width="2"
   />
@@ -79,7 +102,7 @@
     width="326"
     height="45"
     rx="4"
-    fill="#e9efdf"
+    fill="var(--color-leaf, #e9efdf)"
     stroke="none"
     stroke-width="2"
   />
@@ -89,8 +112,8 @@
     width="326"
     height="45"
     rx="4"
-    fill="#f8f9f5"
-    stroke="#dce1d6"
+    fill="var(--color-paper, #f8f9f5)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <!-- prettier-ignore -->
@@ -100,20 +123,20 @@
   <path
     d="M225 357V380"
     fill="none"
-    stroke="#3a643f"
+    stroke="var(--color-moss, #3a643f)"
     stroke-width="2.5"
     stroke-linecap="round"
     stroke-linejoin="round"
-    marker-end="url(#arrow)"
+    marker-end="url(#utf16-surrogate-pairs-arrow)"
   />
   <path
     d="M575 357V380"
     fill="none"
-    stroke="#3a643f"
+    stroke="var(--color-moss, #3a643f)"
     stroke-width="2.5"
     stroke-linecap="round"
     stroke-linejoin="round"
-    marker-end="url(#arrow)"
+    marker-end="url(#utf16-surrogate-pairs-arrow)"
   />
   <!-- prettier-ignore -->
   <text x="225" y="412" class="mono" text-anchor="middle" xml:space="preserve">0xD800 + 0x000</text>
@@ -129,8 +152,8 @@
     width="720"
     height="349"
     rx="10"
-    fill="white"
-    stroke="#dce1d6"
+    fill="var(--color-diagram-panel, #ffffff)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <rect
@@ -139,7 +162,7 @@
     width="170"
     height="42"
     rx="21"
-    fill="#e9efdf"
+    fill="var(--color-leaf, #e9efdf)"
     stroke="none"
     stroke-width="2"
   />
@@ -155,7 +178,7 @@
     width="326"
     height="45"
     rx="4"
-    fill="#e9efdf"
+    fill="var(--color-leaf, #e9efdf)"
     stroke="none"
     stroke-width="2"
   />
@@ -165,8 +188,8 @@
     width="326"
     height="45"
     rx="4"
-    fill="#f8f9f5"
-    stroke="#dce1d6"
+    fill="var(--color-paper, #f8f9f5)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <!-- prettier-ignore -->
@@ -176,20 +199,20 @@
   <path
     d="M225 728V751"
     fill="none"
-    stroke="#3a643f"
+    stroke="var(--color-moss, #3a643f)"
     stroke-width="2.5"
     stroke-linecap="round"
     stroke-linejoin="round"
-    marker-end="url(#arrow)"
+    marker-end="url(#utf16-surrogate-pairs-arrow)"
   />
   <path
     d="M575 728V751"
     fill="none"
-    stroke="#3a643f"
+    stroke="var(--color-moss, #3a643f)"
     stroke-width="2.5"
     stroke-linecap="round"
     stroke-linejoin="round"
-    marker-end="url(#arrow)"
+    marker-end="url(#utf16-surrogate-pairs-arrow)"
   />
   <!-- prettier-ignore -->
   <text x="225" y="783" class="mono" text-anchor="middle" xml:space="preserve">0xD800 + 0x3FF</text>

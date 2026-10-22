@@ -12,6 +12,7 @@
   --color-code: #f0f2eb;
   --color-code-inline: #edf0e7;
   --color-selection: #d0dfbd;
+  --color-diagram-panel: #ffffff;
   --font-sans: 'Inter', 'Segoe UI', Arial, sans-serif;
   --font-display:
     'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
@@ -36,6 +37,7 @@
     --color-code: #1d261f;
     --color-code-inline: #253228;
     --color-selection: #3b5335;
+    --color-diagram-panel: #1d261f;
   }
   ::selection {
     background: var(--color-selection);
@@ -127,6 +129,12 @@
   .article-prose :where(img) {
     max-width: 100%;
     height: auto;
+  }
+  .article-prose :where(svg.article-diagram) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 3px;
   }
   .article-prose :where(img[style]) {
     display: inline;

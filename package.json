@@ -37,6 +37,7 @@
     "shiki": "4.5.0"
   },
   "devDependencies": {
+    "@svgr/webpack": "8.1.0",
     "@tailwindcss/postcss": "4.3.3",
     "@tailwindcss/typography": "0.5.20",
     "@types/mdx": "2.0.14",

@@ -35,9 +35,9 @@ New images follow the current site branding. Historical screenshots and diagrams
 - Use the quiet field-notes aesthetic: warm paper `#f8f9f5`, dark ink `#20291e`, moss `#3a643f`, muted text `#677061`, pale leaf `#e9efdf`, and rules `#dce1d6`. Plenty of space; restrained linework and simple geometry.
 - Article images should explain one thing: a sequence, relationship, data structure, comparison, or real interface state. Prefer clear diagrams and genuine screenshots. Avoid stock developer imagery, decorative code, invented charts, neon gradients, 3D effects, and ornamental detail.
 - Keep diagram labels short and readable at the actual article width. Use consistent strokes, arrows, spacing, and alignment. Distinguish concepts with labels or shapes as well as color. Add accurate alt text and a caption when interpretation or attribution is needed.
-- For new diagrams, keep an editable SVG source and export a crisp PNG at roughly twice its intended display width, typically 1600–2400 pixels. Choose the aspect ratio to fit the explanation. Don't enlarge old screenshots and describe that as improved detail.
-- Co-locate source and display assets under `content/articles/<slug>/images/` with descriptive names. Diagrams have light (`name.svg` / `name.png`) and dark (`name.dark.svg` / `name.dark.png`) variants with identical layout and dimensions. Use the existing diagrams as references for typography, spacing, and strokes.
-- Use the site's dark palette for the dark variant: paper `#151c17`, ink `#e5eadf`, moss `#a6c991`, muted `#a6b19f`, leaf `#222f24`, rules `#344136`, and panel `#1d261f` (white in light diagrams). Keep backgrounds opaque and recolor the source, rather than applying an inversion filter. Genuine screenshots and photos keep their original colors.
+- Diagrams use a single editable SVG, rendered inline as a React component. Co-locate it under `content/articles/<slug>/images/` with a descriptive name. Keep its `viewBox` and intrinsic aspect ratio; don't export raster or separate theme variants. Genuine screenshots and photos use raster images at roughly twice their intended display width, typically 1600–2400 pixels. Don't enlarge old screenshots and describe that as improved detail.
+- Use the site's CSS color variables with light fallbacks, for example `var(--color-moss, #3a643f)`, so inline diagrams follow the selected theme before hydration. `--color-diagram-panel` provides light and dark panel fills. Standalone SVGs use `:root.article-diagram` inside a dark media query as a system-theme fallback; this must not override the manual theme when inline. Photos, screenshots, and sharing cards keep their original colors.
+- Scope SVG styles to `svg.article-diagram`, prefix IDs with the diagram name (including title/description, markers, and patterns), and include a meaningful `<title>`, `<desc>`, and `aria-labelledby`. Use the existing diagrams as references. Only import reviewed repository SVGs: they become inline page markup.
 
 ### OG and Twitter cards
 
@@ -48,16 +48,25 @@ New images follow the current site branding. Historical screenshots and diagrams
 
 ### Article image loading
 
-Use a static import with the shared component so Next.js supplies dimensions and a small blur placeholder automatically:
+Import a diagram directly. SVGR compiles article SVG imports into Server Components; no browser loader or separate image request is needed:
 
 ```mdx
-import diagram from './images/request-flow.png'
-import diagramDark from './images/request-flow.dark.png'
+import RequestFlow from './images/request-flow.svg'
 
 <figure>
-  <ArticleImage src={diagram} darkSrc={diagramDark} alt="The browser sends a request through the cache to the server." />
+  <RequestFlow />
   <figcaption>A cache miss continues to the server.</figcaption>
 </figure>
 ```
 
-`ArticleImage` uses responsive image loading at quality 90 and reserves the original aspect ratio. Optional `darkSrc` switches variants through the site's theme class, before hydration, with a blur placeholder for each. Omit it for screenshots and photos. Keep small inline SVG icons as ordinary images. Blur placeholders apply to images on the blog; social platforms control loading of the sharing cards they fetch.
+SVG diagrams are sharp at every size and need no blur placeholder. For photos and screenshots, use a static raster import with `ArticleImage` for responsive loading, reserved dimensions, and an automatic blur placeholder:
+
+```mdx
+import screenshot from './images/cache-inspector.png'
+
+<figure>
+  <ArticleImage src={screenshot} alt="The cache inspector shows one stored response." />
+</figure>
+```
+
+`ArticleImage` uses responsive image loading at quality 90 and preserves the original colors. Keep small inline emoji-demo icons as ordinary images. Social platforms control loading of the sharing cards they fetch.

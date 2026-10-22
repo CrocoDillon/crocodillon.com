@@ -25,7 +25,7 @@ The pnpm workspace configuration follows Reeflings and Carely: exact versions, a
 
 - `app/`: routes, components, and shared library code. `@/` resolves to this directory.
 - `content/articles/<slug>/index.mdx`: one article per folder, independent of its publication date.
-- `content/articles/<slug>/images/`: co-located illustrations, with editable SVG sources and high-resolution light/dark PNGs for diagrams.
+- `content/articles/<slug>/images/`: co-located illustrations; each diagram is a single editable, theme-aware SVG.
 - `public/demo/`: reviewed public assets for the legacy demos.
 - `mdx-components.tsx`: the framework-required MDX component registry, at the project root.
 
@@ -57,7 +57,9 @@ Use standard fenced code blocks such as ` ```javascript `. GFM tables and footno
 
 Add global article components to `mdx-components.tsx`, or import components directly in an individual MDX file. Most components should remain Server Components; add `'use client'` only when browser state or APIs are needed.
 
-Use relative static image imports such as `./images/request-flow.png` with the shared `<ArticleImage>` component in MDX for responsive loading, dimensions, and automatic blur placeholders. Pass `darkSrc` for a matching dark diagram; the site's theme class switches variants without waiting for hydration. Next.js emits imported images at versioned asset URLs; they don't need to live in `public/`. See the example in [STYLE.md](STYLE.md).
+Import diagrams as React components, for example `import RequestFlow from './images/request-flow.svg'` and `<RequestFlow />`. SVGR compiles article SVGs with Turbopack; inline diagrams inherit the site's CSS theme colors and render with the article, with no separate image request or blur placeholder. Keep titles/descriptions and scoped styles in the SVG source.
+
+For photos and screenshots, use relative static raster imports with `<ArticleImage>` for responsive loading, dimensions, and automatic blur placeholders. Images don't need to live in `public/`. See [STYLE.md](STYLE.md) for examples of both.
 
 ## Appearance
 
@@ -69,7 +71,7 @@ OG and Twitter cards share a 2400 × 1260 lossless PNG template in `app/lib/soci
 
 ## Legacy compatibility
 
-`/blog/<slug>`, `/blog/rss`, and `/blog/atom` are preserved. Old illustration URLs redirect to the imported assets through a statically generated compatibility route, and the original emoji-demo routes redirect to their new locations. `/contact` and `/webdesign` redirect home. Feeds retain historical entry IDs to avoid duplicate subscriptions.
+`/blog/<slug>`, `/blog/rss`, and `/blog/atom` are preserved. Old illustration URLs redirect to the SVG sources through a statically generated compatibility route, and the original emoji-demo routes redirect to their new locations. `/contact` and `/webdesign` redirect home. Feeds retain historical entry IDs to avoid duplicate subscriptions.
 
 Disqus uses the existing `crocodillon` forum, original slug identifiers, and historical thread URLs. Comments load automatically when the discussion approaches the viewport. Once loaded, the comment frame refreshes when the resolved color theme changes. The contact form and old financial/contact details are removed.
 

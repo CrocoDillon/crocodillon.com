@@ -1,19 +1,20 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  width="2000"
-  height="1900"
+  width="800"
+  height="760"
   viewBox="0 0 800 760"
+  class="article-diagram"
   role="img"
-  aria-labelledby="title desc"
+  aria-labelledby="joins-and-nesting-title joins-and-nesting-desc"
 >
-  <title id="title">Joins or nested documents</title>
-  <desc id="desc">
+  <title id="joins-and-nesting-title">Joins or nested documents</title>
+  <desc id="joins-and-nesting-desc">
     Two relational tables join on p to produce the same fields held together in
     a MongoDB document: id Q33, x 3, y abc and z array containing 1 and 2.
   </desc>
   <defs>
     <marker
-      id="arrow"
+      id="joins-and-nesting-arrow"
       viewBox="0 0 10 10"
       refX="9"
       refY="5"
@@ -21,10 +22,15 @@
       markerHeight="8"
       orient="auto-start-reverse"
     >
-      <path d="M1 1L9 5L1 9" fill="none" stroke="#3a643f" stroke-width="1.5" />
+      <path
+        d="M1 1L9 5L1 9"
+        fill="none"
+        stroke="var(--color-moss, #3a643f)"
+        stroke-width="1.5"
+      />
     </marker>
     <marker
-      id="gray-arrow"
+      id="joins-and-nesting-gray-arrow"
       viewBox="0 0 10 10"
       refX="9"
       refY="5"
@@ -32,24 +38,41 @@
       markerHeight="8"
       orient="auto-start-reverse"
     >
-      <path d="M1 1L9 5L1 9" fill="none" stroke="#677061" stroke-width="1.5" />
+      <path
+        d="M1 1L9 5L1 9"
+        fill="none"
+        stroke="var(--color-muted, #677061)"
+        stroke-width="1.5"
+      />
     </marker>
-    <pattern id="padding" width="8" height="8" patternUnits="userSpaceOnUse">
-      <path d="M0 8L8 0" stroke="#dce1d6" stroke-width="2" />
+    <pattern
+      id="joins-and-nesting-padding"
+      width="8"
+      height="8"
+      patternUnits="userSpaceOnUse"
+    >
+      <path d="M0 8L8 0" stroke="var(--color-line, #dce1d6)" stroke-width="2" />
     </pattern>
   </defs>
   <style>
-    text{font-family:Inter,Arial,sans-serif;font-size:24px;fill:#20291e}.title{font-size:32px;font-weight:600;letter-spacing:-.5px}.section{font-size:26px;font-weight:600}.small{font-size:21px}.tiny{font-size:19px}.muted{fill:#677061}.green{fill:#3a643f}.mono{font-family:Consolas,'Liberation Mono',monospace;font-size:23px}.bold{font-weight:600}.light{fill:#f8f9f5}
+    svg.article-diagram text{font-family:Inter,Arial,sans-serif;font-size:24px;fill:var(--color-ink, #20291e)}svg.article-diagram .title{font-size:32px;font-weight:600;letter-spacing:-.5px}svg.article-diagram .section{font-size:26px;font-weight:600}svg.article-diagram .small{font-size:21px}svg.article-diagram .tiny{font-size:19px}svg.article-diagram .muted{fill:var(--color-muted, #677061)}svg.article-diagram .green{fill:var(--color-moss, #3a643f)}svg.article-diagram .mono{font-family:Consolas,'Liberation Mono',monospace;font-size:23px}svg.article-diagram .bold{font-weight:600}svg.article-diagram .light{fill:var(--color-paper, #f8f9f5)}
+          @media (prefers-color-scheme: dark) {
+            :root.article-diagram {
+              --color-paper: #151c17; --color-ink: #e5eadf; --color-moss: #a6c991;
+              --color-muted: #a6b19f; --color-leaf: #222f24; --color-line: #344136;
+              --color-diagram-panel: #1d261f;
+            }
+          }
   </style>
-  <rect width="800" height="760" fill="#f8f9f5" />
+  <rect width="800" height="760" fill="var(--color-paper, #f8f9f5)" />
   <!-- prettier-ignore -->
   <text x="40" y="61" class="title" text-anchor="start" xml:space="preserve">Joins or nested documents</text>
-  <path d="M40 90H760" stroke="#dce1d6" stroke-width="2" />
+  <path d="M40 90H760" stroke="var(--color-line, #dce1d6)" stroke-width="2" />
   <!-- prettier-ignore -->
   <text x="40" y="139" class="section" text-anchor="start" xml:space="preserve">Relational database</text>
   <!-- prettier-ignore -->
   <text x="430" y="139" class="section" text-anchor="start" xml:space="preserve">MongoDB</text>
-  <path d="M400 118V700" stroke="#dce1d6" stroke-width="2" />
+  <path d="M400 118V700" stroke="var(--color-line, #dce1d6)" stroke-width="2" />
   <!-- prettier-ignore -->
   <text x="40" y="190" class="small muted" text-anchor="start" xml:space="preserve">Table t</text>
   <!-- prettier-ignore -->
@@ -60,8 +83,8 @@
     width="200"
     height="92"
     rx="6"
-    fill="white"
-    stroke="#dce1d6"
+    fill="var(--color-diagram-panel, #ffffff)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <rect
@@ -70,7 +93,7 @@
     width="200"
     height="46"
     rx="6"
-    fill="#e9efdf"
+    fill="var(--color-leaf, #e9efdf)"
     stroke="none"
     stroke-width="2"
   />
@@ -92,8 +115,8 @@
     width="110"
     height="138"
     rx="6"
-    fill="white"
-    stroke="#dce1d6"
+    fill="var(--color-diagram-panel, #ffffff)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <rect
@@ -102,7 +125,7 @@
     width="110"
     height="46"
     rx="6"
-    fill="#e9efdf"
+    fill="var(--color-leaf, #e9efdf)"
     stroke="none"
     stroke-width="2"
   />
@@ -126,8 +149,8 @@
     width="330"
     height="294"
     rx="10"
-    fill="white"
-    stroke="#dce1d6"
+    fill="var(--color-diagram-panel, #ffffff)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <!-- prettier-ignore -->
@@ -150,8 +173,8 @@
     width="330"
     height="237"
     rx="10"
-    fill="white"
-    stroke="#dce1d6"
+    fill="var(--color-diagram-panel, #ffffff)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <!-- prettier-ignore -->
@@ -170,7 +193,7 @@
     width="330"
     height="116"
     rx="10"
-    fill="#e9efdf"
+    fill="var(--color-leaf, #e9efdf)"
     stroke="none"
     stroke-width="2"
   />

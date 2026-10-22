@@ -1,20 +1,21 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  width="2000"
-  height="2175"
+  width="800"
+  height="870"
   viewBox="0 0 800 870"
+  class="article-diagram"
   role="img"
-  aria-labelledby="title desc"
+  aria-labelledby="bson-layout-title bson-layout-desc"
 >
-  <title id="title">Inside a BSON document</title>
-  <desc id="desc">
+  <title id="bson-layout-title">Inside a BSON document</title>
+  <desc id="bson-layout-desc">
     The document {a: 3, b: xyz}, with a stored as int32, occupies 23 bytes. The
     diagram lists every byte in little-endian hexadecimal order, including
     lengths, types, null-terminated keys, string and final document terminator.
   </desc>
   <defs>
     <marker
-      id="arrow"
+      id="bson-layout-arrow"
       viewBox="0 0 10 10"
       refX="9"
       refY="5"
@@ -22,10 +23,15 @@
       markerHeight="8"
       orient="auto-start-reverse"
     >
-      <path d="M1 1L9 5L1 9" fill="none" stroke="#3a643f" stroke-width="1.5" />
+      <path
+        d="M1 1L9 5L1 9"
+        fill="none"
+        stroke="var(--color-moss, #3a643f)"
+        stroke-width="1.5"
+      />
     </marker>
     <marker
-      id="gray-arrow"
+      id="bson-layout-gray-arrow"
       viewBox="0 0 10 10"
       refX="9"
       refY="5"
@@ -33,16 +39,33 @@
       markerHeight="8"
       orient="auto-start-reverse"
     >
-      <path d="M1 1L9 5L1 9" fill="none" stroke="#677061" stroke-width="1.5" />
+      <path
+        d="M1 1L9 5L1 9"
+        fill="none"
+        stroke="var(--color-muted, #677061)"
+        stroke-width="1.5"
+      />
     </marker>
-    <pattern id="padding" width="8" height="8" patternUnits="userSpaceOnUse">
-      <path d="M0 8L8 0" stroke="#dce1d6" stroke-width="2" />
+    <pattern
+      id="bson-layout-padding"
+      width="8"
+      height="8"
+      patternUnits="userSpaceOnUse"
+    >
+      <path d="M0 8L8 0" stroke="var(--color-line, #dce1d6)" stroke-width="2" />
     </pattern>
   </defs>
   <style>
-    text{font-family:Inter,Arial,sans-serif;font-size:24px;fill:#20291e}.title{font-size:32px;font-weight:600;letter-spacing:-.5px}.section{font-size:26px;font-weight:600}.small{font-size:21px}.tiny{font-size:19px}.muted{fill:#677061}.green{fill:#3a643f}.mono{font-family:Consolas,'Liberation Mono',monospace;font-size:23px}.bold{font-weight:600}.light{fill:#f8f9f5}
+    svg.article-diagram text{font-family:Inter,Arial,sans-serif;font-size:24px;fill:var(--color-ink, #20291e)}svg.article-diagram .title{font-size:32px;font-weight:600;letter-spacing:-.5px}svg.article-diagram .section{font-size:26px;font-weight:600}svg.article-diagram .small{font-size:21px}svg.article-diagram .tiny{font-size:19px}svg.article-diagram .muted{fill:var(--color-muted, #677061)}svg.article-diagram .green{fill:var(--color-moss, #3a643f)}svg.article-diagram .mono{font-family:Consolas,'Liberation Mono',monospace;font-size:23px}svg.article-diagram .bold{font-weight:600}svg.article-diagram .light{fill:var(--color-paper, #f8f9f5)}
+          @media (prefers-color-scheme: dark) {
+            :root.article-diagram {
+              --color-paper: #151c17; --color-ink: #e5eadf; --color-moss: #a6c991;
+              --color-muted: #a6b19f; --color-leaf: #222f24; --color-line: #344136;
+              --color-diagram-panel: #1d261f;
+            }
+          }
   </style>
-  <rect width="800" height="870" fill="#f8f9f5" />
+  <rect width="800" height="870" fill="var(--color-paper, #f8f9f5)" />
   <!-- prettier-ignore -->
   <text x="40" y="61" class="title" text-anchor="start" xml:space="preserve">Inside a BSON document</text>
   <!-- prettier-ignore -->
@@ -53,7 +76,7 @@
     width="720"
     height="72"
     rx="10"
-    fill="#e9efdf"
+    fill="var(--color-leaf, #e9efdf)"
     stroke="none"
     stroke-width="2"
   />
@@ -73,8 +96,8 @@
     width="720"
     height="51"
     rx="0"
-    fill="#e9efdf"
-    stroke="#dce1d6"
+    fill="var(--color-leaf, #e9efdf)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <!-- prettier-ignore -->
@@ -89,8 +112,8 @@
     width="720"
     height="51"
     rx="0"
-    fill="white"
-    stroke="#dce1d6"
+    fill="var(--color-diagram-panel, #ffffff)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <!-- prettier-ignore -->
@@ -105,8 +128,8 @@
     width="720"
     height="51"
     rx="0"
-    fill="white"
-    stroke="#dce1d6"
+    fill="var(--color-diagram-panel, #ffffff)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <!-- prettier-ignore -->
@@ -121,8 +144,8 @@
     width="720"
     height="51"
     rx="0"
-    fill="white"
-    stroke="#dce1d6"
+    fill="var(--color-diagram-panel, #ffffff)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <!-- prettier-ignore -->
@@ -137,8 +160,8 @@
     width="720"
     height="51"
     rx="0"
-    fill="white"
-    stroke="#dce1d6"
+    fill="var(--color-diagram-panel, #ffffff)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <!-- prettier-ignore -->
@@ -153,8 +176,8 @@
     width="720"
     height="51"
     rx="0"
-    fill="white"
-    stroke="#dce1d6"
+    fill="var(--color-diagram-panel, #ffffff)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <!-- prettier-ignore -->
@@ -169,8 +192,8 @@
     width="720"
     height="51"
     rx="0"
-    fill="white"
-    stroke="#dce1d6"
+    fill="var(--color-diagram-panel, #ffffff)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <!-- prettier-ignore -->
@@ -185,8 +208,8 @@
     width="720"
     height="51"
     rx="0"
-    fill="white"
-    stroke="#dce1d6"
+    fill="var(--color-diagram-panel, #ffffff)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <!-- prettier-ignore -->
@@ -201,8 +224,8 @@
     width="720"
     height="51"
     rx="0"
-    fill="#e9efdf"
-    stroke="#dce1d6"
+    fill="var(--color-leaf, #e9efdf)"
+    stroke="var(--color-line, #dce1d6)"
     stroke-width="2"
   />
   <!-- prettier-ignore -->

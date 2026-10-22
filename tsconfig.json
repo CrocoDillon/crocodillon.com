@@ -17,6 +17,7 @@
     "paths": { "@/*": ["./app/*"] }
   },
   "include": [
+    "app/types/svg.d.ts",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",

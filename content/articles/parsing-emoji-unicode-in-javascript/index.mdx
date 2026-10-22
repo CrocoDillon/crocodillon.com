@@ -6,8 +6,7 @@ publishedAt: "2014-01-15T14:21:00Z"
 excerpt: "There are hundreds of emoji characters encoded in Unicode, however JavaScript is limited in supporting these correctly. This makes parsing them a little bit more complicated, but the solution is just one click away. <img src=\"/demo/emoji/images/phantom/wink.svg\" alt=\"Winking face.\" style=\"width:1em;height:1em\">"
 ---
 
-import surrogatePairs from './images/utf16-surrogate-pairs.png'
-import surrogatePairsDark from './images/utf16-surrogate-pairs.dark.png'
+import SurrogatePairsDiagram from './images/utf16-surrogate-pairs.svg'
 
 <p className="intro">Why would you want to parse emoji Unicode in JavaScript? Say you have an application that accepts Unicode (including emoji) as user input, for example for comments or chatting. Most mobile devices have no problem displaying emoji natively, but what if emoji is not supported? Wouldn’t it be nice if you can store the correct standardized Unicode character in your database, and use JavaScript to replace this character with some element that displays an image fallback when emoji isn’t supported?</p>
 
@@ -102,7 +101,7 @@ Code points above `U+FFFF` need to be encoded in UTF-16, but the encoding is sim
 Does any of that rings a bell? Let’s try that with the lowest and the highest relevant code points:
 
 <figure>
-  <ArticleImage src={surrogatePairs} darkSrc={surrogatePairsDark} alt="Subtract 0x10000 from a code point and split the offset into two 10-bit values. Adding 0xD800 and 0xDC00 produces the lead and trail surrogates: D800 DC00 for U+10000, and DBFF DFFF for U+10FFFF." />
+  <SurrogatePairsDiagram />
   <figcaption>In UTF-16, <code>{"U+10000"}</code> is encoded as <code>{"\\ud800\\udc00"}</code> and <code>{"U+10FFFF"}</code> is encoded as <code>{"\\udbff\\udfff"}</code>.</figcaption>
 </figure>
 
