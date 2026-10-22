@@ -1,6 +1,6 @@
-/* eslint-disable @next/next/no-html-link-for-pages -- Feed endpoints return XML and need full navigation. */
 import Link from 'next/link'
-import { CrocodileMark, RssIcon } from '@/components/icons'
+import { CrocodileMark } from '@/components/icons'
+import { FeedMenu } from '@/components/feed-menu'
 import { ThemeToggle } from '@/components/theme-toggle'
 
 export function SiteHeader() {
@@ -24,13 +24,7 @@ export function SiteHeader() {
         <Link href="/#about" className="hover:text-moss">
           About
         </Link>
-        <a
-          href="/blog/rss"
-          className="text-muted hover:text-moss"
-          aria-label="Subscribe via RSS"
-        >
-          <RssIcon className="size-5" />
-        </a>
+        <FeedMenu />
         <ThemeToggle />
       </nav>
     </header>

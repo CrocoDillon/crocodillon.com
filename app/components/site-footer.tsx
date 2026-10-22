@@ -1,5 +1,5 @@
-/* eslint-disable @next/next/no-html-link-for-pages -- Feed endpoints return XML and need full navigation. */
-import { ArrowIcon } from '@/components/icons'
+import { GitHubIcon } from '@/components/icons'
+import { SiteLink } from '@/components/site-link'
 import { site } from '@/lib/site'
 
 export function SiteFooter() {
@@ -21,15 +21,13 @@ export function SiteFooter() {
           </p>
         </div>
         <div className="flex items-start gap-8 text-sm md:flex-col md:justify-center md:gap-3">
-          <a
+          <SiteLink
             href={site.github}
             className="inline-flex items-center gap-2 hover:text-moss"
           >
-            Find me on GitHub <ArrowIcon className="size-4 -rotate-45" />
-          </a>
-          <a href="/blog/atom" className="hover:text-moss">
-            Subscribe via Atom ↗
-          </a>
+            <GitHubIcon className="size-5" />
+            Find me on GitHub
+          </SiteLink>
         </div>
       </div>
       <div className="flex flex-wrap justify-between gap-3 border-t border-line pt-6 font-mono text-[11px] text-muted">

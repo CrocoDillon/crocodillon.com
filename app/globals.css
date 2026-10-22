@@ -119,10 +119,6 @@
     font-weight: 400;
     font-size: 0.85em;
   }
-  .article-prose :where(code)::before,
-  .article-prose :where(code)::after {
-    content: none;
-  }
   .article-prose :where(figure) {
     margin-block: 2rem;
   }
@@ -185,6 +181,10 @@
   & pre {
     background: var(--color-code);
     color: var(--color-ink);
+  }
+  &.prose :where(code)::before,
+  &.prose :where(code)::after {
+    content: none;
   }
   & code[data-theme],
   & code[data-theme] span {

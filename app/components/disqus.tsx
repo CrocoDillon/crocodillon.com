@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
+import { SiteLink } from '@/components/site-link'
 
 type DisqusConfig = { page: { identifier: string; url: string; title: string } }
 declare global {
@@ -99,24 +100,24 @@ export function Disqus({ slug, title }: { slug: string; title: string }) {
       <p className="mt-5 text-sm leading-relaxed text-muted">
         Questions, corrections, or something to add? Join the discussion below.
         Comments are powered by{' '}
-        <a
+        <SiteLink
           href="https://disqus.com/privacy-policy/"
           className="underline underline-offset-2"
         >
           Disqus
-        </a>
+        </SiteLink>
         .
       </p>
       <div className="mt-6 min-h-28" id="disqus_thread" />
       {failed ? (
         <p className="mt-4 text-sm text-muted">
           Disqus couldn’t load. Your browser may be blocking it.{' '}
-          <a
+          <SiteLink
             className="underline"
             href={`https://disqus.com/home/forums/crocodillon/`}
           >
             Open the discussion on Disqus.
-          </a>
+          </SiteLink>
         </p>
       ) : null}
       <noscript>
