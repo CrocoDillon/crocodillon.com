@@ -1,0 +1,105 @@
+---
+slug: 'angular-material-date-input-with-a-custom-date-adapter'
+title: 'Dutch dates with a custom Angular Material date adapter'
+description: 'Let users type DD-MM-YYYY into an Angular Material datepicker with a small custom NativeDateAdapter and a placeholder that explains the expected format.'
+publishedAt: '2026-10-25T04:00:00Z'
+excerpt: 'The datepicker worked, but we also wanted users to type dates. A small custom adapter made it understand the format we use in the Netherlands.'
+draft: false
+---
+
+import demo from './demo/codepen.lock.json'
+
+<p className="intro">In the same project as my <a href="/blog/angular-date-time-controls-with-ngcontrol">date, time and datetime controls</a>, we also wanted users to enter dates manually. Here in the Netherlands, we use DD-MM-YYYY. Typing a date shouldn’t mean switching to MM/DD/YYYY just to keep the input happy.</p>
+
+Angular Material’s datepicker already lets you type into its input. The part we needed to change was how it interpreted that text. It turned out to be a small custom date adapter.[^adapter]
+
+<ArticleDemo title="Type a Dutch date or use the calendar" slug="angular-material-date-input-with-a-custom-date-adapter" penUrl={demo.editorUrl} />
+
+This is the same nested reactive form as before, reduced to one date control. Try typing `25-10-2026`, then choose another date from the calendar. Both use the same format. The example uses Angular and Angular Material 22.2.3; CodePen’s `index.ts` combines the files shown below.
+
+## Teach the adapter our format
+
+We still want JavaScript `Date` objects in the form, so we can extend `NativeDateAdapter`. We only need to change parsing and the input’s display format:
+
+```ts title="dutch-date-adapter.ts"
+import { Injectable } from '@angular/core';
+import { NativeDateAdapter } from '@angular/material/core';
+
+@Injectable()
+export class DutchDateAdapter extends NativeDateAdapter {
+  override parse(value: unknown): Date | null {
+    if (value == null || value === '') return null;
+    if (value instanceof Date) return this.clone(value);
+    if (typeof value !== 'string') return this.invalid();
+
+    const match = /^(\d{2})-(\d{2})-(\d{4})$/.exec(value.trim());
+    if (!match) return this.invalid();
+
+    const [, day, month, year] = match.map(Number);
+    const date = new Date(0);
+    date.setFullYear(year, month - 1, day);
+    date.setHours(0, 0, 0, 0);
+
+    return date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day
+      ? date
+      : this.invalid();
+  }
+
+  override format(date: Date, displayFormat: object | 'dutch-date'): string {
+    if (displayFormat !== 'dutch-date') return super.format(date, displayFormat);
+
+    return [
+      String(date.getDate()).padStart(2, '0'),
+      String(date.getMonth() + 1).padStart(2, '0'),
+      String(date.getFullYear()).padStart(4, '0'),
+    ].join('-');
+  }
+}
+```
+
+The parser expects two digits for the day and month, and four for the year. An empty input returns `null`; malformed input returns an invalid `Date`, allowing Material to report a parse error.
+
+The comparison after creating the date matters. JavaScript happily turns 31 February into a date in March. Checking the resulting parts rejects that overflow, including invalid leap days. Using `setFullYear` also avoids the constructor’s special treatment of years below 100.
+
+## Register it and add a hint
+
+Replace the previous example’s `provideNativeDateAdapter()` with these providers on the app component. Keep its other component settings:
+
+```ts title="app.ts"
+import {
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE,
+  MAT_NATIVE_DATE_FORMATS,
+} from '@angular/material/core';
+import { DutchDateAdapter } from './dutch-date-adapter';
+
+// Inside @Component({ ... })
+providers: [
+  { provide: MAT_DATE_LOCALE, useValue: 'nl-NL' },
+  { provide: DateAdapter, useClass: DutchDateAdapter },
+  {
+    provide: MAT_DATE_FORMATS,
+    useValue: {
+      ...MAT_NATIVE_DATE_FORMATS,
+      display: { ...MAT_NATIVE_DATE_FORMATS.display, dateInput: 'dutch-date' },
+    },
+  },
+],
+```
+
+`dutch-date` is our own marker, not a built-in format string. Only the input uses it; calendar headings and accessible date labels still go through the native formatter with the Dutch locale. Our parser always expects DD-MM-YYYY, so it doesn’t need a configurable parse format. Setting the locale alone doesn’t make the native parser understand that format.
+
+Finally, add a placeholder to the existing date input, keeping its form-control and picker bindings:
+
+```html title="date-control.html"
+<input matInput [matDatepicker]="picker" [formControl]="date"
+  placeholder="DD-MM-YYYY" [required]="required"
+  [errorStateMatcher]="errorMatcher" (blur)="onTouched()">
+```
+
+We added that little hint just in case. The demo also keeps a visible format hint below the field, since a placeholder disappears as you type. The calendar still works, and the parent form still receives a `Date` rather than the formatted string.
+
+[^adapter]: Angular Material’s [date implementation and format settings](https://material.angular.dev/components/datepicker/overview#choosing-a-date-implementation-and-date-format-settings) describe custom adapters and `MAT_DATE_FORMATS`.

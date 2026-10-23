@@ -1,0 +1,7 @@
+{
+  "key": "angular-dutch-date-adapter",
+  "title": "Dutch dates with a custom Angular Material date adapter",
+  "description": "Type DD-MM-YYYY or use the calendar. A custom NativeDateAdapter with strict parsing, a format placeholder, and one reusable NgControl date control in a nested reactive form.",
+  "tags": ["angular", "angular-material", "crocodillon-demo"],
+  "files": ["index.html", "index.css", "index.ts"]
+}
