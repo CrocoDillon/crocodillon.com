@@ -18,7 +18,9 @@ function reportHeight() {
   }
 }
 
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
+  // The first reported height should include the finished font layout.
+  await document.fonts.ready
   new ResizeObserver(reportHeight).observe(document.body)
   reportHeight()
 })

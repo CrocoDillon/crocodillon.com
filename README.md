@@ -133,8 +133,8 @@ draft nor scheduled and that its public URL returns HTTP 200. Until then, the
 Pen has no article backlink. Standard UTM parameters (`utm_source=codepen`,
 `utm_medium=referral`, and the article slug as `utm_campaign`) attribute arrivals
 without adding an analytics script to the Pen or its sandbox. Native UTM
-dashboard filtering requires Web Analytics Plus or Enterprise; the custom
-arrival event works on Pro without that add-on.
+dashboard filtering requires Web Analytics Plus or Enterprise. There is no
+custom arrival event; campaign attribution is left to Web Analytics.
 
 Vercel Web Analytics custom events require Pro or Enterprise and are enabled
 only for published articles on Production deployments:
@@ -142,8 +142,6 @@ only for published articles on Production deployments:
 - `DemoRun`, source `blog`: the reader presses “Run example”. This records intent, not a
   guarantee that the demo finished loading.
 - `DemoOpen`, source `codepen`: the reader follows the article’s CodePen link.
-- `ArticleArrival`, source `codepen`: the article loads with the CodePen backlink marker.
-  This counts completed arrivals, not clicks that never reach the article.
 
 Each event carries only `{ article: slug, source }` and is sent at most once per
 source per mounted article view. Only known sources are accepted. No form values, custom visitor IDs, or persistent tracking state
@@ -151,7 +149,8 @@ are collected. Development and Preview send none of these events, and the
 sandbox never sends analytics events or page views. Compare each event’s count,
 filtered by article, with that article’s page views over the same date range.
 The ratio describes actions per page view, not unique-person conversion; ad
-blockers and failed loads can prevent collection. No UTM-filtering add-on is needed.
+blockers and failed loads can prevent collection. No UTM-filtering add-on is
+needed for these two interaction events.
 
 `content/demos/theme.css` supplies the blog palette, typography, spacing,
 light/dark colors, and Material system-token overrides. It is copied into each
@@ -179,6 +178,10 @@ The article renders a static placeholder and link. Its iframe is added only
 after “Run example” is pressed, keeping sandbox startup out of initial article
 loading. `/demo/<slug>` serves the self-hosted example; CodePen is the optional
 editor. Demo routes follow the same draft and scheduling rules as their articles.
+On activation, the panel keeps its measured idle height and shows a loading
+state while the iframe loads invisibly. Only a validated content-height message
+reveals the example and resizes the panel; there is no guessed initial height.
+Loading and resizing animations respect reduced-motion preferences.
 
 `pnpm install` installs each demo’s pinned workspace dependencies. `pnpm dev` and
 `pnpm build` first run `pnpm demo:build`, which bundles the Angular demo separately
