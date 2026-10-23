@@ -2,7 +2,6 @@ import { createHash } from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import ts from 'typescript'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const hash = value =>
@@ -36,14 +35,14 @@ export async function syncCodePen({
   } catch (error) {
     if (error.code !== 'ENOENT') throw error
   }
-  let files = await Promise.all(
+  const files = await Promise.all(
     config.files.map(async name => {
       if (name.includes('/') || name.includes('\\') || name.startsWith('.'))
         throw new Error(
           'Demo source files must be explicit filenames in the demo folder.'
         )
       let content = await fs.readFile(path.join(directory, name), 'utf8')
-      if (name === 'style.css')
+      if (name === 'index.css')
         content =
           (await fs.readFile(
             path.join(root, 'content/demos/theme.css'),
@@ -54,45 +53,37 @@ export async function syncCodePen({
       return { path: '/' + name, content }
     })
   )
-  if (config.compact) {
-    const stylesheet = files.find(file => file.path === '/style.css')
-    const source = files.find(file => file.path === '/script.ts')
-    const html = files.find(file => file.path === '/index.html')
-    const tsconfig = files.find(file => file.path === '/tsconfig.json')
-    if (!stylesheet || !source || !html || !tsconfig)
-      throw new Error(
-        'Compact demos require index.html, style.css, script.ts and tsconfig.json.'
-      )
-    const converted = ts.convertCompilerOptionsFromJson(
-      JSON.parse(tsconfig.content).compilerOptions,
-      directory
-    )
-    if (converted.errors.length) throw new Error('Invalid demo tsconfig.json.')
-    const compiled = ts.transpileModule(source.content, {
-      fileName: 'script.ts',
-      reportDiagnostics: true,
-      compilerOptions: converted.options,
-    })
-    if (
-      compiled.diagnostics?.some(
-        item => item.category === ts.DiagnosticCategory.Error
-      )
-    )
-      throw new Error('Demo TypeScript compilation failed.')
-    html.content = html.content
-      .replace(
-        /<link\s+rel="stylesheet"\s+href="\.\/style\.css"\s*\/?>/,
-        `<style>\n${stylesheet.content}\n</style>`
-      )
-      .replace('src="./script.ts"', 'src="./script.js"')
-    files = [
-      ...files.filter(
-        file =>
-          !['/style.css', '/script.ts', '/tsconfig.json'].includes(file.path)
-      ),
-      { path: '/script.js', content: compiled.outputText },
-    ]
-  }
+  // Pin browser imports without uploading a fourth editable source file.
+  // CodePen's TypeScript Block compiles index.ts itself; never transpile it here.
+  const { dependencies } = JSON.parse(
+    await fs.readFile(path.join(directory, 'package.json'), 'utf8')
+  )
+  const imports = Object.fromEntries(
+    Object.entries(dependencies).flatMap(([name, version]) => [
+      [name, `https://esm.sh/*${name}@${version}`],
+      [name + '/', `https://esm.sh/*${name}@${version}/`],
+    ])
+  )
+  const html = files.find(file => file.path === '/index.html')
+  html.content = html.content.replace(
+    '</head>',
+    `<script type="importmap">${JSON.stringify({ imports }, null, 2)}</script>\n  </head>`
+  )
+  const compiler = JSON.parse(
+    await fs.readFile(path.join(directory, 'tsconfig.json'), 'utf8')
+  )
+  // CodePen compiles the original TS; npm declarations are checked locally.
+  compiler.compilerOptions.noCheck = true
+  const configuration = [
+    {
+      path: '/tsconfig.json',
+      content: JSON.stringify(compiler, null, 2) + '\n',
+    },
+    {
+      path: '/package.json',
+      content: JSON.stringify({ dependencies }, null, 2) + '\n',
+    },
+  ]
   const sourceUrl = `https://github.com/CrocoDillon/crocodillon.com/tree/main/content/articles/${slug}/demo`
   const identityTag = 'demo-' + hash(config.key).slice(0, 12)
   const metadata = {
@@ -100,7 +91,7 @@ export async function syncCodePen({
     description: `${config.description}\n\nSource: ${sourceUrl}`,
     tags: [...config.tags, identityTag],
   }
-  const sourceHash = hash({ files, metadata })
+  const sourceHash = hash({ files, configuration, metadata })
   if (dryRun) {
     log(
       JSON.stringify({
@@ -198,14 +189,24 @@ export async function syncCodePen({
       return lock
     }
     const remoteFiles = await api('GET', `pens/${pen.id}/files`)
-    const ownedRemote = remoteFiles.filter(f =>
-      files.some(local => local.path === f.path)
-    )
+    const ownedPaths = lock.ownedPaths ?? files.map(file => file.path)
+    const ownedRemote = remoteFiles.filter(f => ownedPaths.includes(f.path))
     if (lock.remoteHash && fileHash(ownedRemote) !== lock.remoteHash) {
       throw new Error(
         'The Pen was edited outside this repository. Copy those changes into the demo and reconcile codepen.lock.json before syncing.'
       )
     }
+    if (
+      lock.configurationHash &&
+      fileHash(
+        remoteFiles.filter(file =>
+          configuration.some(config => config.path === file.path)
+        )
+      ) !== lock.configurationHash
+    )
+      throw new Error(
+        'The CodePen compiler configuration was edited outside Git. Reconcile it before syncing.'
+      )
     if (
       pen.title !== metadata.title ||
       pen.description !== metadata.description ||
@@ -215,21 +216,52 @@ export async function syncCodePen({
       await api('PATCH', `pens/${pen.id}`, metadata)
     }
     const written = await api('PUT', `pens/${pen.id}/files`, {
-      files,
+      files: [
+        ...ownedRemote
+          .filter(remote => !files.some(local => local.path === remote.path))
+          .map(file => ({ path: file.path, delete: true })),
+        ...files,
+        // Compiler-created config files don't use the three editable-file slots.
+        ...configuration.filter(config =>
+          remoteFiles.some(file => file.path === config.path)
+        ),
+      ],
       expected_version_id: pen.saved_version.id,
       wait: 45,
     })
     build = written.build
   }
-  for (let attempt = 0; attempt < 12; attempt++) {
-    const next = build.status === 'Canceled' ? build.next_id : null
-    if (!next && !['Queued', 'Running'].includes(build.status)) break
-    await new Promise(resolve => setTimeout(resolve, 10000))
-    build = await api('GET', `builds/${next ?? build.id}`)
+  async function settle(current) {
+    for (let attempt = 0; attempt < 12; attempt++) {
+      const next = current.status === 'Canceled' ? current.next_id : null
+      if (!next && !['Queued', 'Running'].includes(current.status))
+        return current
+      await new Promise(resolve => setTimeout(resolve, 10000))
+      current = await api('GET', `builds/${next ?? current.id}`)
+    }
+    throw new Error(
+      'The CodePen build is still running. Wait before syncing again.'
+    )
   }
+  build = await settle(build)
   // The compiler may have added or patched configuration files. Read its head.
   pen = await api('GET', `pens/${lock.penId}`)
-  const savedFiles = await api('GET', `pens/${lock.penId}/files`)
+  let savedFiles = await api('GET', `pens/${lock.penId}/files`)
+  const configChanges = configuration.filter(config =>
+    savedFiles.some(
+      file => file.path === config.path && file.content !== config.content
+    )
+  )
+  if (configChanges.length) {
+    const written = await api('PUT', `pens/${pen.id}/files`, {
+      files: configChanges,
+      expected_version_id: pen.saved_version.id,
+      wait: 45,
+    })
+    build = await settle(written.build)
+    pen = await api('GET', `pens/${lock.penId}`)
+    savedFiles = await api('GET', `pens/${lock.penId}/files`)
+  }
   lock = {
     penId: pen.id,
     editorUrl: pen.urls.editor,
@@ -239,6 +271,12 @@ export async function syncCodePen({
     ...(build.status === 'Success' ? { sourceHash } : {}),
     remoteHash: fileHash(
       savedFiles.filter(f => files.some(local => local.path === f.path))
+    ),
+    ownedPaths: files.map(file => file.path),
+    configurationHash: fileHash(
+      savedFiles.filter(file =>
+        configuration.some(config => config.path === file.path)
+      )
     ),
   }
   await save()

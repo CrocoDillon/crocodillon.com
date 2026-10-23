@@ -1,32 +1,38 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
 
 export function ArticleDemo({
   title,
   penUrl,
+  slug,
   height = 760,
 }: {
   title: string
   penUrl: string
+  slug: string
   height?: number
 }) {
   const [running, setRunning] = useState(false)
   const { resolvedTheme } = useTheme()
-  const embed = new URL(penUrl)
-  if (
-    embed.origin !== 'https://codepen.io' ||
-    !embed.pathname.includes('/pen/')
-  ) {
-    throw new Error('ArticleDemo requires a CodePen Pen URL.')
+  const frame = useRef<HTMLIFrameElement>(null)
+  const theme = resolvedTheme === 'dark' ? 'dark' : 'light'
+
+  function sendTheme() {
+    // A sandbox without allow-same-origin has an opaque origin, requiring '*'.
+    frame.current?.contentWindow?.postMessage(
+      { type: 'article-demo-theme', theme },
+      '*'
+    )
   }
-  embed.pathname = embed.pathname.replace('/pen/', '/embed/')
-  embed.search = new URLSearchParams({
-    file: 'false',
-    preview: 'true',
-    'theme-id': resolvedTheme === 'dark' ? '-2' : '-3',
-  }).toString()
+
+  useEffect(() => {
+    frame.current?.contentWindow?.postMessage(
+      { type: 'article-demo-theme', theme },
+      '*'
+    )
+  }, [theme])
 
   return (
     <figure className="not-prose my-8 overflow-hidden rounded-sm border border-line">
@@ -43,14 +49,17 @@ export function ArticleDemo({
       </div>
       {running ? (
         <iframe
-          src={embed.toString()}
+          ref={frame}
+          src={`/demo/${encodeURIComponent(slug)}`}
+          sandbox="allow-scripts"
+          referrerPolicy="no-referrer"
+          onLoad={sendTheme}
           title={title}
           className="block w-full border-0"
           style={{
             height,
-            colorScheme: resolvedTheme === 'dark' ? 'dark' : 'light',
+            colorScheme: theme,
           }}
-          allow="fullscreen"
         />
       ) : (
         <div className="flex min-h-48 flex-col items-center justify-center gap-4 bg-paper p-6 text-center">

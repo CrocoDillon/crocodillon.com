@@ -1,4 +1,4 @@
-/* Shared by every article demo. Prepended during CodePen sync. */
+/* Shared by every article demo. Prepended during build and CodePen sync. */
 @font-face {
   font-family: Inter;
   font-style: normal;
@@ -54,7 +54,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     color-scheme: dark;
     --demo-paper: #151c17;
     --demo-ink: #e5eadf;
@@ -65,6 +65,18 @@
     --mat-sys-error: #ffb4ab;
     --mat-sys-on-error: #690005;
   }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --demo-paper: #151c17;
+  --demo-ink: #e5eadf;
+  --demo-moss: #a6c991;
+  --demo-muted: #a6b19f;
+  --demo-leaf: #222f24;
+  --demo-line: #344136;
+  --mat-sys-error: #ffb4ab;
+  --mat-sys-on-error: #690005;
 }
 
 * {

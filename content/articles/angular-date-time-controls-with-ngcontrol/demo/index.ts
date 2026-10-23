@@ -14,7 +14,7 @@ import { JsonPipe } from '@angular/common'
 import { bootstrapApplication } from '@angular/platform-browser'
 import {
   ControlContainer,
-  ControlValueAccessor,
+  type ControlValueAccessor,
   FormControl,
   FormGroup,
   FormGroupDirective,
@@ -22,12 +22,12 @@ import {
   NG_VALUE_ACCESSOR,
   NgControl,
   ReactiveFormsModule,
-  ValidationErrors,
-  Validator,
+  type ValidationErrors,
+  type Validator,
   Validators,
 } from '@angular/forms'
 import {
-  ErrorStateMatcher,
+  type ErrorStateMatcher,
   provideNativeDateAdapter,
 } from '@angular/material/core'
 import { MatFormFieldModule } from '@angular/material/form-field'
@@ -50,15 +50,20 @@ function controlProviders(getType: () => unknown) {
 @Directive()
 abstract class TemporalControl implements ControlValueAccessor, Validator {
   @Input() label = ''
+
   abstract readonly kind: 'date' | 'time' | 'datetime'
+
   private readonly injector = inject(Injector)
   private readonly destroyRef = inject(DestroyRef)
   private readonly parentForm = inject(FormGroupDirective, { optional: true })
+
   ngControl: NgControl | null = null
+
   readonly parts = new FormGroup({
     date: new FormControl<Date | null>(null),
     time: new FormControl<Date | null>(null),
   })
+
   onChange: (value: Date | null) => void = () => {}
   onTouched: () => void = () => {}
   private onValidatorChange: () => void = () => {}
@@ -76,20 +81,24 @@ abstract class TemporalControl implements ControlValueAccessor, Validator {
   ngOnInit(): void {
     // Resolve after construction to avoid a cycle with our accessor/validator providers.
     this.ngControl = this.injector.get(NgControl, null, { self: true })
+
     this.parts.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.onChange(this.readValue())
       })
+
     this.parts.statusChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.onValidatorChange()
       })
   }
+
   get required(): boolean {
     return this.ngControl?.control?.hasValidator(Validators.required) ?? false
   }
+
   writeValue(value: Date | null): void {
     const date =
       value instanceof Date && !Number.isNaN(value.getTime()) ? value : null
@@ -101,19 +110,24 @@ abstract class TemporalControl implements ControlValueAccessor, Validator {
       { emitEvent: false }
     )
   }
+
   registerOnChange(fn: (value: Date | null) => void): void {
     this.onChange = fn
   }
+
   registerOnTouched(fn: () => void): void {
     this.onTouched = fn
   }
+
   registerOnValidatorChange(fn: () => void): void {
     this.onValidatorChange = fn
   }
+
   setDisabledState(disabled: boolean): void {
     if (disabled) this.parts.disable({ emitEvent: false })
     else this.parts.enable({ emitEvent: false })
   }
+
   validate(): ValidationErrors | null {
     const { date, time } = this.parts.controls
     if (this.kind !== 'time' && date.invalid) return { date: date.errors }
@@ -129,19 +143,23 @@ abstract class TemporalControl implements ControlValueAccessor, Validator {
       return { invalidLocalTime: true }
     return null
   }
+
   private readValue(): Date | null {
     const { date, time } = this.parts.getRawValue()
     if (this.kind === 'date') return date ? new Date(date) : null
     if (this.kind === 'time') return time ? new Date(time) : null
     if (!date || !time) return null
+
     const combined = new Date(date)
     combined.setHours(time.getHours(), time.getMinutes(), 0, 0)
+
     // Reject nonexistent local times normalized across a spring-forward DST gap.
     if (
       combined.getHours() !== time.getHours() ||
       combined.getMinutes() !== time.getMinutes()
     )
       return null
+
     return combined
   }
 }
@@ -153,6 +171,7 @@ const pickerImports = [
   MatDatepickerModule,
   MatTimepickerModule,
 ]
+
 const pickerTemplate = `
   <div class="picker-fields">
     @if (kind !== 'time') {
@@ -165,6 +184,7 @@ const pickerTemplate = `
         <mat-error>Enter a valid {{ label.toLowerCase() }}.</mat-error>
       </mat-form-field>
     }
+
     @if (kind !== 'date') {
       <mat-form-field appearance="outline">
         <mat-label>{{ kind === 'datetime' ? label + ' · time' : label }}</mat-label>
@@ -188,6 +208,7 @@ const pickerTemplate = `
 class DateControl extends TemporalControl {
   readonly kind = 'date' as const
 }
+
 @Component({
   selector: 'app-time-control',
   changeDetection: ChangeDetectionStrategy.Default,
@@ -198,6 +219,7 @@ class DateControl extends TemporalControl {
 class TimeControl extends TemporalControl {
   readonly kind = 'time' as const
 }
+
 @Component({
   selector: 'app-datetime-control',
   changeDetection: ChangeDetectionStrategy.Default,
@@ -210,6 +232,7 @@ class DateTimeControl extends TemporalControl {
 }
 
 type Field = { name: string; label: string; type: 'date' | 'time' | 'datetime' }
+
 @Component({
   selector: 'app-dynamic-fields',
   changeDetection: ChangeDetectionStrategy.Default,
@@ -240,15 +263,18 @@ class DynamicFields {
   providers: [provideNativeDateAdapter()],
   template: `
     <main class="demo-shell">
-      <p class="demo-eyebrow">Angular · Material · reactive forms · NgControl</p>
+      <p class="demo-eyebrow">Angular · Material · Reactive Forms · NgControl</p>
       <h1>Three controls. One form.</h1>
       <p class="demo-intro">Material Datepicker and Timepicker, with both combined into
         a single datetime control. Nested forms, without passing controls down.</p>
-      <form [formGroup]="form" (ngSubmit)="form.markAllAsTouched()" #formDirective="ngForm">
+
+      <form [formGroup]="form" #formDirective="ngForm">
         <!-- Keep formGroupName on an ancestor of the forwarding component. -->
         <div formGroupName="appointment"><app-dynamic-fields [fields]="fields" /></div>
+
         <div class="actions">
-          <button mat-flat-button type="submit" [disabled]="form.disabled">Validate</button>
+          <button mat-flat-button type="button" (click)="form.markAllAsTouched()"
+            [disabled]="form.disabled">Validate</button>
           <button mat-stroked-button type="button" (click)="formDirective.resetForm()">Reset</button>
           <button mat-stroked-button type="button" (click)="fill()">Fill example</button>
           <button mat-stroked-button type="button" (click)="toggleDisabled()">
@@ -256,6 +282,7 @@ class DynamicFields {
           </button>
         </div>
       </form>
+
       <section class="demo-panel" aria-label="Form state" aria-live="polite">
         <p class="demo-status">{{ form.status }} · {{ form.dirty ? 'dirty' : 'pristine' }} ·
           {{ form.touched ? 'touched' : 'untouched' }}</p>
@@ -272,6 +299,7 @@ class App {
     { name: 'time', label: 'Time', type: 'time' },
     { name: 'datetime', label: 'Appointment', type: 'datetime' },
   ]
+
   readonly form = new FormGroup({
     appointment: new FormGroup({
       date: new FormControl<Date | null>(null, Validators.required),
@@ -279,6 +307,7 @@ class App {
       datetime: new FormControl<Date | null>(null, Validators.required),
     }),
   })
+
   fill(): void {
     this.form.patchValue({
       appointment: {
@@ -288,9 +317,11 @@ class App {
       },
     })
   }
+
   toggleDisabled(): void {
     if (this.form.disabled) this.form.enable()
     else this.form.disable()
   }
 }
+
 bootstrapApplication(App).catch(console.error)

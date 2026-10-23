@@ -133,25 +133,45 @@ Pen during sync, so published demos use a snapshot of the shared style. Re-sync
 an example to adopt later theme changes. Local demo styles cover only that
 example’s layout. Pin its package versions independently of the blog.
 
-The Angular demo uses `compact: true` to fit the free plan’s three-file limit:
-TypeScript stays editable in Git, but sync transpiles it to JavaScript, inlines
-the combined CSS in HTML, and uploads HTML, JavaScript, and `package.json`.
-Demo TypeScript is excluded from the blog’s type checker because it runs in a
-separate framework project. Type-check it against its own pinned dependencies
-when changing its logic. The compact compiler checks syntax; it is not a full
-Angular type checker.
+The Angular demo uploads three editable source files: `index.html`, `index.css`,
+and the original `index.ts`. CodePen’s TypeScript Block compiles it. The compiler
+creates its own configuration files; sync pins their dependencies and compiler
+settings after scaffolding. A generated import map resolves the pinned browser
+packages. CodePen emits TypeScript without checking npm declarations; full
+TypeScript checking runs locally through `pnpm check-types`, including the
+independent Angular workspace. This does not perform Angular template checking.
 
 Embed a synced demo with the registered MDX component:
 
 ```mdx
 import demo from './demo/codepen.lock.json'
 
-<ArticleDemo title="A working example" penUrl={demo.editorUrl} />
+<ArticleDemo title="A working example" slug="my-article" penUrl={demo.editorUrl} />
 ```
 
 The article renders a static placeholder and link. Its iframe is added only
 after “Run example” is pressed, keeping sandbox startup out of initial article
-loading. CodePen hosts the execution and editor; the blog supplies the frame.
+loading. `/demo/<slug>` serves the self-hosted example; CodePen is the optional
+editor. Demo routes follow the same draft and scheduling rules as their articles.
+
+`pnpm install` installs each demo’s pinned workspace dependencies. `pnpm dev` and
+`pnpm build` first run `pnpm demo:build`, which bundles the Angular demo separately
+with esbuild into ignored `.demo-build/` output. During development, re-run
+`pnpm demo:build` and reload the article after editing demo sources. The build
+inlines JavaScript, Material CSS, the shared theme, and the font into one HTML
+document, so the demo needs no network requests after loading. Angular is never
+imported by the blog’s React components.
+
+The iframe uses `sandbox="allow-scripts"`, with no same-origin access, forms,
+popups, or top-level navigation. Its CSP blocks connections and external assets.
+Angular JIT needs `unsafe-eval` inside this isolated document; this permission
+does not apply to the containing blog. A one-way message updates the demo’s
+theme without resetting its form. Only reviewed repository code is bundled;
+this is not an editor or a service for executing visitor-submitted code.
+
+Give article snippets a filename and location using fenced code metadata, for
+example `ts title="index.ts — App.form"`. Inline Angular templates are labeled
+with the TypeScript file they actually live in.
 
 See CodePen’s [API documentation](https://blog.codepen.io/docs/api/api-v2/)
 for current limits, build behavior, and key rotation.

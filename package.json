@@ -8,11 +8,12 @@
     "node": ">=24"
   },
   "scripts": {
-    "dev": "next dev --hostname 127.0.0.1",
-    "build": "next build",
+    "dev": "pnpm demo:build && next dev --hostname 127.0.0.1",
+    "build": "pnpm demo:build && next build",
     "start": "next start --hostname 127.0.0.1",
     "lint": "eslint --max-warnings 0",
-    "check-types": "next typegen && tsc --noEmit",
+    "check-types": "next typegen && tsc --noEmit && pnpm -r --if-present check-types",
+    "demo:build": "node scripts/build-demos.mjs",
     "demo:sync": "node scripts/sync-codepen.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -38,6 +39,7 @@
     "shiki": "4.5.0"
   },
   "devDependencies": {
+    "esbuild": "0.25.12",
     "@svgr/webpack": "8.1.0",
     "@tailwindcss/postcss": "4.3.3",
     "@tailwindcss/typography": "0.5.20",
