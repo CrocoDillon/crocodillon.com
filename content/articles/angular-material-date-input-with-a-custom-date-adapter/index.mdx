@@ -90,7 +90,7 @@ providers: [
 ],
 ```
 
-`dutch-date` is our own marker, not a built-in format string. Only the input uses it; calendar headings and accessible date labels still go through the native formatter with the Dutch locale. Our parser always expects `DD-MM-YYYY`, so it doesn’t need a configurable parse format. Setting the locale alone doesn’t make the native parser understand that format.
+`dutch-date` is our own marker, not a built-in format string. Only the input uses it; calendar headings and accessible date labels still go through the native formatter with the Dutch locale. Our parser always uses day-month-year order, so it doesn’t need a configurable parse format. Setting the locale alone doesn’t make the native parser understand that format.
 
 Finally, add a placeholder to the existing date input, keeping its form-control and picker bindings:
 
