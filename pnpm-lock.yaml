@@ -142,6 +142,36 @@ importers:
         specifier: 2.8.1
         version: 2.8.1
 
+  content/articles/dutch-dates-with-a-custom-date-adapter/demo:
+    dependencies:
+      '@angular/cdk':
+        specifier: 22.2.3
+        version: 22.2.3(@angular/common@22.2.3(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(@angular/forms@22.2.3(@angular/common@22.2.3(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(@angular/platform-browser@22.2.3(@angular/common@22.2.3(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2)))(rxjs@7.8.2))(@angular/platform-browser@22.2.3(@angular/common@22.2.3(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2)))(rxjs@7.8.2)
+      '@angular/common':
+        specifier: 22.2.3
+        version: 22.2.3(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(rxjs@7.8.2)
+      '@angular/compiler':
+        specifier: 22.2.3
+        version: 22.2.3
+      '@angular/core':
+        specifier: 22.2.3
+        version: 22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2)
+      '@angular/forms':
+        specifier: 22.2.3
+        version: 22.2.3(@angular/common@22.2.3(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(@angular/platform-browser@22.2.3(@angular/common@22.2.3(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2)))(rxjs@7.8.2)
+      '@angular/material':
+        specifier: 22.2.3
+        version: 22.2.3(b72606a500fa95764f34c218536f0160)
+      '@angular/platform-browser':
+        specifier: 22.2.3
+        version: 22.2.3(@angular/common@22.2.3(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))
+      rxjs:
+        specifier: 7.8.2
+        version: 7.8.2
+      tslib:
+        specifier: 2.8.1
+        version: 2.8.1
+
 packages:
 
   '@alloc/quick-lru@5.3.0':
