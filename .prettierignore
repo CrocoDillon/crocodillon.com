@@ -1,4 +1,5 @@
 .next/
+.demo-build/
 .vercel/
 .qa/
 node_modules/

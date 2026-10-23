@@ -1,22 +1,27 @@
-/* The shared content/demos/theme.css is prepended by the sync command. */
+/* The shared content/demos/theme.css is prepended during build and sync. */
+
 app-dynamic-fields {
   display: grid;
   gap: 8px;
 }
+
 app-date-control,
 app-time-control,
 app-datetime-control {
   display: block;
   min-width: 0;
 }
+
 mat-form-field {
   width: 100%;
 }
+
 .picker-fields {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
   gap: 16px;
 }
+
 .actions {
   display: flex;
   flex-wrap: wrap;

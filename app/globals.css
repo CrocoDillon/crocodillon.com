@@ -94,6 +94,7 @@
   }
   .article-prose :where(.note--info) {
     border-left: 2px solid var(--color-moss);
+    border-radius: 3px;
     padding: 1rem 1.5rem;
     background: var(--color-leaf);
   }
@@ -140,6 +141,22 @@
     text-align: center;
     font-size: 0.8rem;
     color: var(--color-muted);
+  }
+  .article-prose [data-rehype-pretty-code-title] {
+    margin: 0;
+    border: 1px solid var(--color-line);
+    border-bottom: 0;
+    border-radius: 3px 3px 0 0;
+    padding: 0.65rem 1.5rem;
+    background: var(--color-leaf);
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+  .article-prose [data-rehype-pretty-code-title] + pre {
+    margin-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
   .article-prose :where(table) {
     display: block;

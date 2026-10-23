@@ -49,9 +49,11 @@ restyling individual internal elements. The sync command copies the shared
 stylesheet into each Pen; re-sync examples when adopting a shared style change.
 
 Use `<ArticleDemo>` for the article frame and explicit “Run example” interaction.
-Keep runnable source and pinned dependencies in Git beside the article. CodePen
-provides the execution and editor; a successful build must also be checked in
-the browser before embedding it.
+Keep runnable source and pinned dependencies in Git beside the article. Build
+the demo separately and serve it in an opaque-origin sandboxed iframe; its
+framework must stay out of the blog’s client bundle. CodePen provides an editor
+for experimentation with the original TypeScript, HTML, and CSS. Check both
+the hosted demo and the Pen in the browser after changes.
 
 ### OG and Twitter cards
 
