@@ -17,13 +17,13 @@ For this example, we’ll use Angular Material’s Datepicker for dates, Timepic
 
 <ArticleDemo title="Date, time and datetime controls" slug="angular-date-time-controls-with-ngcontrol" penUrl={demo.editorUrl} />
 
-The example has three editable files: `index.html` loads the page, `index.css` styles it, and `index.ts` contains the Angular components and their inline templates. The snippets below each name the part of `index.ts` they come from. Open it in CodePen to experiment with the complete source.
+<p className="note--info">On CodePen, <code>index.ts</code> contains all the Angular components and their inline templates to keep the example within its three-file limit. Below, we’ll use the filenames you’d give them in an application. Comments in the Pen mark where each virtual file starts.</p>
 
 ## Let the form own the controls
 
 The parent creates the reactive form. Here’s a small group for an appointment:
 
-```ts title="index.ts — App.form"
+```ts title="app.ts"
 readonly form = new FormGroup({
   appointment: new FormGroup({
     date: new FormControl<Date | null>(null, Validators.required),
@@ -35,7 +35,7 @@ readonly form = new FormGroup({
 
 The field renderer receives a description of the fields to display. It doesn’t receive the controls themselves:
 
-```html title="index.ts — App template"
+```html title="app.html"
 <form [formGroup]="form">
   <div formGroupName="appointment">
     <app-dynamic-fields [fields]="fields" />
@@ -45,7 +45,7 @@ The field renderer receives a description of the fields to display. It doesn’t
 
 Inside that renderer, a date field becomes:
 
-```html title="index.ts — DynamicFields template"
+```html title="dynamic-fields.html"
 <app-date-control
   [formControlName]="field.name"
   [label]="field.label"
@@ -60,7 +60,7 @@ There are two connections to make here: finding the right group across the compo
 
 The dynamic field renderer forwards its nearest ancestor container into its own view:
 
-```ts title="index.ts — DynamicFields component metadata"
+```ts title="dynamic-fields.ts"
 viewProviders: [{
   provide: ControlContainer,
   useFactory: () => inject(ControlContainer, { skipSelf: true }),
@@ -79,7 +79,7 @@ The component implements `ControlValueAccessor` to communicate with that directi
 
 Our components also provide a validator so that errors from Material’s inner inputs reach the outer control. Those providers reference the component, so resolving `NgControl` in the constructor would create a dependency cycle. Resolve it after construction instead:
 
-```ts title="index.ts — TemporalControl"
+```ts title="temporal-control.ts"
 private readonly injector = inject(Injector);
 
 ngControl: NgControl | null = null;
@@ -97,7 +97,7 @@ The picker inputs have their own internal controls. They handle editing and pars
 
 The datetime component keeps the two picker values separately. Once both are present, it copies the selected date and applies the selected hours and minutes:
 
-```ts title="index.ts — TemporalControl.readValue()"
+```ts title="temporal-control.ts"
 const combined = new Date(date);
 combined.setHours(time.getHours(), time.getMinutes(), 0, 0);
 ```

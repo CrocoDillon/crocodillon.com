@@ -94,6 +94,7 @@
   }
   .article-prose :where(.note--info) {
     border-left: 2px solid var(--color-moss);
+    border-radius: 3px;
     padding: 1rem 1.5rem;
     background: var(--color-leaf);
   }

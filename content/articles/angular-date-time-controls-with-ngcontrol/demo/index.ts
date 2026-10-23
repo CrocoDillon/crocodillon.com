@@ -1,3 +1,4 @@
+// Virtual files are combined for CodePen, with their imports shared here.
 import '@angular/compiler'
 import {
   ChangeDetectionStrategy,
@@ -36,6 +37,7 @@ import { MatButtonModule } from '@angular/material/button'
 import { MatDatepickerModule } from '@angular/material/datepicker'
 import { MatTimepickerModule } from '@angular/material/timepicker'
 
+// control-providers.ts
 function controlProviders(getType: () => unknown) {
   return [
     {
@@ -47,6 +49,7 @@ function controlProviders(getType: () => unknown) {
   ]
 }
 
+// temporal-control.ts
 @Directive()
 abstract class TemporalControl implements ControlValueAccessor, Validator {
   @Input() label = ''
@@ -164,6 +167,7 @@ abstract class TemporalControl implements ControlValueAccessor, Validator {
   }
 }
 
+// picker-imports.ts
 const pickerImports = [
   ReactiveFormsModule,
   MatFormFieldModule,
@@ -173,6 +177,7 @@ const pickerImports = [
 ]
 
 const pickerTemplate = `
+  <!-- picker-fields.html -->
   <div class="picker-fields">
     @if (kind !== 'time') {
       <mat-form-field appearance="outline">
@@ -198,6 +203,7 @@ const pickerTemplate = `
   </div>
 `
 
+// date-control.ts
 @Component({
   selector: 'app-date-control',
   changeDetection: ChangeDetectionStrategy.Default,
@@ -209,6 +215,7 @@ class DateControl extends TemporalControl {
   readonly kind = 'date' as const
 }
 
+// time-control.ts
 @Component({
   selector: 'app-time-control',
   changeDetection: ChangeDetectionStrategy.Default,
@@ -220,6 +227,7 @@ class TimeControl extends TemporalControl {
   readonly kind = 'time' as const
 }
 
+// datetime-control.ts
 @Component({
   selector: 'app-datetime-control',
   changeDetection: ChangeDetectionStrategy.Default,
@@ -231,8 +239,10 @@ class DateTimeControl extends TemporalControl {
   readonly kind = 'datetime' as const
 }
 
+// field.ts
 type Field = { name: string; label: string; type: 'date' | 'time' | 'datetime' }
 
+// dynamic-fields.ts
 @Component({
   selector: 'app-dynamic-fields',
   changeDetection: ChangeDetectionStrategy.Default,
@@ -244,6 +254,7 @@ type Field = { name: string; label: string; type: 'date' | 'time' | 'datetime' }
     },
   ],
   template: `
+    <!-- dynamic-fields.html -->
     @for (field of fields; track field.name) {
       @switch (field.type) {
         @case ('date') { <app-date-control [formControlName]="field.name" [label]="field.label" /> }
@@ -257,11 +268,13 @@ class DynamicFields {
   @Input() fields: Field[] = []
 }
 
+// app.ts
 @Component({
   selector: 'app-root',
   imports: [ReactiveFormsModule, DynamicFields, JsonPipe, MatButtonModule],
   providers: [provideNativeDateAdapter()],
   template: `
+    <!-- app.html -->
     <main class="demo-shell">
       <p class="demo-eyebrow">Angular · Material · Reactive Forms · NgControl</p>
       <h1>Three controls. One form.</h1>
@@ -293,6 +306,7 @@ class DynamicFields {
     </main>
   `,
 })
+// app.ts (continued)
 class App {
   readonly fields: Field[] = [
     { name: 'date', label: 'Date', type: 'date' },
@@ -324,4 +338,5 @@ class App {
   }
 }
 
+// main.ts
 bootstrapApplication(App).catch(console.error)

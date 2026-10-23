@@ -134,3 +134,15 @@ body {
   font-size: 12px;
   margin-bottom: 0;
 }
+
+.demo-article-link {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 24px 32px;
+  font-size: 14px;
+}
+
+.demo-article-link a {
+  color: var(--demo-moss);
+  text-underline-offset: 4px;
+}

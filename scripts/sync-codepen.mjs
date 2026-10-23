@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import matter from 'gray-matter'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const hash = value =>
@@ -65,6 +66,26 @@ export async function syncCodePen({
     ])
   )
   const html = files.find(file => file.path === '/index.html')
+  const { data: article } = matter(
+    await fs.readFile(path.join(directory, '../index.mdx'), 'utf8')
+  )
+  let articleUrl = null
+  if (article.draft !== true && Date.parse(article.publishedAt) <= Date.now()) {
+    const url = `https://crocodillon.com/blog/${slug}`
+    const response = await fetch(url, {
+      method: 'HEAD',
+      redirect: 'manual',
+      signal: AbortSignal.timeout(15000),
+    })
+    if (response.status === 200)
+      articleUrl = `${url}?utm_source=codepen&utm_medium=referral&utm_campaign=${slug}`
+  }
+  if (articleUrl) {
+    html.content = html.content.replace(
+      '</body>',
+      `<footer class="demo-article-link"><a href="${articleUrl}" target="_blank" rel="noopener">Read the article on CrocoDillon ↗</a></footer>\n  </body>`
+    )
+  }
   html.content = html.content.replace(
     '</head>',
     `<script type="importmap">${JSON.stringify({ imports }, null, 2)}</script>\n  </head>`
@@ -98,6 +119,7 @@ export async function syncCodePen({
         penId: lock.penId ?? null,
         localChanges: lock.sourceHash !== sourceHash,
         files: files.map(f => f.path),
+        articleUrl,
       })
     )
     return lock
