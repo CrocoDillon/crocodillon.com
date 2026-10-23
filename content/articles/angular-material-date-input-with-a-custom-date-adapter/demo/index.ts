@@ -48,7 +48,7 @@ class DutchDateAdapter extends NativeDateAdapter {
     if (value instanceof Date) return this.clone(value)
     if (typeof value !== 'string') return this.invalid()
 
-    const match = /^(\d{2})-(\d{2})-(\d{4})$/.exec(value.trim())
+    const match = /^(\d{1,2})-(\d{1,2})-(\d{4})$/.exec(value.trim())
     if (!match) return this.invalid()
 
     const [, day, month, year] = match.map(Number)

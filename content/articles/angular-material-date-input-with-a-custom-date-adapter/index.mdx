@@ -32,7 +32,7 @@ export class DutchDateAdapter extends NativeDateAdapter {
     if (value instanceof Date) return this.clone(value);
     if (typeof value !== 'string') return this.invalid();
 
-    const match = /^(\d{2})-(\d{2})-(\d{4})$/.exec(value.trim());
+    const match = /^(\d{1,2})-(\d{1,2})-(\d{4})$/.exec(value.trim());
     if (!match) return this.invalid();
 
     const [, day, month, year] = match.map(Number);
@@ -59,7 +59,7 @@ export class DutchDateAdapter extends NativeDateAdapter {
 }
 ```
 
-The parser expects two digits for the day and month, and four for the year. An empty input returns `null`; malformed input returns an invalid `Date`, allowing Material to report a parse error.
+The parser accepts one or two digits for the day and month, and four for the year. Material calls the adapter’s `format()` when a valid date input loses focus, so `1-2-2026` becomes `01-02-2026` without an extra blur handler. An empty input returns `null`; malformed input returns an invalid `Date`, allowing Material to report a parse error.
 
 The comparison after creating the date matters. JavaScript happily turns 31 February into a date in March. Checking the resulting parts rejects that overflow, including invalid leap days. Using `setFullYear` also avoids the constructor’s special treatment of years below 100.
 
