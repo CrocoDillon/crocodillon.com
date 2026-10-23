@@ -106,7 +106,6 @@ class DutchDateAdapter extends NativeDateAdapter {
         [errorStateMatcher]="errorMatcher" (blur)="onTouched()">
       <mat-datepicker-toggle matIconSuffix [for]="picker" />
       <mat-datepicker #picker (closed)="onTouched()" />
-      <mat-hint>Day-month-year, for example 25-10-2026.</mat-hint>
       <mat-error>Enter a valid date in DD-MM-YYYY format.</mat-error>
     </mat-form-field>
   `,
@@ -220,8 +219,8 @@ class DynamicFields {
     <main class="demo-shell">
       <p class="demo-eyebrow">Angular · Material · Reactive Forms · NgControl</p>
       <h1>Type a date. Or pick one.</h1>
-      <p class="demo-intro">The same nested form, with one date control. Type
-        25-10-2026 or choose a date from the calendar. Try 31-02-2026 to see validation.</p>
+      <p class="demo-intro">The same nested form, with one date control.
+        Type a date or choose one from the calendar.</p>
 
       <form [formGroup]="form" #formDirective="ngForm">
         <div formGroupName="appointment"><app-dynamic-fields [fields]="fields" /></div>

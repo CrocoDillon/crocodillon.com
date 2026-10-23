@@ -9,13 +9,13 @@ draft: false
 
 import demo from './demo/codepen.lock.json'
 
-<p className="intro">In the same project as my <a href="/blog/angular-date-time-controls-with-ngcontrol">date, time and datetime controls</a>, we also wanted users to enter dates manually. Here in the Netherlands, we use DD-MM-YYYY. Typing a date shouldn’t mean switching to MM/DD/YYYY just to keep the input happy.</p>
+<p className="intro">In the same project as my <a href="/blog/angular-date-time-controls-with-ngcontrol">date, time and datetime controls</a>, we also wanted users to enter dates manually. Here in the Netherlands, we use <code>DD-MM-YYYY</code>. Typing a date shouldn’t mean switching to <code>MM/DD/YYYY</code> just to keep the input happy.</p>
 
 Angular Material’s datepicker already lets you type into its input. The part we needed to change was how it interpreted that text. It turned out to be a small custom date adapter.[^adapter]
 
 <ArticleDemo title="Type a Dutch date or use the calendar" slug="angular-material-date-input-with-a-custom-date-adapter" penUrl={demo.editorUrl} />
 
-This is the same nested reactive form as before, reduced to one date control. Try typing `25-10-2026`, then choose another date from the calendar. Both use the same format. The example uses Angular and Angular Material 22.2.3; CodePen’s `index.ts` combines the files shown below.
+<p className="note--info">This is the same nested reactive form as before, reduced to one date control. Try typing <code>25-10-2026</code>, then choose another date from the calendar. Both use the same format. CodePen’s <code>index.ts</code> combines the files shown below.</p>
 
 ## Teach the adapter our format
 
@@ -90,7 +90,7 @@ providers: [
 ],
 ```
 
-`dutch-date` is our own marker, not a built-in format string. Only the input uses it; calendar headings and accessible date labels still go through the native formatter with the Dutch locale. Our parser always expects DD-MM-YYYY, so it doesn’t need a configurable parse format. Setting the locale alone doesn’t make the native parser understand that format.
+`dutch-date` is our own marker, not a built-in format string. Only the input uses it; calendar headings and accessible date labels still go through the native formatter with the Dutch locale. Our parser always expects `DD-MM-YYYY`, so it doesn’t need a configurable parse format. Setting the locale alone doesn’t make the native parser understand that format.
 
 Finally, add a placeholder to the existing date input, keeping its form-control and picker bindings:
 
@@ -100,6 +100,6 @@ Finally, add a placeholder to the existing date input, keeping its form-control 
   [errorStateMatcher]="errorMatcher" (blur)="onTouched()">
 ```
 
-We added that little hint just in case. The demo also keeps a visible format hint below the field, since a placeholder disappears as you type. The calendar still works, and the parent form still receives a `Date` rather than the formatted string.
+We added that little hint just in case. The calendar still works, and the parent form still receives a `Date` rather than the formatted string.
 
 [^adapter]: Angular Material’s [date implementation and format settings](https://material.angular.dev/components/datepicker/overview#choosing-a-date-implementation-and-date-format-settings) describe custom adapters and `MAT_DATE_FORMATS`.
