@@ -2,6 +2,7 @@ import { readFile, access } from 'node:fs/promises'
 import path from 'node:path'
 import { notFound } from 'next/navigation'
 import { getPost, getPosts } from '@/lib/posts'
+import { renderDemoDocument } from '@/lib/demo-document'
 
 export const dynamic = 'force-static'
 export const dynamicParams = false
@@ -51,12 +52,12 @@ export async function GET(
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') notFound()
     throw error
   }
-  return new Response(html, {
+  return new Response(await renderDemoDocument(html), {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       // Angular's JIT compiler requires eval inside this isolated document only.
       'Content-Security-Policy':
-        "default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src data:; img-src data:; frame-ancestors 'self'; sandbox allow-scripts",
+        "default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline'; font-src data:; img-src data:; frame-ancestors 'self'; sandbox allow-scripts",
       'X-Content-Type-Options': 'nosniff',
       'X-Robots-Tag': 'noindex, nofollow',
       'Referrer-Policy': 'no-referrer',

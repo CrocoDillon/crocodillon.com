@@ -156,9 +156,9 @@ needed for these two interaction events.
 `content/demos/theme.css` supplies the blog palette, typography, spacing,
 light/dark colors, and Material system-token overrides. It is copied into each
 Pen during sync, so published demos use a snapshot of the shared style. Re-sync
-an example to adopt later theme changes. On-site demos link to `/demo/theme.css`,
-served separately by the blog with the font embedded as a data URL. Theme edits
-do not change or rebuild the compiled demo artifacts.
+an example to adopt later theme changes. For on-site demos, the site inserts the
+current stylesheet into each demo response, with the font embedded as a data URL.
+Theme edits do not change or rebuild the compiled demo artifacts.
 Local demo styles cover only that example’s layout. Pin its package versions
 independently of the blog.
 
@@ -212,13 +212,17 @@ unrelated site deployments continue to use it. Add a new demo's compiled artifac
 before publishing its article; missing artifacts are not automatically rebuilt.
 
 The demo build inlines JavaScript, Material CSS, and example-specific styles into
-one HTML document. The shared theme loads separately from `/demo/theme.css`,
-between Material CSS and the example's styles to preserve their cascade. Angular
-is never imported by the blog's React components.
+one HTML document. Its `/demo/theme.css` link and `/demo/frame.js` script tag are
+insertion slots: `app/lib/demo-document.ts` replaces them with the current shared
+CSS and child bridge when the site renders the demo route. The theme stays
+between Material CSS and the example's styles to preserve their cascade. The
+iframe makes no asset requests, which also lets it run on authenticated Vercel
+previews without access to their session cookies. Angular is never imported by
+the blog's React components.
 
 The parent event handlers live in `app/components/article-demo-client.tsx`.
-The child bridge lives in `content/demos/frame.js`, served by the site at
-`/demo/frame.js` and referenced by the frozen HTML rather than bundled into it.
+The child bridge lives in `content/demos/frame.js`, inserted by the site into the
+demo response rather than frozen into the compiled artifact.
 Both sides can therefore be updated with a site deployment without rebuilding
 demo dependencies. Preserve these contracts for all committed demos:
 
@@ -231,13 +235,13 @@ demo dependencies. Preserve these contracts for all committed demos:
 
 Keep message names, payload meanings, and the bridge's expected DOM structure
 compatible with existing artifacts. Additive changes can use the same bridge;
-breaking changes need a versioned bridge URL and support for older messages in
+breaking changes need versioned bridge slots and support for older messages in
 the parent. Shared CSS and bridge edits need only a site rebuild. CodePen keeps
 its separate three-file sync workflow.
 
 The iframe uses `sandbox="allow-scripts"`, with no same-origin access, forms,
-popups, or top-level navigation. Its CSP permits same-origin stylesheets and the
-shared bridge script while blocking fetch/XHR connections and external assets.
+popups, or top-level navigation. Its CSP blocks fetch/XHR connections and all
+external scripts and stylesheets.
 Angular JIT needs `unsafe-eval` inside this isolated document; this permission
 does not apply to the containing blog. Messages update the demo’s theme without
 resetting its form and resize the iframe to its content, avoiding nested page
