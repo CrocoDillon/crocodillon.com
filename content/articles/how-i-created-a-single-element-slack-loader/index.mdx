@@ -1,0 +1,217 @@
+---
+slug: 'how-i-created-a-single-element-slack-loader'
+title: 'How I created a single element Slack loader'
+description: 'Taking apart an old CSS experiment: one HTML element, two pseudo-elements, four box-shadows, and a few keyframes recreate the old Slack loader.'
+publishedAt: '2026-10-26T04:00:00Z'
+excerpt: 'My most popular Pen is a Slack loader made with one HTML element and CSS. Looking at it again, I had to figure out how I’d done it.'
+draft: false
+---
+
+import { SlackLoaderExample } from './slack-loader-example'
+
+<p className="intro">Today I want to write a little about my most popular Pen, with almost 150,000 views: a Slack loader built with a single HTML element and only CSS. The old Slack loader, that is. The Pen is quite old too.</p>
+
+I was going through my Pens because I want to use CodePen again for article demos. Looking at some of my old work, I’ll be honest: it blew my mind a little. If I set my mind to creating something like this today, would I still be able to do it?
+
+A few years ago, while working for a client, my colleagues put “CSS god” on my Azure DevOps profile. So today I’ll try to live up to that—not so humble—title.
+
+To be fair to my present self, back then I had fewer responsibilities, no kids, and a lot of free time. Although a fair amount of that went into World of Warcraft as well.
+
+Let’s dissect the [single element Slack loader](https://codepen.io/CrocoDillon/pen/DMNWjR) and figure out how it works. We’ll build it up here, one step at a time.
+
+## One element to start with
+
+It all starts with a single, empty `div`:
+
+```html
+<div class="loader"></div>
+```
+
+Wow… that’s it! All the HTML we need. The CSS is where it comes alive.
+
+The original Pen uses SCSS. For this article I’ve written it as plain CSS with custom properties, keeping the same dimensions, colors, and animation. We’ll leave out the rotation for now because it makes the rest harder to follow.
+
+```css
+.loader {
+  --size: 2.5em;
+  --thickness: 0.5em;
+  --lat: calc((var(--size) - var(--thickness)) / 2);
+  --offset: calc(var(--lat) - var(--thickness));
+  --pink: hsla(337, 84%, 48%, 0.75);
+  --green: hsla(160, 50%, 48%, 0.75);
+  --blue: hsla(190, 61%, 65%, 0.75);
+  --yellow: hsla(41, 82%, 52%, 0.75);
+
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+}
+```
+
+There’s nothing to see yet: the element has dimensions, but no background or border. It’s a square, rather than one of the dots. Its job is to give the pseudo-elements a positioning reference.
+
+In the examples, the “Show element backgrounds” button gives that square a background and a dashed outline. Later it also reveals the pseudo-elements. These are just aids for seeing what’s going on; they aren’t part of the loader’s CSS. I’ve enlarged the examples by setting their `font-size`, since all the dimensions use `em`.
+
+<SlackLoaderExample stage="element" caption="The empty div occupies a square. Turn off its background and it disappears." />
+
+The effect we’re aiming for is a dot stretching into a pill, then shrinking into a dot at the other end, before sliding back to its starting position. Do that four times, with different colors, positions, and directions, and you have the Slack loader.
+
+## Two invisible circles
+
+So how do we get four dots from one element? Pseudo-elements and box-shadows.
+
+First, we give our `div` two pseudo-elements:
+
+```css
+.loader::before,
+.loader::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--thickness);
+  height: var(--thickness);
+  border-radius: calc(var(--thickness) / 2);
+  transform: translate(-50%, -50%);
+}
+```
+
+The empty `content` creates each pseudo-element without adding any text. Both are `0.5em` squares with a `0.25em` corner radius, making them circles.
+
+`top` and `left` put their top-left corners at the center of the parent. The translation moves them back by half their own width and height, so their centers line up instead.[^translate] That last part will matter when we start changing their dimensions.
+
+<SlackLoaderExample stage="pseudo" caption="Both pseudo-elements sit in the center, directly on top of each other. With backgrounds enabled, they look like a single circle." />
+
+Still no colored dots. Just two invisible circles occupying the same spot. Now for the fun part.
+
+## Four dots from two shadows each
+
+A `box-shadow` doesn’t have to look like a shadow. Leave out the blur and spread, give it a color, and you get a sharp copy of the element’s rounded shape. You can also give one element several comma-separated shadows.[^shadows]
+
+```css
+.loader::before {
+  box-shadow:
+    var(--lat) calc(-1 * var(--offset)) var(--pink),
+    calc(-1 * var(--lat)) var(--offset) var(--blue);
+}
+
+.loader::after {
+  box-shadow:
+    var(--offset) var(--lat) var(--green),
+    calc(-1 * var(--offset)) calc(-1 * var(--lat)) var(--yellow);
+}
+```
+
+Each shadow here has a horizontal offset, a vertical offset, and a color. Positive offsets move right and down; negative offsets move left and up. The shadow can be visible even though the element casting it has a transparent background.
+
+Our two calculated values work out to `--lat: 1em` and `--offset: 0.5em`. The first is the distance from the center to either end of a dot’s travel. The second puts each parallel track `0.5em` away from the center, leaving `1em` between them.
+
+Before rotation, pink starts at the top right, blue at the bottom left, green at the bottom right, and yellow at the top left. They’re staggered around the center, rather than sitting at the corners of a square.
+
+<SlackLoaderExample stage="shadows" caption="Four colored shadows surround the overlapping pseudo-elements. Turn off the backgrounds to see only the four dots." />
+
+The parent draws none of the dots. `::before` casts the pink and blue ones; `::after` casts the green and yellow ones. Each pair shares the shape of its pseudo-element, but the two shadows can move in opposite directions.
+
+## From dot to pill and back
+
+Now we need to stretch those dots and move them around. `::before` handles the horizontal pair by changing its `width`. `::after` handles the vertical pair by changing its `height`.
+
+We’ll start with the horizontal animation:
+
+```css
+.loader::before {
+  animation: horizontal 2s infinite;
+}
+
+@keyframes horizontal {
+  0%,
+  100% {
+    width: var(--thickness);
+    box-shadow:
+      var(--lat) calc(-1 * var(--offset)) var(--pink),
+      calc(-1 * var(--lat)) var(--offset) var(--blue);
+  }
+  35% {
+    width: var(--size);
+    box-shadow:
+      0 calc(-1 * var(--offset)) var(--pink),
+      0 var(--offset) var(--blue);
+  }
+  70% {
+    width: var(--thickness);
+    box-shadow:
+      calc(-1 * var(--lat)) calc(-1 * var(--offset)) var(--pink),
+      var(--lat) var(--offset) var(--blue);
+  }
+}
+```
+
+At `0%`, we have our two dots. At `35%`, the pseudo-element is `2.5em` wide, so both shadows become horizontal pills. Their horizontal offsets have reached zero, putting the pills’ centers on the parent’s center line. Their vertical offsets stay unchanged.
+
+At `70%`, the width is back to `0.5em`, but the horizontal offsets have swapped signs. Pink has become a dot on the left; blue has become a dot on the right. During the remaining `30%`, the offsets return to their starting values while the width stays small. That gives us the slide back.
+
+The changing width and the changing offsets work together. Take pink: its right edge stays in place while the pill grows to the left. Then its left edge stays in place while it shrinks from the right. That’s what makes it look like the dot stretches across the track and collects at the other end.
+
+Remember the `translate(-50%, -50%)`? It keeps the pseudo-element centered as its width changes. Without it, growing the width would push everything out from the pseudo-element’s left edge instead.
+
+The corner radius stays at half the thickness. Using `50%` here would give us an ellipse as the width grows; a fixed radius keeps the sides straight and the ends round.
+
+The vertical pair does the same thing, swapping width for height and horizontal movement for vertical movement:
+
+```css
+.loader::after {
+  animation: vertical 2s infinite;
+}
+
+@keyframes vertical {
+  0%,
+  100% {
+    height: var(--thickness);
+    box-shadow:
+      var(--offset) var(--lat) var(--green),
+      calc(-1 * var(--offset)) calc(-1 * var(--lat)) var(--yellow);
+  }
+  35% {
+    height: var(--size);
+    box-shadow:
+      var(--offset) 0 var(--green),
+      calc(-1 * var(--offset)) 0 var(--yellow);
+  }
+  70% {
+    height: var(--thickness);
+    box-shadow:
+      var(--offset) calc(-1 * var(--lat)) var(--green),
+      calc(-1 * var(--offset)) var(--lat) var(--yellow);
+  }
+}
+```
+
+Both animations run together over two seconds, using the default `ease` timing function. There’s no delay between colors. The different starting positions and opposite directions do the work.
+
+<SlackLoaderExample stage="motion" caption="Width and height change the shapes; shadow offsets move them. Pause the animation with the backgrounds visible to inspect the shapes casting the shadows." />
+
+When the pills cross, their colors overlap too. The original colors have an alpha value of `0.75`, so those intersections are darker. No extra shapes needed.
+
+## The finishing touch
+
+All that’s left is to rotate the parent:
+
+```css
+.loader {
+  transform: rotate(165deg);
+}
+```
+
+The original uses `165deg`. That’s a half-turn minus `15deg`, giving the tracks their slight tilt and putting the colors in their final positions. Since we rotate the parent, its pseudo-elements and their shadows rotate together.
+
+Turn off the debugging backgrounds, and there it is:
+
+<SlackLoaderExample stage="final" caption="The finished single element Slack loader. Enable the backgrounds to peek at the shapes underneath." />
+
+The snippets above build on one another; the final version simply leaves the parent and pseudo-element backgrounds transparent. All four visible shapes are still box-shadows. If you prefer the original SCSS, it’s all in the [Pen](https://codepen.io/CrocoDillon/pen/DMNWjR).
+
+I hope you enjoyed this. I had fun creating it, and I’ve had fun figuring it out again while writing about it. Its practical use may be close to zero, but sometimes those are the best projects.
+
+[^translate]: MDN’s [`translate()` reference](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/transform-function/translate) explains that percentage translations use the transformed element’s reference box. Here, that lets the translation follow the pseudo-element’s changing size.
+
+[^shadows]: MDN’s [`box-shadow` reference](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/box-shadow) covers multiple shadows, offsets, and how a shadow follows an element’s border radius.
