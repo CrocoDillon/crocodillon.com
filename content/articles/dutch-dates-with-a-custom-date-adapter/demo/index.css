@@ -1,4 +1,4 @@
-/* The shared content/demos/theme.css is prepended during build and sync. */
+/* The shared theme loads before these styles, on site and in CodePen. */
 
 app-dynamic-fields {
   display: grid;

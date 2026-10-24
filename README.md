@@ -19,13 +19,14 @@ pnpm build
 pnpm start
 ```
 
-The pnpm workspace configuration follows Reeflings and Carely: exact versions, a 48-hour minimum release age, and an explicit native build-script allowlist. There is no test runner or test suite.
+The pnpm workspace configuration follows Reeflings and Carely: exact versions, a 48-hour minimum release age, and an explicit native build-script allowlist. Each article demo has its own workspace and lockfile; the commands above only install, build, and type-check the site. There is no test runner or test suite.
 
 ## Structure
 
 - `app/`: routes, components, and shared library code. `@/` resolves to this directory.
 - `content/articles/<slug>/index.mdx`: one article per folder, independent of its publication date.
 - `content/articles/<slug>/images/`: co-located illustrations; each diagram is a single editable, theme-aware SVG.
+- `content/articles/<slug>/demo/dist/`: committed demo HTML and build provenance, served through the publication-gated demo route.
 - `public/demo/`: reviewed public assets for the legacy demos.
 - `mdx-components.tsx`: the framework-required MDX component registry, at the project root.
 
@@ -155,16 +156,19 @@ needed for these two interaction events.
 `content/demos/theme.css` supplies the blog palette, typography, spacing,
 light/dark colors, and Material system-token overrides. It is copied into each
 Pen during sync, so published demos use a snapshot of the shared style. Re-sync
-an example to adopt later theme changes. Local demo styles cover only that
-example’s layout. Pin its package versions independently of the blog.
+an example to adopt later theme changes. For on-site demos, the site inserts the
+current stylesheet into each demo response, with the font embedded as a data URL.
+Theme edits do not change or rebuild the compiled demo artifacts.
+Local demo styles cover only that example’s layout. Pin its package versions
+independently of the blog.
 
 The Angular demo uploads three editable source files: `index.html`, `index.css`,
 and the original `index.ts`. CodePen’s TypeScript Block compiles it. The compiler
 creates its own configuration files; sync pins their dependencies and compiler
 settings after scaffolding. A generated import map resolves the pinned browser
 packages. CodePen emits TypeScript without checking npm declarations; full
-TypeScript checking runs locally through `pnpm check-types`, including the
-independent Angular workspace. This does not perform Angular template checking.
+TypeScript checking runs independently in the selected demo using the commands
+below. This does not perform Angular template checking.
 
 Embed a synced demo with the registered MDX component:
 
@@ -183,16 +187,61 @@ state while the iframe loads invisibly. Only a validated content-height message
 reveals the example and resizes the panel; there is no guessed initial height.
 Loading and resizing animations respect reduced-motion preferences.
 
-`pnpm install` installs each demo’s pinned workspace dependencies. `pnpm dev` and
-`pnpm build` first run `pnpm demo:build`, which bundles the Angular demo separately
-with esbuild into ignored `.demo-build/` output. During development, re-run
-`pnpm demo:build` and reload the article after editing demo sources. The build
-inlines JavaScript, Material CSS, the shared theme, and the font into one HTML
-document, so the demo needs no network requests after loading. Angular is never
-imported by the blog’s React components.
+`pnpm install`, `pnpm dev`, `pnpm build`, and `pnpm check-types` at the repository
+root do not install, compile, or type-check demos. Each demo has an independent
+`package.json`, `pnpm-workspace.yaml`, and `pnpm-lock.yaml`, including pinned
+esbuild and TypeScript versions. Old demo dependencies are absent from the site's
+lockfile. The site reads committed `demo/dist/index.html` files; no demo compiler
+or installed demo dependencies are needed to deploy them.
+
+To work on one demo, replace the example slug in these commands:
+
+```sh
+pnpm --dir content/articles/angular-date-time-controls-with-ngcontrol/demo install --frozen-lockfile
+pnpm --dir content/articles/angular-date-time-controls-with-ngcontrol/demo check-types
+pnpm demo:build angular-date-time-controls-with-ngcontrol
+```
+
+The build requires an explicit article slug and only replaces that demo's
+`dist/index.html` and `dist/build.json` after compilation succeeds. Alternatively,
+run `pnpm build` inside that demo's directory. Commit its source, lockfile, and
+updated `dist/` together, then reload the article during local development.
+`build.json` records the source/toolchain hashes and Node version used to produce
+the HTML. Preserve the existing artifact if an old toolchain stops building;
+unrelated site deployments continue to use it. Add a new demo's compiled artifact
+before publishing its article; missing artifacts are not automatically rebuilt.
+
+The demo build inlines JavaScript, Material CSS, and example-specific styles into
+one HTML document. Its `/demo/theme.css` link and `/demo/frame.js` script tag are
+insertion slots: `app/lib/demo-document.ts` replaces them with the current shared
+CSS and child bridge when the site renders the demo route. The theme stays
+between Material CSS and the example's styles to preserve their cascade. The
+iframe makes no asset requests, which also lets it run on authenticated Vercel
+previews without access to their session cookies. Angular is never imported by
+the blog's React components.
+
+The parent event handlers live in `app/components/article-demo-client.tsx`.
+The child bridge lives in `content/demos/frame.js`, inserted by the site into the
+demo response rather than frozen into the compiled artifact.
+Both sides can therefore be updated with a site deployment without rebuilding
+demo dependencies. Preserve these contracts for all committed demos:
+
+- Parent → child: `{ type: 'article-demo-theme', theme: 'light' | 'dark' }`;
+  the child applies `data-theme` to its document root.
+- Child → parent: `{ type: 'article-demo-resize', height: number }`, measured in
+  CSS pixels. The parent accepts finite heights from 200 through 5000.
+- The parent checks the sending iframe window; the child checks `event.source`
+  against `parent`. Sandboxed origins require `'*'` as the target origin.
+
+Keep message names, payload meanings, and the bridge's expected DOM structure
+compatible with existing artifacts. Additive changes can use the same bridge;
+breaking changes need versioned bridge slots and support for older messages in
+the parent. Shared CSS and bridge edits need only a site rebuild. CodePen keeps
+its separate three-file sync workflow.
 
 The iframe uses `sandbox="allow-scripts"`, with no same-origin access, forms,
-popups, or top-level navigation. Its CSP blocks connections and external assets.
+popups, or top-level navigation. Its CSP blocks fetch/XHR connections and all
+external scripts and stylesheets.
 Angular JIT needs `unsafe-eval` inside this isolated document; this permission
 does not apply to the containing blog. Messages update the demo’s theme without
 resetting its form and resize the iframe to its content, avoiding nested page

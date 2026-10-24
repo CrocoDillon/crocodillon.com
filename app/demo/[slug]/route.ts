@@ -2,6 +2,7 @@ import { readFile, access } from 'node:fs/promises'
 import path from 'node:path'
 import { notFound } from 'next/navigation'
 import { getPost, getPosts } from '@/lib/posts'
+import { renderDemoDocument } from '@/lib/demo-document'
 
 export const dynamic = 'force-static'
 export const dynamicParams = false
@@ -12,7 +13,12 @@ export async function generateStaticParams() {
     posts.map(async ({ slug }) => {
       try {
         await access(
-          path.join(process.cwd(), '.demo-build', slug, 'index.html')
+          path.join(
+            process.cwd(),
+            'content/articles',
+            slug,
+            'demo/dist/index.html'
+          )
         )
         return { slug }
       } catch (error) {
@@ -34,14 +40,19 @@ export async function GET(
   let html: string
   try {
     html = await readFile(
-      path.join(process.cwd(), '.demo-build', slug, 'index.html'),
+      path.join(
+        process.cwd(),
+        'content/articles',
+        slug,
+        'demo/dist/index.html'
+      ),
       'utf8'
     )
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') notFound()
     throw error
   }
-  return new Response(html, {
+  return new Response(await renderDemoDocument(html), {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       // Angular's JIT compiler requires eval inside this isolated document only.

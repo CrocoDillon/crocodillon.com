@@ -1,3 +1,6 @@
+// Shared site-managed bridge. Keep these messages compatible with frozen demos.
+// Parent -> child: { type: 'article-demo-theme', theme: 'light' | 'dark' }.
+// Child -> parent: { type: 'article-demo-resize', height: number } (CSS pixels).
 // Only the containing article may change the theme.
 window.addEventListener('message', event => {
   if (event.source !== parent || event.data?.type !== 'article-demo-theme')

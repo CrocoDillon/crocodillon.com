@@ -9,7 +9,7 @@ export default defineConfig([
   prettier,
   globalIgnores([
     '.next/**',
-    '.demo-build/**',
+    'content/articles/*/demo/dist/**',
     '.vercel/**',
     '.qa/**',
     'public/demo/**',
