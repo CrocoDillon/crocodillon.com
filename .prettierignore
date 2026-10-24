@@ -1,5 +1,4 @@
 .next/
-.demo-build/
 content/articles/*/demo/dist/
 .vercel/
 .qa/
