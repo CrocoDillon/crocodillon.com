@@ -1,0 +1,172 @@
+.example {
+  position: relative;
+  border: 1px solid var(--color-line);
+  border-radius: 3px;
+  background: var(--color-diagram-panel);
+}
+
+.controls {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+}
+
+.controls button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--color-line);
+  border-radius: 3px;
+  color: var(--color-ink);
+  background: var(--color-paper);
+}
+
+.controls button:hover {
+  background: var(--color-leaf);
+  border-color: var(--color-moss);
+}
+
+.controls svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.canvas {
+  display: grid;
+  place-items: center;
+  min-height: 12rem;
+  padding: 2rem;
+  overflow: hidden;
+}
+
+.example figcaption {
+  padding: 0 1rem 1rem;
+}
+
+.loader {
+  --size: 2.5em;
+  --thickness: 0.5em;
+  --lat: calc((var(--size) - var(--thickness)) / 2);
+  --offset: calc(var(--lat) - var(--thickness));
+  --pink: hsla(337, 84%, 48%, 0.75);
+  --green: hsla(160, 50%, 48%, 0.75);
+  --blue: hsla(190, 61%, 65%, 0.75);
+  --yellow: hsla(41, 82%, 52%, 0.75);
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  font-size: 2.5rem;
+}
+
+.loader:not([data-stage='final']) {
+  background: var(--color-leaf);
+  outline: 1px dashed var(--color-muted);
+}
+
+.loader:not([data-stage='element'])::before,
+.loader:not([data-stage='element'])::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--thickness);
+  height: var(--thickness);
+  border-radius: calc(var(--thickness) / 2);
+  transform: translate(-50%, -50%);
+}
+
+.loader:is([data-stage='pseudo'], [data-stage='shadows'])::before,
+.loader:is([data-stage='pseudo'], [data-stage='shadows'])::after {
+  background: var(--color-muted);
+}
+
+.loader:is(
+    [data-stage='shadows'],
+    [data-stage='motion'],
+    [data-stage='final']
+  )::before {
+  box-shadow:
+    var(--lat) calc(-1 * var(--offset)) var(--pink),
+    calc(-1 * var(--lat)) var(--offset) var(--blue);
+}
+
+.loader:is(
+    [data-stage='shadows'],
+    [data-stage='motion'],
+    [data-stage='final']
+  )::after {
+  box-shadow:
+    var(--offset) var(--lat) var(--green),
+    calc(-1 * var(--offset)) calc(-1 * var(--lat)) var(--yellow);
+}
+
+.loader:is([data-stage='motion'], [data-stage='final'])::before {
+  animation: horizontal 2s infinite;
+}
+
+.loader:is([data-stage='motion'], [data-stage='final'])::after {
+  animation: vertical 2s infinite;
+}
+
+.loader[data-stage='final'] {
+  transform: rotate(165deg);
+}
+
+.loader[data-paused='true']::before,
+.loader[data-paused='true']::after {
+  animation-play-state: paused;
+}
+
+@keyframes horizontal {
+  0%,
+  100% {
+    width: var(--thickness);
+    box-shadow:
+      var(--lat) calc(-1 * var(--offset)) var(--pink),
+      calc(-1 * var(--lat)) var(--offset) var(--blue);
+  }
+  35% {
+    width: var(--size);
+    box-shadow:
+      0 calc(-1 * var(--offset)) var(--pink),
+      0 var(--offset) var(--blue);
+  }
+  70% {
+    width: var(--thickness);
+    box-shadow:
+      calc(-1 * var(--lat)) calc(-1 * var(--offset)) var(--pink),
+      var(--lat) var(--offset) var(--blue);
+  }
+}
+
+@keyframes vertical {
+  0%,
+  100% {
+    height: var(--thickness);
+    box-shadow:
+      var(--offset) var(--lat) var(--green),
+      calc(-1 * var(--offset)) calc(-1 * var(--lat)) var(--yellow);
+  }
+  35% {
+    height: var(--size);
+    box-shadow:
+      var(--offset) 0 var(--green),
+      calc(-1 * var(--offset)) 0 var(--yellow);
+  }
+  70% {
+    height: var(--thickness);
+    box-shadow:
+      var(--offset) calc(-1 * var(--lat)) var(--green),
+      calc(-1 * var(--offset)) var(--lat) var(--yellow);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader:is([data-stage='motion'], [data-stage='final'])::before,
+  .loader:is([data-stage='motion'], [data-stage='final'])::after {
+    /* Playback is opt-in; preserve its timing over the global motion reset. */
+    animation-duration: 2s !important;
+  }
+}

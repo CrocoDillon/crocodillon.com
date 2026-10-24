@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { ComponentProps } from 'react'
 import { ArrowIcon } from '@/components/icons'
 import { site } from '@/lib/site'
@@ -16,6 +17,21 @@ export function SiteLink({
     url !== null &&
     (url.protocol === 'https:' || url.protocol === 'http:') &&
     url.hostname !== siteHostname
+
+  if (
+    href &&
+    url &&
+    (url.protocol === 'https:' || url.protocol === 'http:') &&
+    !external &&
+    !href.startsWith('#') &&
+    props.download === undefined
+  ) {
+    return (
+      <Link {...props} href={href} target={target} rel={rel}>
+        {children}
+      </Link>
+    )
+  }
 
   return (
     <a
