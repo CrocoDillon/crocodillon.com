@@ -7,7 +7,7 @@ excerpt: 'My most popular Pen is a Slack loader made with one HTML element and C
 draft: false
 ---
 
-import { SlackLoaderExample } from './slack-loader-example'
+import { SlackLoader } from './slack-loader'
 
 <p className="intro">Today I want to write a little about my most popular Pen, with almost 150,000 views: a Slack loader built with a single HTML element and only CSS. The old Slack loader, that is. The Pen is quite old too.</p>
 
@@ -50,9 +50,9 @@ The original Pen uses SCSS. For this article I’ve written it as plain CSS with
 
 There’s nothing to see yet: the element has dimensions, but no background or border. It’s a square, rather than one of the dots. Its job is to give the pseudo-elements a positioning reference.
 
-In the examples, the “Show element backgrounds” button gives that square a background and a dashed outline. Later it also reveals the pseudo-elements. These are just aids for seeing what’s going on; they aren’t part of the loader’s CSS. I’ve enlarged the examples by setting their `font-size`, since all the dimensions use `em`.
+In the first few examples, I’ve given that square a background and a dashed outline. We’ll give the pseudo-elements backgrounds too, so we can see them while building up the effect. These are just aids for seeing what’s going on; they aren’t part of the loader’s CSS. I’ve enlarged the examples by setting their `font-size`, since all the dimensions use `em`.
 
-<SlackLoaderExample stage="element" caption="The empty div occupies a square. Turn off its background and it disappears." />
+<SlackLoader stage="element" caption="The empty div occupies a square. Its background and outline make it visible here." />
 
 The effect we’re aiming for is a dot stretching into a pill, then shrinking into a dot at the other end, before sliding back to its starting position. Do that four times, with different colors, positions, and directions, and you have the Slack loader.
 
@@ -80,7 +80,7 @@ The empty `content` creates each pseudo-element without adding any text. Both ar
 
 `top` and `left` put their top-left corners at the center of the parent. The translation moves them back by half their own width and height, so their centers line up instead.[^translate] That last part will matter when we start changing their dimensions.
 
-<SlackLoaderExample stage="pseudo" caption="Both pseudo-elements sit in the center, directly on top of each other. With backgrounds enabled, they look like a single circle." />
+<SlackLoader stage="pseudo" caption="Both pseudo-elements sit in the center, directly on top of each other. Their backgrounds make them look like a single circle." />
 
 Still no colored dots. Just two invisible circles occupying the same spot. Now for the fun part.
 
@@ -108,7 +108,7 @@ Our two calculated values work out to `--lat: 1em` and `--offset: 0.5em`. The fi
 
 Before rotation, pink starts at the top right, blue at the bottom left, green at the bottom right, and yellow at the top left. They’re staggered around the center, rather than sitting at the corners of a square.
 
-<SlackLoaderExample stage="shadows" caption="Four colored shadows surround the overlapping pseudo-elements. Turn off the backgrounds to see only the four dots." />
+<SlackLoader stage="shadows" caption="Four colored shadows surround the overlapping pseudo-elements, which are still visible in the center." />
 
 The parent draws none of the dots. `::before` casts the pink and blue ones; `::after` casts the green and yellow ones. Each pair shares the shape of its pseudo-element, but the two shadows can move in opposite directions.
 
@@ -188,7 +188,9 @@ The vertical pair does the same thing, swapping width for height and horizontal 
 
 Both animations run together over two seconds, using the default `ease` timing function. There’s no delay between colors. The different starting positions and opposite directions do the work.
 
-<SlackLoaderExample stage="motion" caption="Width and height change the shapes; shadow offsets move them. Pause the animation with the backgrounds visible to inspect the shapes casting the shadows." />
+For the animation, I’ve removed the pseudo-element backgrounds. Only the parent square is still visible behind the four moving shadows.
+
+<SlackLoader stage="motion" caption="Width and height change the shapes; shadow offsets move them. The parent div’s background shows the space they move through." />
 
 When the pills cross, their colors overlap too. The original colors have an alpha value of `0.75`, so those intersections are darker. No extra shapes needed.
 
@@ -204,9 +206,9 @@ All that’s left is to rotate the parent:
 
 The original uses `165deg`. That’s a half-turn minus `15deg`, giving the tracks their slight tilt and putting the colors in their final positions. Since we rotate the parent, its pseudo-elements and their shadows rotate together.
 
-Turn off the debugging backgrounds, and there it is:
+Remove the parent’s background and outline too, and there it is:
 
-<SlackLoaderExample stage="final" caption="The finished single element Slack loader. Enable the backgrounds to peek at the shapes underneath." />
+<SlackLoader stage="final" caption="The finished single element Slack loader. Only the four colored shadows are visible." />
 
 The snippets above build on one another; the final version simply leaves the parent and pseudo-element backgrounds transparent. All four visible shapes are still box-shadows. If you prefer the original SCSS, it’s all in the [Pen](https://codepen.io/CrocoDillon/pen/DMNWjR).
 

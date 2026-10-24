@@ -1,30 +1,36 @@
 .example {
+  position: relative;
   border: 1px solid var(--color-line);
   border-radius: 3px;
   background: var(--color-diagram-panel);
 }
 
 .controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1rem;
-  border-bottom: 1px solid var(--color-line);
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
 }
 
 .controls button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
   border: 1px solid var(--color-line);
   border-radius: 3px;
-  padding: 0.45rem 0.7rem;
   color: var(--color-ink);
   background: var(--color-paper);
-  font: inherit;
-  font-size: 0.75rem;
 }
 
-.controls button[aria-pressed='true'] {
+.controls button:hover {
   background: var(--color-leaf);
   border-color: var(--color-moss);
+}
+
+.controls svg {
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 .canvas {
@@ -54,7 +60,7 @@
   font-size: 2.5rem;
 }
 
-.loader[data-backgrounds='true'] {
+.loader:not([data-stage='final']) {
   background: var(--color-leaf);
   outline: 1px dashed var(--color-muted);
 }
@@ -71,8 +77,8 @@
   transform: translate(-50%, -50%);
 }
 
-.loader[data-backgrounds='true']::before,
-.loader[data-backgrounds='true']::after {
+.loader:is([data-stage='pseudo'], [data-stage='shadows'])::before,
+.loader:is([data-stage='pseudo'], [data-stage='shadows'])::after {
   background: var(--color-muted);
 }
 

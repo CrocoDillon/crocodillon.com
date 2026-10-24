@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useSyncExternalStore } from 'react'
-import styles from './slack-loader-example.module.css'
+import styles from './slack-loader.module.css'
 
 type Stage = 'element' | 'pseudo' | 'shadows' | 'motion' | 'final'
 
@@ -22,14 +22,13 @@ function getServerMotionPreference() {
   return true
 }
 
-export function SlackLoaderExample({
+export function SlackLoader({
   stage,
   caption,
 }: {
   stage: Stage
   caption: string
 }) {
-  const [backgrounds, setBackgrounds] = useState(stage !== 'final')
   const reducedMotion = useSyncExternalStore(
     subscribeToMotionPreference,
     getMotionPreference,
@@ -41,25 +40,28 @@ export function SlackLoaderExample({
 
   return (
     <figure className={`not-prose ${styles.example}`}>
-      <div className={styles.controls}>
-        <button
-          type="button"
-          aria-pressed={backgrounds}
-          onClick={() => setBackgrounds(value => !value)}
-        >
-          Show element backgrounds
-        </button>
-        {animated && (
-          <button type="button" onClick={() => setPauseOverride(!paused)}>
-            {paused ? 'Play animation' : 'Pause animation'}
+      {animated && (
+        <div className={styles.controls}>
+          <button
+            type="button"
+            aria-label={paused ? 'Play animation' : 'Pause animation'}
+            title={paused ? 'Play animation' : 'Pause animation'}
+            onClick={() => setPauseOverride(!paused)}
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              {paused ? (
+                <path d="m8 5 11 7-11 7z" />
+              ) : (
+                <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
+              )}
+            </svg>
           </button>
-        )}
-      </div>
+        </div>
+      )}
       <div className={styles.canvas} aria-hidden="true">
         <div
           className={styles.loader}
           data-stage={stage}
-          data-backgrounds={backgrounds}
           data-paused={paused}
         />
       </div>
