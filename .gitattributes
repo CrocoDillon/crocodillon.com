@@ -6,3 +6,5 @@
 *.woff2 binary
 # Preserve the archived, exported demo artwork without formatting it.
 public/demo/** -whitespace linguist-vendored
+# Compiled article demos are reviewed through their co-located source.
+content/articles/*/demo/dist/** linguist-generated=true

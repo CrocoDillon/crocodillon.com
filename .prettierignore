@@ -1,9 +1,10 @@
 .next/
 .demo-build/
+content/articles/*/demo/dist/
 .vercel/
 .qa/
 node_modules/
-pnpm-lock.yaml
+**/pnpm-lock.yaml
 next-env.d.ts
 public/demo/
 *.tmp

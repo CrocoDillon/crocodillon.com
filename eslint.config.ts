@@ -10,6 +10,7 @@ export default defineConfig([
   globalIgnores([
     '.next/**',
     '.demo-build/**',
+    'content/articles/*/demo/dist/**',
     '.vercel/**',
     '.qa/**',
     'public/demo/**',

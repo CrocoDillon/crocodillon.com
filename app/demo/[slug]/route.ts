@@ -12,7 +12,12 @@ export async function generateStaticParams() {
     posts.map(async ({ slug }) => {
       try {
         await access(
-          path.join(process.cwd(), '.demo-build', slug, 'index.html')
+          path.join(
+            process.cwd(),
+            'content/articles',
+            slug,
+            'demo/dist/index.html'
+          )
         )
         return { slug }
       } catch (error) {
@@ -34,7 +39,12 @@ export async function GET(
   let html: string
   try {
     html = await readFile(
-      path.join(process.cwd(), '.demo-build', slug, 'index.html'),
+      path.join(
+        process.cwd(),
+        'content/articles',
+        slug,
+        'demo/dist/index.html'
+      ),
       'utf8'
     )
   } catch (error) {
@@ -46,7 +56,7 @@ export async function GET(
       'Content-Type': 'text/html; charset=utf-8',
       // Angular's JIT compiler requires eval inside this isolated document only.
       'Content-Security-Policy':
-        "default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline'; font-src data:; img-src data:; frame-ancestors 'self'; sandbox allow-scripts",
+        "default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src data:; img-src data:; frame-ancestors 'self'; sandbox allow-scripts",
       'X-Content-Type-Options': 'nosniff',
       'X-Robots-Tag': 'noindex, nofollow',
       'Referrer-Policy': 'no-referrer',

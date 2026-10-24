@@ -1,8 +1,7 @@
-packages:
-  - 'content/articles/*/demo'
+# Demos are independent projects with their own workspaces and lockfiles.
+packages: []
 allowBuilds:
   '@tailwindcss/oxide': true
-  esbuild: true
   sharp: true
   unrs-resolver: true
 minimumReleaseAge: 2880 # 48 hrs, matching Reeflings and Carely.
