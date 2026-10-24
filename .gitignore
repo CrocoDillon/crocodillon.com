@@ -6,7 +6,6 @@ npm-debug.log
 .pnpm-store/
 .qa/
 .env*
-!.env.example
 *.tsbuildinfo
 next-env.d.ts
 *.tmp
