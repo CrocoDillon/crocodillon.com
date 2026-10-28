@@ -93,7 +93,7 @@ select {
   border-bottom: 1px solid transparent;
   border-radius: 0;
   padding: 0;
-  min-width: 1.5ch;
+  min-width: 0;
   max-width: 55ch;
   background: transparent;
   color: inherit;
