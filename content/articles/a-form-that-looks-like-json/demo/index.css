@@ -1,25 +1,31 @@
-/* Match the site's Shiki github-light / github-dark JSON tokens. */
+/* A quiet mix of blue, moss, terracotta, and mauve on the shared paper. */
 :root {
   --json-punctuation: #24292e;
-  --json-key: #005cc5;
-  --json-string: #032f62;
-  --json-literal: #005cc5;
+  --json-key: #426b8a;
+  --json-string: #466d39;
+  --json-number: #9a4c25;
+  --json-boolean: #76558f;
+  --json-null: #975366;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --json-punctuation: #e1e4e8;
-    --json-key: #79b8ff;
-    --json-string: #9ecbff;
-    --json-literal: #79b8ff;
+    --json-key: #8bb8d8;
+    --json-string: #b8d594;
+    --json-number: #e6ae80;
+    --json-boolean: #c7a6db;
+    --json-null: #d7a2b2;
   }
 }
 
 :root[data-theme='dark'] {
   --json-punctuation: #e1e4e8;
-  --json-key: #79b8ff;
-  --json-string: #9ecbff;
-  --json-literal: #79b8ff;
+  --json-key: #8bb8d8;
+  --json-string: #b8d594;
+  --json-number: #e6ae80;
+  --json-boolean: #c7a6db;
+  --json-null: #d7a2b2;
 }
 
 .demo-shell {
@@ -37,7 +43,7 @@
   min-width: 100%;
   color: var(--json-punctuation);
   font:
-    14px/1.8 ui-monospace,
+    14px/1.55 ui-monospace,
     SFMono-Regular,
     Consolas,
     monospace;
@@ -45,7 +51,7 @@
 .json-line {
   display: flex;
   align-items: center;
-  min-height: 34px;
+  min-height: 24px;
   white-space: pre;
 }
 .children {
@@ -64,16 +70,21 @@
 .json-string {
   color: var(--json-string);
 }
-.json-literal {
-  color: var(--json-literal);
+.json-number {
+  color: var(--json-number);
+}
+.json-boolean {
+  color: var(--json-boolean);
+}
+.json-null {
+  color: var(--json-null);
 }
 .punctuation {
   color: var(--json-punctuation);
 }
 input,
 button,
-select,
-textarea {
+select {
   font: inherit;
 }
 .inline-input {
@@ -129,12 +140,12 @@ select:hover {
   pointer-events: auto;
 }
 .entry-actions button {
-  min-width: 28px;
-  min-height: 28px;
+  min-width: 24px;
+  min-height: 24px;
   padding: 2px 5px;
 }
 .entry-actions select {
-  min-height: 28px;
+  min-height: 24px;
   padding: 2px 4px;
 }
 button:disabled {
@@ -170,30 +181,6 @@ button:disabled {
   border-left: 2px solid var(--demo-moss);
   padding: 8px 12px;
   margin: 16px 0;
-}
-.result {
-  margin-top: 20px;
-  border-top: 1px solid var(--demo-line);
-  padding-top: 16px;
-}
-.result summary {
-  cursor: pointer;
-  color: var(--demo-moss);
-  font-size: 13px;
-}
-.result textarea {
-  display: block;
-  width: 100%;
-  margin-top: 12px;
-  padding: 12px;
-  border: 1px solid var(--demo-line);
-  border-radius: 3px;
-  background: var(--demo-paper);
-  color: var(--demo-ink);
-  resize: vertical;
-  font:
-    13px/1.7 ui-monospace,
-    monospace;
 }
 .sr-only {
   position: absolute;
