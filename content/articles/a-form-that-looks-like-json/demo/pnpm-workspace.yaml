@@ -1,0 +1,6 @@
+# This demo installs independently from the site and every other demo.
+packages: []
+allowBuilds:
+  esbuild: true
+minimumReleaseAge: 2880 # 48 hours.
+saveExact: true
