@@ -21,7 +21,7 @@ export function ArticleDemoClient({
   autoRun = false,
   analyticsEnabled,
 }: ArticleDemoProps & { analyticsEnabled: boolean }) {
-  const [running, setRunning] = useState(autoRun)
+  const [running, setRunning] = useState(false)
   const [ready, setReady] = useState(false)
   const [contentHeight, setContentHeight] = useState<number>()
   const { resolvedTheme } = useTheme()
@@ -54,8 +54,6 @@ export function ArticleDemoClient({
   }, [theme])
 
   useEffect(() => {
-    if (!running) return
-
     function resize(event: MessageEvent) {
       // Sandboxed documents have an opaque origin; check the sending window.
       if (event.source !== frame.current?.contentWindow) return
@@ -69,7 +67,14 @@ export function ArticleDemoClient({
 
     window.addEventListener('message', resize)
     return () => window.removeEventListener('message', resize)
-  }, [running])
+  }, [])
+
+  useEffect(() => {
+    if (!autoRun) return
+    // Mount after hydration and listener setup, so an early resize isn't lost.
+    const request = window.requestAnimationFrame(() => setRunning(true))
+    return () => window.cancelAnimationFrame(request)
+  }, [autoRun])
 
   return (
     <figure className="not-prose my-8 overflow-hidden rounded-sm border border-line">
@@ -94,7 +99,7 @@ export function ArticleDemoClient({
         ref={panel}
         className="relative overflow-hidden bg-paper transition-[height] duration-500 ease-in-out motion-reduce:transition-none"
         style={{ height: contentHeight ?? (autoRun ? 192 : undefined) }}
-        aria-busy={running && !ready}
+        aria-busy={(autoRun || running) && !ready}
       >
         {running ? (
           <>
@@ -112,6 +117,8 @@ export function ArticleDemoClient({
             />
             {!ready ? <DemoLoading /> : null}
           </>
+        ) : autoRun ? (
+          <DemoLoading />
         ) : (
           <div className="flex min-h-48 flex-col items-center justify-center gap-4 p-6 text-center">
             <p className="m-0 text-sm text-muted">

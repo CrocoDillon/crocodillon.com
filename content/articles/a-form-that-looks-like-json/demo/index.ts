@@ -115,7 +115,9 @@ function TextField({
     autoComplete: 'off',
     'aria-invalid': invalid || undefined,
     'aria-describedby': invalid ? 'json-errors' : undefined,
-    style: { width: `${Math.max(1, display.length) + 0.5}ch` } as CSSProperties,
+    style: {
+      width: `${Math.max(editing ? 1 : 0, display.length)}ch`,
+    } as CSSProperties,
     onFocus: () => setEditing(true),
     onBlur: () => setEditing(false),
     onChange: (event: ChangeEvent<HTMLInputElement>) =>
@@ -157,8 +159,8 @@ function Entry({
   const keyField =
     parent?.type === 'object'
       ? h(
-          'span',
-          { className: 'json-key' },
+          'label',
+          { className: 'json-key', htmlFor: `key-${entry.id}` },
           '"',
           h(TextField, {
             id: `key-${entry.id}`,
@@ -192,8 +194,11 @@ function Entry({
     )
   else
     value = h(
-      'span',
-      { className: entry.type === 'string' ? 'json-string' : 'json-number' },
+      'label',
+      {
+        className: entry.type === 'string' ? 'json-string' : 'json-number',
+        htmlFor: `value-${entry.id}`,
+      },
       entry.type === 'string' ? '"' : '',
       h(TextField, {
         id: `value-${entry.id}`,
