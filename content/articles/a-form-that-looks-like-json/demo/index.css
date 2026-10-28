@@ -1,0 +1,230 @@
+/* Match the site's Shiki github-light / github-dark JSON tokens. */
+:root {
+  --json-punctuation: #24292e;
+  --json-key: #005cc5;
+  --json-string: #032f62;
+  --json-literal: #005cc5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --json-punctuation: #e1e4e8;
+    --json-key: #79b8ff;
+    --json-string: #9ecbff;
+    --json-literal: #79b8ff;
+  }
+}
+
+:root[data-theme='dark'] {
+  --json-punctuation: #e1e4e8;
+  --json-key: #79b8ff;
+  --json-string: #9ecbff;
+  --json-literal: #79b8ff;
+}
+
+.demo-shell {
+  max-width: 900px;
+}
+.editor-scroll {
+  border: 1px solid var(--demo-line);
+  border-radius: 3px;
+  overflow: auto;
+  max-height: 950px;
+}
+.json-editor {
+  padding: 20px;
+  width: max-content;
+  min-width: 100%;
+  color: var(--json-punctuation);
+  font:
+    14px/1.8 ui-monospace,
+    SFMono-Regular,
+    Consolas,
+    monospace;
+}
+.json-line {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  white-space: pre;
+}
+.children {
+  margin-left: 2ch;
+  border-left: 1px solid var(--demo-line);
+  padding-left: 1ch;
+}
+.json-key,
+.json-string {
+  display: inline-flex;
+  align-items: baseline;
+}
+.json-key {
+  color: var(--json-key);
+}
+.json-string {
+  color: var(--json-string);
+}
+.json-literal {
+  color: var(--json-literal);
+}
+.punctuation {
+  color: var(--json-punctuation);
+}
+input,
+button,
+select,
+textarea {
+  font: inherit;
+}
+.inline-input {
+  appearance: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  padding: 0;
+  min-width: 1.5ch;
+  max-width: 55ch;
+  background: transparent;
+  color: inherit;
+  line-height: 1.5;
+}
+.inline-input:hover {
+  border-bottom-color: var(--demo-line);
+}
+.inline-input:focus {
+  background: var(--demo-leaf);
+}
+.inline-input[aria-invalid='true'] {
+  border-bottom: 2px dashed var(--demo-moss);
+}
+button,
+select {
+  cursor: pointer;
+  border: 1px solid var(--demo-line);
+  border-radius: 3px;
+  background: var(--demo-paper);
+  color: var(--demo-muted);
+}
+button:hover,
+select:hover {
+  color: var(--demo-ink);
+  background: var(--demo-leaf);
+}
+:focus-visible {
+  outline: 2px solid var(--demo-moss);
+  outline-offset: 3px;
+}
+.entry-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 18px;
+  opacity: 0;
+  pointer-events: none;
+  font: 12px/1.4 var(--demo-font);
+}
+.json-line:hover > .entry-actions,
+.json-line:focus-within > .entry-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+.entry-actions button {
+  min-width: 28px;
+  min-height: 28px;
+  padding: 2px 5px;
+}
+.entry-actions select {
+  min-height: 28px;
+  padding: 2px 4px;
+}
+button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.boolean {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  line-height: 1.5;
+}
+.form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0;
+}
+.form-footer .demo-note {
+  margin: 0;
+}
+.reset {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.errors {
+  color: var(--demo-ink);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.errors:not(:empty) {
+  border-left: 2px solid var(--demo-moss);
+  padding: 8px 12px;
+  margin: 16px 0;
+}
+.result {
+  margin-top: 20px;
+  border-top: 1px solid var(--demo-line);
+  padding-top: 16px;
+}
+.result summary {
+  cursor: pointer;
+  color: var(--demo-moss);
+  font-size: 13px;
+}
+.result textarea {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--demo-line);
+  border-radius: 3px;
+  background: var(--demo-paper);
+  color: var(--demo-ink);
+  resize: vertical;
+  font:
+    13px/1.7 ui-monospace,
+    monospace;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (hover: none), (pointer: coarse) {
+  .entry-actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .entry-actions button,
+  .entry-actions select {
+    min-width: 36px;
+    min-height: 36px;
+  }
+}
+@media (max-width: 560px) {
+  .demo-shell {
+    padding: 24px 12px;
+  }
+  .json-editor {
+    padding: 12px;
+    font-size: 13px;
+  }
+  .entry-actions {
+    margin-left: 12px;
+  }
+}

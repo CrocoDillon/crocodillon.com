@@ -1,0 +1,7 @@
+{
+  "key": "a-form-that-looks-like-json-react",
+  "title": "A form that looks like JSON",
+  "description": "An editable, syntax-highlighted JSON form built with React. Add, reorder, and nest objects and arrays; edit strings, numbers, booleans, and null. Just for fun.",
+  "tags": ["react", "json", "crocodillon-demo"],
+  "files": ["index.html", "index.css", "index.ts"]
+}
