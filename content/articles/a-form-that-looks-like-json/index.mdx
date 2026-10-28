@@ -11,14 +11,14 @@ import demo from './demo/codepen.lock.json'
 
 <p className="intro">I was scrolling through my old Pens again and found <a href="https://codepen.io/CrocoDillon/pen/nYMBZp">a form that looks like JSON</a>. Inputs dressed up as syntax-highlighted values, with braces and quotes around them. Not particularly useful, perhaps, but I still like the idea.</p>
 
-So let’s give it another go. This time you can edit the keys, change value types, and nest objects and arrays. Strings, numbers, booleans, and `null` are all invited. Regular expressions from the old experiment aren’t—they’re not JSON.
+So let’s give it another go. This time you can edit the keys, change value types, and nest objects and arrays. Strings, numbers, booleans, and `null` are all invited. Sorry, regular expressions—you’re not JSON, so you’re not invited this time.
 
-<ArticleDemo title="A form that looks like JSON" slug="a-form-that-looks-like-json" penUrl={demo.editorUrl ?? undefined} />
+I’ve been recycling a few old ideas lately, mostly because I’m finally motivated to write about them. This is the last one, I promise.
+
+<ArticleDemo title="A form that looks like JSON" slug="a-form-that-looks-like-json" penUrl={demo.editorUrl ?? undefined} autoRun />
 
 Click a value and start typing. Hover over a line, or tab into it, to reveal its type selector and the move and delete buttons. Objects and arrays have a button to add another entry. On touch screens, the controls stay visible. Try adding an object inside an array, then moving the whole thing up a line.
 
-The JSON result below the form updates as you edit. Quotes and backslashes are escaped for you; strings show those escapes when you leave the field. An unfinished number or duplicate key needs fixing before there’s a result to copy. That’s just keeping the JSON intact, without deciding what your data is supposed to mean.
-
 I used React for this version, but it would be trivial to port the idea to Angular or vanilla JavaScript. There’s no special React trick behind the braces.
 
-Maybe there’s a use for dynamically rendering a form when the result just needs to be JSON, without a schema telling you what belongs where. Or maybe it’s just a fun little editor. Adding something like [Zod](https://zod.dev/) validation could be a nice follow-up project—then it could complain about your choices as well as your commas.
+Maybe there’s a use for dynamically rendering a form when the result just needs to be JSON, without a schema telling you what belongs where. Or maybe it’s just a fun little editor. Adding something like [Zod](https://zod.dev/) validation could be a nice follow-up project.

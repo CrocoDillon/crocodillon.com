@@ -73,31 +73,6 @@ function errors(entry: JsonNode): string[] {
   return result
 }
 
-// Serialize the tree directly: no coercion, lost duplicate keys, or reordered keys.
-function json(entry: JsonNode, depth = 0): string {
-  if (entry.type === 'string') return JSON.stringify(entry.value)
-  if (entry.type === 'null') return 'null'
-  if (!isContainer(entry)) return entry.value
-  const object = entry.type === 'object'
-  const [open, close] = object ? ['{', '}'] : ['[', ']']
-  if (!entry.children.length) return open + close
-  return (
-    open +
-    '\n' +
-    entry.children
-      .map(
-        child =>
-          '  '.repeat(depth + 1) +
-          (object ? JSON.stringify(child.key) + ': ' : '') +
-          json(child, depth + 1)
-      )
-      .join(',\n') +
-    '\n' +
-    '  '.repeat(depth) +
-    close
-  )
-}
-
 function update(
   tree: JsonNode,
   id: number,
@@ -201,13 +176,13 @@ function Entry({
   let value
   if (container) value = object ? '{' : '['
   else if (entry.type === 'null')
-    value = h('span', { className: 'json-literal' }, 'null')
+    value = h('span', { className: 'json-null' }, 'null')
   else if (entry.type === 'boolean')
     value = h(
       'button',
       {
         type: 'button',
-        className: 'boolean json-literal',
+        className: 'boolean json-boolean',
         'aria-label': `Toggle ${label}: ${entry.value}`,
         'aria-pressed': entry.value === 'true',
         onClick: () =>
@@ -218,7 +193,7 @@ function Entry({
   else
     value = h(
       'span',
-      { className: entry.type === 'string' ? 'json-string' : 'json-literal' },
+      { className: entry.type === 'string' ? 'json-string' : 'json-number' },
       entry.type === 'string' ? '"' : '',
       h(TextField, {
         id: `value-${entry.id}`,
@@ -393,7 +368,6 @@ function App() {
   const [announcement, announce] = useState('')
   const [focusRequest, requestFocus] = useState<{ id: string } | null>(null)
   const problems = [...new Set(errors(tree))]
-  const output = problems.length ? '' : json(tree)
   useEffect(() => {
     if (focusRequest) document.getElementById(focusRequest.id)?.focus()
   }, [focusRequest])
@@ -447,25 +421,6 @@ function App() {
       'div',
       { id: 'json-errors', className: 'errors', role: 'status' },
       problems.join(' ')
-    ),
-    h(
-      'details',
-      { className: 'result' },
-      h('summary', null, 'JSON result'),
-      h(
-        'p',
-        { className: 'demo-note' },
-        output
-          ? 'Select the result and copy it anywhere you like.'
-          : 'Finish the edits above to get valid JSON.'
-      ),
-      h('textarea', {
-        'aria-label': 'JSON result',
-        readOnly: true,
-        value: output,
-        spellCheck: false,
-        rows: 10,
-      })
     ),
     h(
       'p',

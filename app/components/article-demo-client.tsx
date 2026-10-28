@@ -8,6 +8,7 @@ export type ArticleDemoProps = {
   title: string
   penUrl?: string
   slug: string
+  autoRun?: boolean
 }
 
 type DemoEvent = 'DemoRun' | 'DemoOpen'
@@ -17,9 +18,10 @@ export function ArticleDemoClient({
   title,
   penUrl,
   slug,
+  autoRun = false,
   analyticsEnabled,
 }: ArticleDemoProps & { analyticsEnabled: boolean }) {
-  const [running, setRunning] = useState(false)
+  const [running, setRunning] = useState(autoRun)
   const [ready, setReady] = useState(false)
   const [contentHeight, setContentHeight] = useState<number>()
   const { resolvedTheme } = useTheme()
@@ -91,7 +93,7 @@ export function ArticleDemoClient({
       <div
         ref={panel}
         className="relative overflow-hidden bg-paper transition-[height] duration-500 ease-in-out motion-reduce:transition-none"
-        style={{ height: contentHeight }}
+        style={{ height: contentHeight ?? (autoRun ? 192 : undefined) }}
         aria-busy={running && !ready}
       >
         {running ? (
