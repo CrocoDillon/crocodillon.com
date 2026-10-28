@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stale-while-revalidate caching with RxJS</title>
+    <link rel="stylesheet" href="/demo/theme.css" />
+    <style>.demo-shell {
+  max-width: 960px;
+}
+.demo-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.demo-heading h1 {
+  font-size: clamp(24px, 4vw, 32px);
+  margin-bottom: 0;
+}
+.server {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+button {
+  border: 1px solid var(--demo-line);
+  border-radius: 3px;
+  background: var(--demo-paper);
+  color: var(--demo-ink);
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+button:hover:not(:disabled) {
+  background: var(--demo-leaf);
+  border-color: var(--demo-moss);
+}
+button:focus-visible {
+  outline: 2px solid var(--demo-moss);
+  outline-offset: 3px;
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+#add {
+  background: var(--demo-moss);
+  border-color: var(--demo-moss);
+  color: var(--demo-paper);
+}
+#add:hover:not(:disabled) {
+  opacity: 0.85;
+}
+#announcement {
+  margin-top: 12px;
+  min-height: 1.6em;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+.card {
+  min-width: 0;
+  border: 1px solid var(--demo-line);
+  padding: 18px;
+  border-radius: 3px;
+}
+.card[data-kind='last'] {
+  border-color: var(--demo-moss);
+}
+.card h2 {
+  font:
+    600 15px/1.4 ui-monospace,
+    monospace;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.policy {
+  font-size: 12px;
+  color: var(--demo-muted);
+  line-height: 1.5;
+  margin: 8px 0 16px;
+  min-height: 3em;
+}
+.resource {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-top: 1px solid var(--demo-line);
+}
+.cache {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  min-width: 52px;
+}
+.field-label {
+  font-size: 11px;
+  color: var(--demo-muted);
+}
+.request {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  min-width: 0;
+}
+.request-text {
+  display: grid;
+}
+.request-state {
+  font-weight: 500;
+}
+.request-detail {
+  color: var(--demo-muted);
+  font-size: 11px;
+}
+.request-dot {
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--demo-muted);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.request[data-pending='true'] .request-dot {
+  background: var(--demo-moss);
+  border-color: var(--demo-moss);
+}
+.subscribers-label {
+  border-top: 1px solid var(--demo-line);
+  padding-top: 12px;
+  margin: 0 0 12px;
+}
+.subscribers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 8px;
+  min-height: 160px;
+  align-content: start;
+}
+.empty {
+  grid-column: 1 / -1;
+  align-self: center;
+  color: var(--demo-muted);
+  font-size: 12px;
+  margin: 0;
+}
+.subscriber {
+  display: grid;
+  grid-template-columns: 36px 14px 44px;
+  grid-template-rows: 44px auto;
+  align-items: center;
+  justify-content: center;
+  gap: 5px 0;
+}
+.subscriber-square {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--demo-muted);
+  background: var(--demo-leaf);
+  font:
+    500 15px ui-monospace,
+    monospace;
+}
+.connector {
+  height: 1px;
+  background: var(--demo-line);
+}
+.value-circle {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--demo-muted);
+  border-radius: 50%;
+  color: var(--demo-muted);
+  font:
+    500 13px ui-monospace,
+    monospace;
+}
+.value-circle[data-freshness='current'] {
+  background: var(--demo-moss);
+  border-color: var(--demo-moss);
+  color: var(--demo-paper);
+}
+.value-circle[data-freshness='stale'] {
+  background: #dcb671;
+  border-color: #dcb671;
+  color: #20291e;
+}
+.subscriber-state,
+.value-state {
+  font-size: 9px;
+  text-align: center;
+  color: var(--demo-muted);
+}
+.subscriber-state {
+  grid-column: 1;
+}
+.value-state {
+  grid-column: 3;
+}
+.cache .value-state {
+  grid-column: 1;
+  font-size: 10px;
+}
+@media (max-width: 540px) {
+  .demo-shell {
+    padding: 24px 16px;
+  }
+  .demo-heading {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .cards {
+    grid-template-columns: 1fr;
+  }
+  .policy {
+    min-height: 0;
+  }
+  .subscribers {
+    min-height: 0;
+  }
+  .empty {
+    min-height: 50px;
+    display: grid;
+    place-items: center;
+  }
+  .card {
+    padding: 16px;
+  }
+}
+</style>
+  <script src="/demo/frame.js"></script></head>
+  <body>
+    <main class="demo-shell">
+      <div class="demo-heading">
+        <div>
+          <p class="demo-eyebrow">RXJS · FOUR OPERATORS</p>
+          <h1>Same subscribers. Different caches.</h1>
+        </div>
+        <div class="server">
+          <span>Server</span>
+          <span id="server-value" class="value-circle" data-freshness="current"
+            >v1</span
+          >
+        </div>
+      </div>
+      <div class="controls" aria-label="Control all four comparisons">
+        <button id="add" type="button">+ Add subscriber</button>
+        <button id="remove" type="button" disabled>− Remove subscriber</button>
+        <button id="remove-all" type="button" disabled>Remove all</button>
+        <button id="advance" type="button">Change server value</button>
+        <button id="reset" type="button">Reset</button>
+      </div>
+      <p id="announcement" class="demo-note" role="status">
+        0 of 4 subscribers. Add one to start a request.
+      </p>
+      <div id="cards" class="cards"></div>
+      <p class="demo-note">
+        Green means the value matches the server; amber means it’s stale.
+        Changing the server doesn’t start a request. Each simulated GET takes
+        1.8 seconds and returns the value captured when it started.
+      </p>
+      <p class="demo-note">
+        shareLast waits one second between refreshes while subscribers remain.
+        Returning after “Remove all” always refreshes. Completed subscribers
+        keep displaying their last value.
+      </p>
+    </main>
+    <script>"use strict";(()=>{var Q=function(r,t){return Q=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(e,o){e.__proto__=o}||function(e,o){for(var i in o)Object.prototype.hasOwnProperty.call(o,i)&&(e[i]=o[i])},Q(r,t)};function g(r,t){if(typeof t!="function"&&t!==null)throw new TypeError("Class extends value "+String(t)+" is not a constructor or null");Q(r,t);function e(){this.constructor=r}r.prototype=t===null?Object.create(t):(e.prototype=t.prototype,new e)}function pe(r,t,e,o){function i(n){return n instanceof e?n:new e(function(s){s(n)})}return new(e||(e=Promise))(function(n,s){function a(f){try{u(o.next(f))}catch(p){s(p)}}function c(f){try{u(o.throw(f))}catch(p){s(p)}}function u(f){f.done?n(f.value):i(f.value).then(a,c)}u((o=o.apply(r,t||[])).next())})}function G(r,t){var e={label:0,sent:function(){if(n[0]&1)throw n[1];return n[1]},trys:[],ops:[]},o,i,n,s=Object.create((typeof Iterator=="function"?Iterator:Object).prototype);return s.next=a(0),s.throw=a(1),s.return=a(2),typeof Symbol=="function"&&(s[Symbol.iterator]=function(){return this}),s;function a(u){return function(f){return c([u,f])}}function c(u){if(o)throw new TypeError("Generator is already executing.");for(;s&&(s=0,u[0]&&(e=0)),e;)try{if(o=1,i&&(n=u[0]&2?i.return:u[0]?i.throw||((n=i.return)&&n.call(i),0):i.next)&&!(n=n.call(i,u[1])).done)return n;switch(i=0,n&&(u=[u[0]&2,n.value]),u[0]){case 0:case 1:n=u;break;case 4:return e.label++,{value:u[1],done:!1};case 5:e.label++,i=u[1],u=[0];continue;case 7:u=e.ops.pop(),e.trys.pop();continue;default:if(n=e.trys,!(n=n.length>0&&n[n.length-1])&&(u[0]===6||u[0]===2)){e=0;continue}if(u[0]===3&&(!n||u[1]>n[0]&&u[1]<n[3])){e.label=u[1];break}if(u[0]===6&&e.label<n[1]){e.label=n[1],n=u;break}if(n&&e.label<n[2]){e.label=n[2],e.ops.push(u);break}n[2]&&e.ops.pop(),e.trys.pop();continue}u=t.call(r,e)}catch(f){u=[6,f],i=0}finally{o=n=0}if(u[0]&5)throw u[1];return{value:u[0]?u[1]:void 0,done:!0}}}function _(r){var t=typeof Symbol=="function"&&Symbol.iterator,e=t&&r[t],o=0;if(e)return e.call(r);if(r&&typeof r.length=="number")return{next:function(){return r&&o>=r.length&&(r=void 0),{value:r&&r[o++],done:!r}}};throw new TypeError(t?"Object is not iterable.":"Symbol.iterator is not defined.")}function S(r,t){var e=typeof Symbol=="function"&&r[Symbol.iterator];if(!e)return r;var o=e.call(r),i,n=[],s;try{for(;(t===void 0||t-- >0)&&!(i=o.next()).done;)n.push(i.value)}catch(a){s={error:a}}finally{try{i&&!i.done&&(e=o.return)&&e.call(o)}finally{if(s)throw s.error}}return n}function E(r,t,e){if(e||arguments.length===2)for(var o=0,i=t.length,n;o<i;o++)(n||!(o in t))&&(n||(n=Array.prototype.slice.call(t,0,o)),n[o]=t[o]);return r.concat(n||Array.prototype.slice.call(t))}function T(r){return this instanceof T?(this.v=r,this):new T(r)}function me(r,t,e){if(!Symbol.asyncIterator)throw new TypeError("Symbol.asyncIterator is not defined.");var o=e.apply(r,t||[]),i,n=[];return i=Object.create((typeof AsyncIterator=="function"?AsyncIterator:Object).prototype),a("next"),a("throw"),a("return",s),i[Symbol.asyncIterator]=function(){return this},i;function s(l){return function(y){return Promise.resolve(y).then(l,p)}}function a(l,y){o[l]&&(i[l]=function(d){return new Promise(function(A,k){n.push([l,d,A,k])>1||c(l,d)})},y&&(i[l]=y(i[l])))}function c(l,y){try{u(o[l](y))}catch(d){b(n[0][3],d)}}function u(l){l.value instanceof T?Promise.resolve(l.value.v).then(f,p):b(n[0][2],l)}function f(l){c("next",l)}function p(l){c("throw",l)}function b(l,y){l(y),n.shift(),n.length&&c(n[0][0],n[0][1])}}function de(r){if(!Symbol.asyncIterator)throw new TypeError("Symbol.asyncIterator is not defined.");var t=r[Symbol.asyncIterator],e;return t?t.call(r):(r=typeof _=="function"?_(r):r[Symbol.iterator](),e={},o("next"),o("throw"),o("return"),e[Symbol.asyncIterator]=function(){return this},e);function o(n){e[n]=r[n]&&function(s){return new Promise(function(a,c){s=r[n](s),i(a,c,s.done,s.value)})}}function i(n,s,a,c){Promise.resolve(c).then(function(u){n({value:u,done:a})},s)}}function m(r){return typeof r=="function"}function K(r){var t=function(o){Error.call(o),o.stack=new Error().stack},e=r(t);return e.prototype=Object.create(Error.prototype),e.prototype.constructor=e,e}var B=K(function(r){return function(e){r(this),this.message=e?e.length+` errors occurred during unsubscription:
+`+e.map(function(o,i){return i+1+") "+o.toString()}).join(`
+  `):"",this.name="UnsubscriptionError",this.errors=e}});function $(r,t){if(r){var e=r.indexOf(t);0<=e&&r.splice(e,1)}}var C=(function(){function r(t){this.initialTeardown=t,this.closed=!1,this._parentage=null,this._finalizers=null}return r.prototype.unsubscribe=function(){var t,e,o,i,n;if(!this.closed){this.closed=!0;var s=this._parentage;if(s)if(this._parentage=null,Array.isArray(s))try{for(var a=_(s),c=a.next();!c.done;c=a.next()){var u=c.value;u.remove(this)}}catch(d){t={error:d}}finally{try{c&&!c.done&&(e=a.return)&&e.call(a)}finally{if(t)throw t.error}}else s.remove(this);var f=this.initialTeardown;if(m(f))try{f()}catch(d){n=d instanceof B?d.errors:[d]}var p=this._finalizers;if(p){this._finalizers=null;try{for(var b=_(p),l=b.next();!l.done;l=b.next()){var y=l.value;try{he(y)}catch(d){n=n??[],d instanceof B?n=E(E([],S(n)),S(d.errors)):n.push(d)}}}catch(d){o={error:d}}finally{try{l&&!l.done&&(i=b.return)&&i.call(b)}finally{if(o)throw o.error}}}if(n)throw new B(n)}},r.prototype.add=function(t){var e;if(t&&t!==this)if(this.closed)he(t);else{if(t instanceof r){if(t.closed||t._hasParent(this))return;t._addParent(this)}(this._finalizers=(e=this._finalizers)!==null&&e!==void 0?e:[]).push(t)}},r.prototype._hasParent=function(t){var e=this._parentage;return e===t||Array.isArray(e)&&e.includes(t)},r.prototype._addParent=function(t){var e=this._parentage;this._parentage=Array.isArray(e)?(e.push(t),e):e?[e,t]:t},r.prototype._removeParent=function(t){var e=this._parentage;e===t?this._parentage=null:Array.isArray(e)&&$(e,t)},r.prototype.remove=function(t){var e=this._finalizers;e&&$(e,t),t instanceof r&&t._removeParent(this)},r.EMPTY=(function(){var t=new r;return t.closed=!0,t})(),r})();var X=C.EMPTY;function Y(r){return r instanceof C||r&&"closed"in r&&m(r.remove)&&m(r.add)&&m(r.unsubscribe)}function he(r){m(r)?r():r.unsubscribe()}var w={onUnhandledError:null,onStoppedNotification:null,Promise:void 0,useDeprecatedSynchronousErrorHandling:!1,useDeprecatedNextContext:!1};var I={setTimeout:function(r,t){for(var e=[],o=2;o<arguments.length;o++)e[o-2]=arguments[o];var i=I.delegate;return i?.setTimeout?i.setTimeout.apply(i,E([r,t],S(e))):setTimeout.apply(void 0,E([r,t],S(e)))},clearTimeout:function(r){var t=I.delegate;return(t?.clearTimeout||clearTimeout)(r)},delegate:void 0};function z(r){I.setTimeout(function(){var t=w.onUnhandledError;if(t)t(r);else throw r})}function ee(){}var be=(function(){return re("C",void 0,void 0)})();function ye(r){return re("E",void 0,r)}function ve(r){return re("N",r,void 0)}function re(r,t,e){return{kind:r,value:t,error:e}}var O=null;function R(r){if(w.useDeprecatedSynchronousErrorHandling){var t=!O;if(t&&(O={errorThrown:!1,error:null}),r(),t){var e=O,o=e.errorThrown,i=e.error;if(O=null,o)throw i}}else r()}function xe(r){w.useDeprecatedSynchronousErrorHandling&&O&&(O.errorThrown=!0,O.error=r)}var q=(function(r){g(t,r);function t(e){var o=r.call(this)||this;return o.isStopped=!1,e?(o.destination=e,Y(e)&&e.add(o)):o.destination=He,o}return t.create=function(e,o,i){return new j(e,o,i)},t.prototype.next=function(e){this.isStopped?oe(ve(e),this):this._next(e)},t.prototype.error=function(e){this.isStopped?oe(ye(e),this):(this.isStopped=!0,this._error(e))},t.prototype.complete=function(){this.isStopped?oe(be,this):(this.isStopped=!0,this._complete())},t.prototype.unsubscribe=function(){this.closed||(this.isStopped=!0,r.prototype.unsubscribe.call(this),this.destination=null)},t.prototype._next=function(e){this.destination.next(e)},t.prototype._error=function(e){try{this.destination.error(e)}finally{this.unsubscribe()}},t.prototype._complete=function(){try{this.destination.complete()}finally{this.unsubscribe()}},t})(C);var Ve=Function.prototype.bind;function te(r,t){return Ve.call(r,t)}var We=(function(){function r(t){this.partialObserver=t}return r.prototype.next=function(t){var e=this.partialObserver;if(e.next)try{e.next(t)}catch(o){Z(o)}},r.prototype.error=function(t){var e=this.partialObserver;if(e.error)try{e.error(t)}catch(o){Z(o)}else Z(t)},r.prototype.complete=function(){var t=this.partialObserver;if(t.complete)try{t.complete()}catch(e){Z(e)}},r})(),j=(function(r){g(t,r);function t(e,o,i){var n=r.call(this)||this,s;if(m(e)||!e)s={next:e??void 0,error:o??void 0,complete:i??void 0};else{var a;n&&w.useDeprecatedNextContext?(a=Object.create(e),a.unsubscribe=function(){return n.unsubscribe()},s={next:e.next&&te(e.next,a),error:e.error&&te(e.error,a),complete:e.complete&&te(e.complete,a)}):s=e}return n.destination=new We(s),n}return t})(q);function Z(r){w.useDeprecatedSynchronousErrorHandling?xe(r):z(r)}function Ne(r){throw r}function oe(r,t){var e=w.onStoppedNotification;e&&I.setTimeout(function(){return e(r,t)})}var He={closed:!0,next:ee,error:Ne,complete:ee};var L=(function(){return typeof Symbol=="function"&&Symbol.observable||"@@observable"})();function we(r){return r}function _e(r){return r.length===0?we:r.length===1?r[0]:function(e){return r.reduce(function(o,i){return i(o)},e)}}var v=(function(){function r(t){t&&(this._subscribe=t)}return r.prototype.lift=function(t){var e=new r;return e.source=this,e.operator=t,e},r.prototype.subscribe=function(t,e,o){var i=this,n=Ke(t)?t:new j(t,e,o);return R(function(){var s=i,a=s.operator,c=s.source;n.add(a?a.call(n,c):c?i._subscribe(n):i._trySubscribe(n))}),n},r.prototype._trySubscribe=function(t){try{return this._subscribe(t)}catch(e){t.error(e)}},r.prototype.forEach=function(t,e){var o=this;return e=ge(e),new e(function(i,n){var s=new j({next:function(a){try{t(a)}catch(c){n(c),s.unsubscribe()}},error:n,complete:i});o.subscribe(s)})},r.prototype._subscribe=function(t){var e;return(e=this.source)===null||e===void 0?void 0:e.subscribe(t)},r.prototype[L]=function(){return this},r.prototype.pipe=function(){for(var t=[],e=0;e<arguments.length;e++)t[e]=arguments[e];return _e(t)(this)},r.prototype.toPromise=function(t){var e=this;return t=ge(t),new t(function(o,i){var n;e.subscribe(function(s){return n=s},function(s){return i(s)},function(){return o(n)})})},r.create=function(t){return new r(t)},r})();function ge(r){var t;return(t=r??w.Promise)!==null&&t!==void 0?t:Promise}function Ge(r){return r&&m(r.next)&&m(r.error)&&m(r.complete)}function Ke(r){return r&&r instanceof q||Ge(r)&&Y(r)}function Be(r){return m(r?.lift)}function Se(r){return function(t){if(Be(t))return t.lift(function(e){try{return r(e,this)}catch(o){this.error(o)}});throw new TypeError("Unable to lift unknown Observable type")}}var Ee=K(function(r){return function(){r(this),this.name="ObjectUnsubscribedError",this.message="object unsubscribed"}});var D=(function(r){g(t,r);function t(){var e=r.call(this)||this;return e.closed=!1,e.currentObservers=null,e.observers=[],e.isStopped=!1,e.hasError=!1,e.thrownError=null,e}return t.prototype.lift=function(e){var o=new Te(this,this);return o.operator=e,o},t.prototype._throwIfClosed=function(){if(this.closed)throw new Ee},t.prototype.next=function(e){var o=this;R(function(){var i,n;if(o._throwIfClosed(),!o.isStopped){o.currentObservers||(o.currentObservers=Array.from(o.observers));try{for(var s=_(o.currentObservers),a=s.next();!a.done;a=s.next()){var c=a.value;c.next(e)}}catch(u){i={error:u}}finally{try{a&&!a.done&&(n=s.return)&&n.call(s)}finally{if(i)throw i.error}}}})},t.prototype.error=function(e){var o=this;R(function(){if(o._throwIfClosed(),!o.isStopped){o.hasError=o.isStopped=!0,o.thrownError=e;for(var i=o.observers;i.length;)i.shift().error(e)}})},t.prototype.complete=function(){var e=this;R(function(){if(e._throwIfClosed(),!e.isStopped){e.isStopped=!0;for(var o=e.observers;o.length;)o.shift().complete()}})},t.prototype.unsubscribe=function(){this.isStopped=this.closed=!0,this.observers=this.currentObservers=null},Object.defineProperty(t.prototype,"observed",{get:function(){var e;return((e=this.observers)===null||e===void 0?void 0:e.length)>0},enumerable:!1,configurable:!0}),t.prototype._trySubscribe=function(e){return this._throwIfClosed(),r.prototype._trySubscribe.call(this,e)},t.prototype._subscribe=function(e){return this._throwIfClosed(),this._checkFinalizedStatuses(e),this._innerSubscribe(e)},t.prototype._innerSubscribe=function(e){var o=this,i=this,n=i.hasError,s=i.isStopped,a=i.observers;return n||s?X:(this.currentObservers=null,a.push(e),new C(function(){o.currentObservers=null,$(a,e)}))},t.prototype._checkFinalizedStatuses=function(e){var o=this,i=o.hasError,n=o.thrownError,s=o.isStopped;i?e.error(n):s&&e.complete()},t.prototype.asObservable=function(){var e=new v;return e.source=this,e},t.create=function(e,o){return new Te(e,o)},t})(v);var Te=(function(r){g(t,r);function t(e,o){var i=r.call(this)||this;return i.destination=e,i.source=o,i}return t.prototype.next=function(e){var o,i;(i=(o=this.destination)===null||o===void 0?void 0:o.next)===null||i===void 0||i.call(o,e)},t.prototype.error=function(e){var o,i;(i=(o=this.destination)===null||o===void 0?void 0:o.error)===null||i===void 0||i.call(o,e)},t.prototype.complete=function(){var e,o;(o=(e=this.destination)===null||e===void 0?void 0:e.complete)===null||o===void 0||o.call(e)},t.prototype._subscribe=function(e){var o,i;return(i=(o=this.source)===null||o===void 0?void 0:o.subscribe(e))!==null&&i!==void 0?i:X},t})(D);var ne={now:function(){return(ne.delegate||Date).now()},delegate:void 0};var V=(function(r){g(t,r);function t(e,o,i){e===void 0&&(e=1/0),o===void 0&&(o=1/0),i===void 0&&(i=ne);var n=r.call(this)||this;return n._bufferSize=e,n._windowTime=o,n._timestampProvider=i,n._buffer=[],n._infiniteTimeWindow=!0,n._infiniteTimeWindow=o===1/0,n._bufferSize=Math.max(1,e),n._windowTime=Math.max(1,o),n}return t.prototype.next=function(e){var o=this,i=o.isStopped,n=o._buffer,s=o._infiniteTimeWindow,a=o._timestampProvider,c=o._windowTime;i||(n.push(e),!s&&n.push(a.now()+c)),this._trimBuffer(),r.prototype.next.call(this,e)},t.prototype._subscribe=function(e){this._throwIfClosed(),this._trimBuffer();for(var o=this._innerSubscribe(e),i=this,n=i._infiniteTimeWindow,s=i._buffer,a=s.slice(),c=0;c<a.length&&!e.closed;c+=n?1:2)e.next(a[c]);return this._checkFinalizedStatuses(e),o},t.prototype._trimBuffer=function(){var e=this,o=e._bufferSize,i=e._timestampProvider,n=e._buffer,s=e._infiniteTimeWindow,a=(s?1:2)*o;if(o<1/0&&a<n.length&&n.splice(0,n.length-a),!s){for(var c=i.now(),u=0,f=1;f<n.length&&n[f]<=c;f+=2)u=f;u&&n.splice(0,u+1)}},t})(D);var Oe=(function(r){return r&&typeof r.length=="number"&&typeof r!="function"});function je(r){return m(r?.then)}function Pe(r){return m(r[L])}function Ae(r){return Symbol.asyncIterator&&m(r?.[Symbol.asyncIterator])}function Ce(r){return new TypeError("You provided "+(r!==null&&typeof r=="object"?"an invalid object":"'"+r+"'")+" where a stream was expected. You can provide an Observable, Promise, ReadableStream, Array, AsyncIterable, or Iterable.")}function Ye(){return typeof Symbol!="function"||!Symbol.iterator?"@@iterator":Symbol.iterator}var Ie=Ye();function Re(r){return m(r?.[Ie])}function qe(r){return me(this,arguments,function(){var e,o,i,n;return G(this,function(s){switch(s.label){case 0:e=r.getReader(),s.label=1;case 1:s.trys.push([1,,9,10]),s.label=2;case 2:return[4,T(e.read())];case 3:return o=s.sent(),i=o.value,n=o.done,n?[4,T(void 0)]:[3,5];case 4:return[2,s.sent()];case 5:return[4,T(i)];case 6:return[4,s.sent()];case 7:return s.sent(),[3,2];case 8:return[3,10];case 9:return e.releaseLock(),[7];case 10:return[2]}})})}function Le(r){return m(r?.getReader)}function ie(r){if(r instanceof v)return r;if(r!=null){if(Pe(r))return ze(r);if(Oe(r))return Ze(r);if(je(r))return Je(r);if(Ae(r))return Fe(r);if(Re(r))return Qe(r);if(Le(r))return Xe(r)}throw Ce(r)}function ze(r){return new v(function(t){var e=r[L]();if(m(e.subscribe))return e.subscribe(t);throw new TypeError("Provided object does not correctly implement Symbol.observable")})}function Ze(r){return new v(function(t){for(var e=0;e<r.length&&!t.closed;e++)t.next(r[e]);t.complete()})}function Je(r){return new v(function(t){r.then(function(e){t.closed||(t.next(e),t.complete())},function(e){return t.error(e)}).then(null,z)})}function Qe(r){return new v(function(t){var e,o;try{for(var i=_(r),n=i.next();!n.done;n=i.next()){var s=n.value;if(t.next(s),t.closed)return}}catch(a){e={error:a}}finally{try{n&&!n.done&&(o=i.return)&&o.call(i)}finally{if(e)throw e.error}}t.complete()})}function Fe(r){return new v(function(t){er(r,t).catch(function(e){return t.error(e)})})}function Xe(r){return Fe(qe(r))}function er(r,t){var e,o,i,n;return pe(this,void 0,void 0,function(){var s,a;return G(this,function(c){switch(c.label){case 0:c.trys.push([0,5,6,11]),e=de(r),c.label=1;case 1:return[4,e.next()];case 2:if(o=c.sent(),!!o.done)return[3,4];if(s=o.value,t.next(s),t.closed)return[2];c.label=3;case 3:return[3,1];case 4:return[3,11];case 5:return a=c.sent(),i={error:a},[3,11];case 6:return c.trys.push([6,,9,10]),o&&!o.done&&(n=e.return)?[4,n.call(e)]:[3,8];case 7:c.sent(),c.label=8;case 8:return[3,10];case 9:if(i)throw i.error;return[7];case 10:return[7];case 11:return t.complete(),[2]}})})}function F(r){r===void 0&&(r={});var t=r.connector,e=t===void 0?function(){return new D}:t,o=r.resetOnError,i=o===void 0?!0:o,n=r.resetOnComplete,s=n===void 0?!0:n,a=r.resetOnRefCountZero,c=a===void 0?!0:a;return function(u){var f,p,b,l=0,y=!1,d=!1,A=function(){p?.unsubscribe(),p=void 0},k=function(){A(),f=b=void 0,y=d=!1},De=function(){var U=f;k(),U?.unsubscribe()};return Se(function(U,le){l++,!d&&!y&&A();var N=b=b??e();le.add(function(){l--,l===0&&!d&&!y&&(p=se(De,c))}),N.subscribe(le),!f&&l>0&&(f=new j({next:function(H){return N.next(H)},error:function(H){d=!0,A(),p=se(k,i,H),N.error(H)},complete:function(){y=!0,A(),p=se(k,s),N.complete()}}),ie(U).subscribe(f))})(u)}}function se(r,t){for(var e=[],o=2;o<arguments.length;o++)e[o-2]=arguments[o];if(t===!0){r();return}if(t!==!1){var i=new j({next:function(){i.unsubscribe(),r()}});return ie(t.apply(void 0,E([],S(e)))).subscribe(i)}}function ae(r,t,e){var o,i,n,s,a=!1;return r&&typeof r=="object"?(o=r.bufferSize,s=o===void 0?1/0:o,i=r.windowTime,t=i===void 0?1/0:i,n=r.refCount,a=n===void 0?!1:n,e=r.scheduler):s=r??1/0,F({connector:function(){return new V(s,t,e)},resetOnError:!0,resetOnComplete:!1,resetOnRefCountZero:a})}function rr({minRefreshInterval:r=1e3}={}){if(!Number.isFinite(r)||r<0)throw new RangeError("minRefreshInterval must be finite and non-negative");return t=>{let e=new Set,o,i,n=-1/0,s=0;return new v(a=>{let c=e.size===0,u=s;if(e.add(a),a.add(()=>{if(e.delete(a)&&e.size===0){let p=i;i=void 0,p?.unsubscribe()}}),o&&a.next(o.value),a.closed||i||s!==u||!c&&Date.now()-n<r)return;let f=new q({next:p=>{o={value:p};for(let b of[...e])b.next(p)},error:p=>{i=void 0;let b=[...e];e.clear();for(let l of b)l.error(p)},complete:()=>{n=Date.now(),i=void 0}});i=f,s++,t.subscribe(f)})}}var tr=[["share","share()","Shares the request; no replay."],["replay","shareReplay","Keeps a completed response."],["resetting","share + ReplaySubject(1)","Clears its cache on completion."],["last","shareLast()","Replays, refreshes, keeps views in sync."]],J=["A","B","C","D"],ue=1e3,or=1800,M=1,x=[];function h(r,t="",e=""){let o=document.createElement(r);return o.className=t,o.textContent=e,o}function Me(r){let t=r===void 0?"waiting":r===M?"current":"stale",e=h("span","value-circle",r===void 0?"\u2014":`v${r}`);return e.dataset.freshness=t,e.setAttribute("aria-label",r===void 0?"No value yet":`v${r}, ${t}`),{circle:e,label:h("span","value-state",t)}}var ce=class{constructor(t,e,o){this.kind=t;this.card.dataset.kind=t;let i=h("h2","",e);i.id=`operator-${t}`,this.card.setAttribute("aria-labelledby",i.id),this.cacheView.setAttribute("aria-label",`${e} cache`),this.requestView.setAttribute("role","status");let n=h("div","resource");n.append(this.cacheView,this.requestView),this.card.append(i,h("p","policy",o),n,h("p","field-label subscribers-label","Subscribers"),this.subscriberView);let s=new v(a=>{let c=++this.requests,u=M;this.pending={id:c,value:u},this.render();let f=!1,p=setTimeout(()=>{f=!0,this.pending=void 0,this.lastRequest=`GET #${c} returned v${u}`,t!=="share"&&(this.cached=u),a.next(u),a.complete(),t==="resetting"&&(this.cached=void 0),t==="last"&&(this.cooldownUntil=Date.now()+ue,clearTimeout(this.cooldownTimer),this.cooldownTimer=setTimeout(()=>this.render(),ue+10)),this.render()},or);return()=>{clearTimeout(p),f||(this.pending=void 0,this.lastRequest=`GET #${c} cancelled`,(t==="replay"||t==="resetting")&&(this.cached=void 0),this.render())}});switch(t){case"share":this.result$=s.pipe(F());break;case"replay":this.result$=s.pipe(ae({bufferSize:1,refCount:!0}));break;case"resetting":this.result$=s.pipe(F({connector:()=>new V(1)}));break;case"last":this.result$=s.pipe(rr({minRefreshInterval:ue}));break}this.render()}card=h("section","card");cacheView=h("div","cache");requestView=h("div","request");subscriberView=h("div","subscribers");listeners=new Map;result$;cached;requests=0;pending;lastRequest="No request yet";cooldownUntil=0;cooldownTimer;add(t){let e={state:"listening"};this.listeners.set(t,e),e.subscription=this.result$.subscribe({next:o=>{e.value=o,this.render()},complete:()=>{e.state="complete",this.render()},error:()=>{e.state="error",this.render()}}),this.render()}remove(t){let e=this.listeners.get(t);this.listeners.delete(t),e?.subscription?.unsubscribe(),this.render()}dispose(){for(let t of[...this.listeners.keys()])this.remove(t);clearTimeout(this.cooldownTimer)}render(){let t=Me(this.cached);this.cached===void 0&&(t.label.textContent="empty"),this.cacheView.replaceChildren(h("span","field-label","Cache"),t.circle,t.label);let e=this.kind==="last"&&this.listeners.size>0&&Date.now()<this.cooldownUntil,o=this.pending?`Fetching v${this.pending.value}\u2026`:e?"Refresh pause \xB7 1s":"No request running",i=this.pending?`GET #${this.pending.id} \xB7 background`:this.lastRequest,n=h("div","request-text");n.append(h("span","request-state",o),h("span","request-detail",i)),this.requestView.dataset.pending=String(!!this.pending),this.requestView.replaceChildren(h("span","request-dot"),n),this.subscriberView.replaceChildren(...Array.from(this.listeners,([s,a])=>{let c=h("div","subscriber");c.dataset.subscriber=s;let u=h("span","subscriber-square",s);u.setAttribute("aria-label",`Subscriber ${s}`);let f=Me(a.value);return c.append(u,h("span","connector"),f.circle,h("span","subscriber-state",a.state),f.label),c})),this.listeners.size||this.subscriberView.append(h("p","empty","No subscribers"))}},nr=document.querySelector("#cards"),ke=document.querySelector("#add"),fe=document.querySelector("#remove"),Ue=document.querySelector("#remove-all"),ir=document.querySelector("#announcement"),sr=document.querySelector("#server-value"),P=[];function W(r){ke.disabled=x.length===J.length,fe.disabled=Ue.disabled=x.length===0,fe.setAttribute("aria-label",x.length?`Remove subscriber ${x.at(-1)}`:"Remove subscriber"),sr.textContent=`v${M}`,ir.textContent=`${x.length} of ${J.length} subscribers. ${r}`}function $e(){P.forEach(r=>r.dispose()),M=1,x=[],P=tr.map(r=>new ce(...r)),nr.replaceChildren(...P.map(r=>r.card)),W("Add one to start a request.")}ke.addEventListener("click",()=>{if(x.length===J.length)return;let r=J[x.length];x.push(r),P.forEach(t=>t.add(r)),W(`${r} added to every comparison.`)});fe.addEventListener("click",()=>{let r=x.pop();r&&(P.forEach(t=>t.remove(r)),W(`${r} removed from every comparison.`))});Ue.addEventListener("click",()=>{P.forEach(r=>x.forEach(t=>r.remove(t))),x=[],W("Cached responses are retained where the operator allows it.")});document.querySelector("#advance").addEventListener("click",()=>{M++,P.forEach(r=>r.render()),W(`Server changed to v${M}. Add a subscriber to see which operators refresh.`)});document.querySelector("#reset").addEventListener("click",$e);$e();})();
+</script>
+  </body>
+</html>

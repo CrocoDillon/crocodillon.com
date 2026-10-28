@@ -1,0 +1,13 @@
+{
+  "node": "v24.22.1",
+  "builder": "0bba77f6369fd0cea04808b490a269d4f084bcbfd983bd339bc1213fe57c7785",
+  "sources": {
+    "index.ts": "6b075c8117a15cf72a5367e48b835732b30b069d0b52ab6146ad1ae7fb2bf179",
+    "index.html": "4ab7012837b0747f105176e6121cb9943692f3dff3fb61047e94e4808e5eaaf9",
+    "index.css": "ce7a09f7e3a8e089d11df6a959bb6220d4c8f27dc7817aea4ba6999a955e8894",
+    "tsconfig.json": "3e1f3eed347cc901a4b6711ef488fbf86c25d336b4a1b6f219437b0286e32e24",
+    "package.json": "374b73803b9c5e83db85ea10bf70cc559de380213a39e1f1cf92475a82557e9b",
+    "pnpm-lock.yaml": "416ce3ad0539b4b5b41f2f51d8d0c5cdeaa377f01df4a41c053234cef880352b"
+  },
+  "html": "5dc95f101b0c7e5fbb9eab4130255bbcb37e7c111362629549050f5aa1582bbe"
+}

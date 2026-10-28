@@ -1,0 +1,203 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="800"
+  height="520"
+  viewBox="0 0 800 520"
+  class="article-diagram subscription-sessions"
+  role="img"
+  aria-labelledby="subscription-sessions-title subscription-sessions-desc"
+>
+  <title id="subscription-sessions-title">
+    One cache, two subscription sessions
+  </title>
+  <desc id="subscription-sessions-desc">
+    A and B share GET 1 and receive v1. Both unsubscribe. While nobody listens,
+    v1 remains cached. C subscribes in a new session, immediately receives
+    cached v1 and shares GET 2. C receives v2 when that request returns. GET
+    completion does not complete the shareLast subscriptions.
+  </desc>
+  <defs>
+    <marker
+      id="subscription-sessions-arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="7"
+      markerHeight="7"
+      orient="auto"
+    >
+      <path
+        d="M1 1l7 4-7 4"
+        fill="none"
+        stroke="var(--color-moss, #3a643f)"
+        stroke-width="1.5"
+      />
+    </marker>
+  </defs>
+  <style>
+    svg.article-diagram.subscription-sessions text {font-family:Inter,Arial,sans-serif;font-size:21px;fill:var(--color-ink, #20291e)}
+    svg.article-diagram.subscription-sessions .title {font-size:28px;font-weight:600}
+    svg.article-diagram.subscription-sessions .small {font-size:19px;fill:var(--color-muted, #677061)}
+    svg.article-diagram.subscription-sessions .value {font-family:Consolas,monospace;font-size:20px}
+    svg.article-diagram.subscription-sessions .value.v1 {fill:#20291e}
+    svg.article-diagram.subscription-sessions .value.v2 {fill:var(--color-paper, #f8f9f5)}
+    svg.article-diagram.subscription-sessions .operator {font-family:Consolas,monospace;font-size:20px}
+    @media (prefers-color-scheme:dark) {:root.article-diagram {--color-paper:#151c17;--color-ink:#e5eadf;--color-moss:#a6c991;--color-muted:#a6b19f;--color-leaf:#222f24;--color-line:#344136;--color-diagram-panel:#1d261f}}
+  </style>
+  <rect width="800" height="520" fill="var(--color-paper, #f8f9f5)" />
+  <text x="32" y="48" class="title" text-anchor="start">
+    One cache, two subscription sessions
+  </text>
+  <g transform="translate(0 -50)">
+    <rect
+      x="428"
+      y="111"
+      width="121"
+      height="345"
+      fill="var(--color-diagram-panel, #ffffff)"
+      stroke="var(--color-line, #dce1d6)"
+      stroke-dasharray="4 5"
+    />
+    <text x="488" y="217" class="small" text-anchor="middle">Nobody</text>
+    <text x="488" y="244" class="small" text-anchor="middle">listening</text>
+    <text x="32" y="190" class="operator" text-anchor="start">GET</text>
+    <path
+      d="M230 183H350"
+      fill="none"
+      stroke="var(--color-moss, #3a643f)"
+      stroke-width="2"
+    />
+    <circle
+      cx="330"
+      cy="183"
+      r="19"
+      fill="var(--share-last-v1, #dcb671)"
+      stroke="var(--share-last-v1, #dcb671)"
+      stroke-width="2"
+    />
+    <text x="330" y="190" class="value v1" text-anchor="middle">v1</text>
+    <path
+      d="M355 169v28"
+      fill="none"
+      stroke="var(--color-ink, #20291e)"
+      stroke-width="2"
+    />
+    <path
+      d="M560 183H720"
+      fill="none"
+      stroke="var(--color-moss, #3a643f)"
+      stroke-width="2"
+    />
+    <circle
+      cx="700"
+      cy="183"
+      r="19"
+      fill="var(--color-moss, #3a643f)"
+      stroke="var(--color-moss, #3a643f)"
+      stroke-width="2"
+    />
+    <text x="700" y="190" class="value v2" text-anchor="middle">v2</text>
+    <path
+      d="M725 169v28"
+      fill="none"
+      stroke="var(--color-ink, #20291e)"
+      stroke-width="2"
+    />
+    <text x="32" y="282" class="small" text-anchor="start">Subscriber A</text>
+    <path
+      d="M230 275H390"
+      fill="none"
+      stroke="var(--color-moss, #3a643f)"
+      stroke-width="2"
+    />
+    <circle
+      cx="330"
+      cy="275"
+      r="19"
+      fill="var(--share-last-v1, #dcb671)"
+      stroke="var(--share-last-v1, #dcb671)"
+      stroke-width="2"
+    />
+    <text x="330" y="282" class="value v1" text-anchor="middle">v1</text>
+    <path
+      d="M383 268l14 14m0-14l-14 14"
+      fill="none"
+      stroke="var(--color-ink, #20291e)"
+      stroke-width="2"
+    />
+    <text x="32" y="357" class="small" text-anchor="start">Subscriber B</text>
+    <path
+      d="M270 350H415"
+      fill="none"
+      stroke="var(--color-moss, #3a643f)"
+      stroke-width="2"
+    />
+    <circle
+      cx="330"
+      cy="350"
+      r="19"
+      fill="var(--share-last-v1, #dcb671)"
+      stroke="var(--share-last-v1, #dcb671)"
+      stroke-width="2"
+    />
+    <text x="330" y="357" class="value v1" text-anchor="middle">v1</text>
+    <path
+      d="M408 343l14 14m0-14l-14 14"
+      fill="none"
+      stroke="var(--color-ink, #20291e)"
+      stroke-width="2"
+    />
+    <text x="32" y="432" class="small" text-anchor="start">Subscriber C</text>
+    <path
+      d="M560 425H755"
+      fill="none"
+      stroke="var(--color-moss, #3a643f)"
+      stroke-width="2"
+      marker-end="url(#subscription-sessions-arrow)"
+    />
+    <circle
+      cx="560"
+      cy="425"
+      r="19"
+      fill="var(--share-last-v1, #dcb671)"
+      stroke="var(--share-last-v1, #dcb671)"
+      stroke-width="2"
+      stroke-dasharray="4 3"
+    />
+    <text x="560" y="432" class="value v1" text-anchor="middle">v1</text>
+    <circle
+      cx="700"
+      cy="425"
+      r="19"
+      fill="var(--color-moss, #3a643f)"
+      stroke="var(--color-moss, #3a643f)"
+      stroke-width="2"
+    />
+    <text x="700" y="432" class="value v2" text-anchor="middle">v2</text>
+    <text x="32" y="520" class="operator" text-anchor="start">Cache</text>
+    <path
+      d="M330 513H755"
+      fill="none"
+      stroke="var(--color-moss, #3a643f)"
+      stroke-width="2"
+    />
+    <text x="347" y="501" class="small" text-anchor="start">
+      v1 retained through idle
+    </text>
+    <text x="712" y="548" class="small" text-anchor="middle">v2</text>
+    <path
+      d="M330 448V524"
+      fill="none"
+      stroke="var(--color-line, #dce1d6)"
+      stroke-width="2"
+      stroke-dasharray="3 5"
+    />
+    <path
+      d="M700 448V524"
+      fill="none"
+      stroke="var(--color-line, #dce1d6)"
+      stroke-width="2"
+      stroke-dasharray="3 5"
+    />
+  </g>
+</svg>

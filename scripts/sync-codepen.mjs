@@ -66,6 +66,11 @@ export async function syncCodePen({
     ])
   )
   const html = files.find(file => file.path === '/index.html')
+  // The site's shared-theme slot is already included in the uploaded CSS.
+  html.content = html.content.replace(
+    '<link rel="stylesheet" href="/demo/theme.css" />',
+    ''
+  )
   const { data: article } = matter(
     await fs.readFile(path.join(directory, '../index.mdx'), 'utf8')
   )

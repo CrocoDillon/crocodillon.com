@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stale-while-revalidate caching with RxJS</title>
+    <link rel="stylesheet" href="/demo/theme.css" />
+    <link rel="stylesheet" href="./index.css" />
+  </head>
+  <body>
+    <main class="demo-shell">
+      <div class="demo-heading">
+        <div>
+          <p class="demo-eyebrow">RXJS · FOUR OPERATORS</p>
+          <h1>Same subscribers. Different caches.</h1>
+        </div>
+        <div class="server">
+          <span>Server</span>
+          <span id="server-value" class="value-circle" data-freshness="current"
+            >v1</span
+          >
+        </div>
+      </div>
+      <div class="controls" aria-label="Control all four comparisons">
+        <button id="add" type="button">+ Add subscriber</button>
+        <button id="remove" type="button" disabled>− Remove subscriber</button>
+        <button id="remove-all" type="button" disabled>Remove all</button>
+        <button id="advance" type="button">Change server value</button>
+        <button id="reset" type="button">Reset</button>
+      </div>
+      <p id="announcement" class="demo-note" role="status">
+        0 of 4 subscribers. Add one to start a request.
+      </p>
+      <div id="cards" class="cards"></div>
+      <p class="demo-note">
+        Green means the value matches the server; amber means it’s stale.
+        Changing the server doesn’t start a request. Each simulated GET takes
+        1.8 seconds and returns the value captured when it started.
+      </p>
+      <p class="demo-note">
+        shareLast waits one second between refreshes while subscribers remain.
+        Returning after “Remove all” always refreshes. Completed subscribers
+        keep displaying their last value.
+      </p>
+    </main>
+    <script type="module" src="./index.ts"></script>
+  </body>
+</html>

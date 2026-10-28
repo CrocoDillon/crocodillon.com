@@ -1,0 +1,7 @@
+{
+  "key": "rxjs-share-last",
+  "title": "Stale-while-revalidate caching with RxJS",
+  "description": "Compare share, shareReplay, a resetting ReplaySubject, and shareLast with the same subscribers and simulated GET requests.",
+  "tags": ["rxjs", "caching", "crocodillon-demo"],
+  "files": ["index.html", "index.css", "index.ts"]
+}

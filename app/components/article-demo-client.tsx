@@ -6,7 +6,7 @@ import { track } from '@vercel/analytics'
 
 export type ArticleDemoProps = {
   title: string
-  penUrl: string
+  penUrl?: string
   slug: string
 }
 
@@ -73,18 +73,20 @@ export function ArticleDemoClient({
     <figure className="not-prose my-8 overflow-hidden rounded-sm border border-line">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-leaf px-5 py-3">
         <span className="text-sm font-medium text-ink">{title}</span>
-        <a
-          href={penUrl}
-          target="_blank"
-          rel="noreferrer"
-          onClick={() => trackOnce('DemoOpen', 'codepen')}
-          onAuxClick={event => {
-            if (event.button === 1) trackOnce('DemoOpen', 'codepen')
-          }}
-          className="text-xs text-moss underline underline-offset-4"
-        >
-          Open in CodePen ↗
-        </a>
+        {penUrl ? (
+          <a
+            href={penUrl}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => trackOnce('DemoOpen', 'codepen')}
+            onAuxClick={event => {
+              if (event.button === 1) trackOnce('DemoOpen', 'codepen')
+            }}
+            className="text-xs text-moss underline underline-offset-4"
+          >
+            Open in CodePen ↗
+          </a>
+        ) : null}
       </div>
       <div
         ref={panel}

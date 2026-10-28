@@ -1,0 +1,230 @@
+---
+slug: 'stale-while-revalidate-caching-with-rxjs'
+title: 'Stale-while-revalidate caching with RxJS'
+description: 'Build a shareLast operator that shares requests, remembers the last response, and replays it while refreshing. Compare it with share and shareReplay.'
+publishedAt: '2026-10-28T04:00:00Z'
+excerpt: 'Sharing a request is easy. Keeping its last response while a new request runs takes a little more work. Let’s build shareLast and compare the difference.'
+draft: false
+---
+
+import ReplayComparison from './images/replay-comparison.svg'
+import SubscriptionSessions from './images/subscription-sessions.svg'
+import demo from './demo/codepen.lock.json'
+
+<p className="intro">I needed to share a GET request between several subscribers. When everyone unsubscribed, I still wanted to remember the response. When subscribers returned, they should get that response immediately while a new request fetched fresh data.</p>
+
+That sounds close to `shareReplay(1)`. Close enough to make you wonder whether you really need another operator. But retaining a response and knowing when to refresh it are two separate decisions.
+
+Let’s build a small operator called `shareLast`, using RxJS. New subscribers get the cached response immediately and can trigger a refresh. That refresh updates everyone who’s still subscribed, including views that were already open. After the last subscriber leaves, keep the response for the next subscriber.
+
+This follows the same stale-while-revalidate idea as [SWR](https://swr.vercel.app/): return cached data, share the request, and distribute the fresh response. SWR also deduplicates requests for the same cache key within a configurable interval.[^swr] Here, the service will own the cache keys, and the operator will manage one shared resource.
+
+## What the existing operators do
+
+`share()` shares an execution with overlapping subscribers. For a typical GET observable that emits one response and completes, those subscribers all receive the response. Once it completes, a later subscription starts another request. There’s no cached response to show while it waits.[^share]
+
+`shareReplay({ bufferSize: 1, refCount: true })` adds a replay buffer, but there’s a detail worth catching: **a successfully completed request stays cached**. Even with `refCount: true`, later subscribers get the response followed by completion, without another request. Reference counting disconnects and resets an unfinished source when everyone leaves; it doesn’t reset a successfully completed one.[^replay]
+
+We can configure `share` to replay and reset:
+
+```ts title="example.ts"
+const products$ = getProducts().pipe(
+  share({
+    connector: () => new ReplaySubject<Product[]>(1),
+    resetOnError: true,
+    resetOnComplete: true,
+    resetOnRefCountZero: true,
+  }),
+);
+```
+
+Those are the default reset settings, written out to make the policy visible. New subscribers can trigger another request, but resetting also discards the replay buffer. We get a refresh without the old response.
+
+<figure>
+  <ReplayComparison />
+  <figcaption>After a response of v1 and an idle period, the server changes to v2. Each line shows what a returning subscriber receives.</figcaption>
+</figure>
+
+Expiring a replay buffer with `windowTime` doesn’t solve this either. It limits which values can be replayed; it doesn’t make a completed source run again.[^buffer]
+
+## See the difference
+
+The example applies the same subscription actions to four independent copies of a simulated GET request. Each request takes 1.8 seconds, so there’s time to see the cached value while the new response is on its way. Squares identify subscribers; their value circles are green when they match the server and amber when they’re stale.
+
+<ArticleDemo title="Compare RxJS request caching" slug="stale-while-revalidate-caching-with-rxjs" penUrl={demo.editorUrl ?? undefined} />
+
+Add subscriber A and wait for v1. Then change the server value: all the displayed responses turn amber, without a request being made. Once `shareLast`’s one-second pause has passed, add B. It receives cached v1 immediately while a background request fetches v2. Both A and B receive that fresh response and turn green.
+
+Compare the other panels: `shareReplay` keeps replaying v1 without refreshing. The resetting operators fetch v2 for B, but A’s subscription has already completed, so its displayed value stays on v1.
+
+There’s room for four subscribers, A–D. Remove the most recently added one, or remove everyone to see which caches survive. Returning after everyone has left makes `shareLast` replay its retained value and revalidate again. Reset clears the comparison. These are real RxJS subscriptions; only the server is simulated, with no network calls.
+
+## Give the request and its subscribers different lifetimes
+
+The request can finish while the subscribers stay connected. Another subscriber should receive the cached value, start a new request when appropriate, and share its result with everyone. Completion of a GET mustn’t complete those subscriptions.
+
+Our policy has three cases:
+
+- If a request is running, join it. Don’t start another one.
+- If a request has finished and subscribers are still present, a new subscriber can refresh it after a short interval. By default, that interval is one second after completion.
+- If nobody was subscribed, the next subscriber always revalidates, even if the cached response is recent.
+
+That interval groups subscriptions arriving close together. It isn’t a cache expiry time, and it doesn’t schedule a refresh for later.
+
+```ts title="share-last.ts"
+import {
+  Observable,
+  Subscriber,
+  type MonoTypeOperatorFunction,
+} from 'rxjs';
+
+interface ShareLastOptions {
+  minRefreshInterval?: number;
+}
+
+export function shareLast<T>(
+  { minRefreshInterval = 1_000 }: ShareLastOptions = {},
+): MonoTypeOperatorFunction<T> {
+  if (!Number.isFinite(minRefreshInterval) || minRefreshInterval < 0) {
+    throw new RangeError('minRefreshInterval must be finite and non-negative');
+  }
+
+  return source => {
+    const subscribers = new Set<Subscriber<T>>();
+    let cached: { value: T } | undefined;
+    let request: Subscriber<T> | undefined;
+    let completedAt = -Infinity;
+    let requestVersion = 0;
+
+    return new Observable<T>(subscriber => {
+      const wasIdle = subscribers.size === 0;
+      const versionBeforeReplay = requestVersion;
+      subscribers.add(subscriber);
+
+      subscriber.add(() => {
+        if (subscribers.delete(subscriber) && subscribers.size === 0) {
+          const pending = request;
+          request = undefined;
+          pending?.unsubscribe();
+        }
+      });
+
+      if (cached) subscriber.next(cached.value);
+
+      if (subscriber.closed || request || requestVersion !== versionBeforeReplay) {
+        return;
+      }
+      if (!wasIdle && Date.now() - completedAt < minRefreshInterval) return;
+
+      const connection = new Subscriber<T>({
+        next: value => {
+          cached = { value };
+          for (const listener of [...subscribers]) listener.next(value);
+        },
+        error: (error: unknown) => {
+          request = undefined;
+          const listeners = [...subscribers];
+          subscribers.clear();
+          for (const listener of listeners) listener.error(error);
+        },
+        complete: () => {
+          completedAt = Date.now();
+          request = undefined;
+        },
+      });
+
+      request = connection;
+      requestVersion++;
+      source.subscribe(connection);
+    });
+  };
+}
+```
+
+The cache, subscriber set, and request connection live inside the function that receives `source`. Each application of the operator therefore gets its own state. The small wrapper object distinguishes “no response yet” from a legitimate response of `undefined`.
+
+We register teardown before replaying the cache because replay is synchronous. A subscriber using `take(1)` can leave during that first emission. It must already be able to remove itself from the set.
+
+The `request` reference does two jobs: it lets the last subscriber cancel a pending GET, and prevents overlapping requests. Assigning a `Subscriber` before subscribing to the source also handles sources that emit or complete synchronously. Assigning the result of `source.subscribe(...)` afterwards would be too late for those callbacks.
+
+The version check covers another synchronous case: a callback receiving cached data can subscribe again and finish a refresh before the original callback returns. The original subscription mustn’t start a second refresh afterwards.
+
+When a fresh value arrives, we save it before notifying the current subscribers. A subscriber joining from inside one of those callbacks can immediately read the new value. We iterate over a snapshot so subscriptions added during delivery don’t change the current delivery loop.
+
+The source’s completion only records the time and releases the request reference. It doesn’t complete our subscribers. If A remains subscribed and B joins after the interval, B immediately receives the cached response, starts another GET, and both A and B receive the result.
+
+<figure>
+  <SubscriptionSessions />
+  <figcaption>The cache survives the gap between active sessions. C gets v1 immediately and v2 when the next GET returns. Subscribers also stay connected after a request completes.</figcaption>
+</figure>
+
+When the last subscriber leaves, we unsubscribe any request still running. The cached value survives. The next subscriber receives it and starts a new GET, bypassing the interval because the resource was idle.
+
+## Let the service own the cache keys
+
+We created these observables in services. That gives the cache a home outside the components consuming it. Angular still recommends injectable services for encapsulating reusable data access logic.[^services]
+
+For `/api/products/:id`, keep one observable per product ID. Applying `shareLast()` inside a method isn’t enough on its own: creating a new observable on every call also creates a new cache on every call.
+
+```ts title="products.service.ts"
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { type Observable } from 'rxjs';
+import { shareLast } from './share-last';
+
+interface Product {
+  id: number;
+  name: string;
+}
+
+@Injectable({ providedIn: 'root' })
+export class ProductsService {
+  private readonly http = inject(HttpClient);
+  private readonly products = new Map<string, Observable<Product>>();
+
+  getProduct(id: string): Observable<Product> {
+    let product$ = this.products.get(id);
+
+    if (!product$) {
+      product$ = this.http
+        .get<Product>(`/api/products/${encodeURIComponent(id)}`)
+        .pipe(shareLast({ minRefreshInterval: 1_000 }));
+      this.products.set(id, product$);
+    }
+
+    return product$;
+  }
+}
+```
+
+Two components calling `getProduct('42')` receive the same observable. They share its cached value and any request in progress. Calling `getProduct('43')` selects a different entry, with its own cache and request. Calling the method doesn’t fetch anything until something subscribes.
+
+If other parameters affect the response, include those in the key too. A product ID alone isn’t enough when the response also depends on a locale or account. Keep that key-building logic in the service.
+
+This root-provided service retains its entries for the application’s lifetime. A feature-scoped provider can give the cache a shorter lifetime. For a large set of IDs, add a limit or eviction policy for unused entries. Dropping an entry while views still use it would let later callers create a separate stream for the same product, breaking synchronization between those views.
+
+For a UI subscription, release it when its owner goes away. `shareLast` doesn’t complete after the response. A component using an async pipe can let that pipe manage the subscription; an imperative consumer needs its own teardown.
+
+## A few consequences of this policy
+
+The interval is checked when someone subscribes. A subscriber arriving inside the one-second window gets cached data without another request; there’s no delayed request waiting for that window to end. Returning after an idle period always revalidates. Set `minRefreshInterval: 0` to allow every new subscriber to trigger a request whenever none is running.
+
+If no new subscribers arrive, there’s no refresh trigger. A view that needs to update on focus, reconnection, or a timer needs those triggers added explicitly. SWR provides those policies too; this operator implements the subscription-triggered part.[^swr-revalidation]
+
+A refresh error reaches the active subscribers and closes their subscriptions. The last successful value stays cached, so a later subscription can replay it and try another request. Keeping a view subscribed through failures would require a different contract, such as emitting `{ data, error, refreshing }` state instead of terminating on error.
+
+One easy trap is `take(1)`. If a cached value exists, that value satisfies it synchronously. The subscriber leaves before it can trigger a refresh. `firstValueFrom` has the same consequence. Consumers that need fresh data must stay subscribed for it; “the first value” may be the old one.
+
+Finally, this stores one value by reference for as long as the shared observable is retained. It has no eviction, invalidation API, or persistence across page loads. Treat emitted objects as immutable and scope the observable appropriately, especially when authentication changes.
+
+[^share]: Examples use RxJS 7.8.2. See the [`share` implementation and reset options](https://github.com/ReactiveX/rxjs/blob/7.8.2/src/internal/operators/share.ts).
+
+[^replay]: The [`shareReplay` implementation](https://github.com/ReactiveX/rxjs/blob/7.8.2/src/internal/operators/shareReplay.ts) sets `resetOnComplete: false` and uses `refCount` for `resetOnRefCountZero`.
+
+[^buffer]: [`ReplaySubject` trims its buffer](https://github.com/ReactiveX/rxjs/blob/7.8.2/src/internal/ReplaySubject.ts) by size and age, independently of the source connection. This is an application-level refresh policy, rather than an implementation of HTTP cache headers.
+
+[^swr]: SWR’s [request deduplication](https://swr.vercel.app/docs/advanced/performance#deduplication) and [`dedupingInterval` option](https://swr.vercel.app/docs/api#options). Our interval starts at completion and is bypassed after idle periods; it isn’t an exact copy of SWR’s policy.
+
+[^services]: Angular’s [HTTP best practices](https://angular.dev/guide/http/making-requests#best-practices).
+
+[^swr-revalidation]: SWR’s [automatic revalidation policies](https://swr.vercel.app/docs/revalidation).

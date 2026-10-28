@@ -29,22 +29,26 @@ const result = await build({
   legalComments: 'inline',
   define: { ngDevMode: 'false' },
 })
-const [template, material, styles] = await Promise.all([
+const [template, styles] = await Promise.all([
   fs.readFile(path.join(directory, 'index.html'), 'utf8'),
-  fs.readFile(
-    path.join(
-      directory,
-      'node_modules/@angular/material/prebuilt-themes/azure-blue.css'
-    ),
-    'utf8'
-  ),
   fs.readFile(path.join(directory, 'index.css'), 'utf8'),
 ])
+const materialLink =
+  /<link\s+rel="stylesheet"\s+href="https:\/\/cdn\.jsdelivr\.net\/npm\/@angular\/material@[^\"]+"\s*\/?>/
+const material = materialLink.test(template)
+  ? await fs.readFile(
+      path.join(
+        directory,
+        'node_modules/@angular/material/prebuilt-themes/azure-blue.css'
+      ),
+      'utf8'
+    )
+  : null
 // Freeze framework CSS with the demo; the site owns the theme and frame bridge.
 // Preserve the cascade: framework defaults, shared theme, demo-specific styles.
 const html = template
   .replace(
-    /<link\s+rel="stylesheet"\s+href="https:\/\/cdn\.jsdelivr\.net\/npm\/@angular\/material@[^\"]+"\s*\/?>/,
+    materialLink,
     () =>
       `<style>${material.replaceAll('</style', '<\\/style')}</style>\n` +
       '<link rel="stylesheet" href="/demo/theme.css" />'

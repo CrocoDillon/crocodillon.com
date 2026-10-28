@@ -1,0 +1,163 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="800"
+  height="480"
+  viewBox="0 0 800 480"
+  class="article-diagram replay-comparison"
+  role="img"
+  aria-labelledby="replay-comparison-title replay-comparison-desc"
+>
+  <title id="replay-comparison-title">
+    What happens when subscribers return?
+  </title>
+  <desc id="replay-comparison-desc">
+    The server previously returned v1. After an idle period, share waits for v2
+    and completes; shareReplay replays v1 and completes without requesting v2;
+    resetting share with a ReplaySubject waits for v2 and completes; shareLast
+    replays v1, requests v2, emits v2, and stays open.
+  </desc>
+  <defs>
+    <marker
+      id="replay-comparison-arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="7"
+      markerHeight="7"
+      orient="auto"
+    >
+      <path
+        d="M1 1l7 4-7 4"
+        fill="none"
+        stroke="var(--color-moss, #3a643f)"
+        stroke-width="1.5"
+      />
+    </marker>
+  </defs>
+  <style>
+    svg.article-diagram.replay-comparison text {font-family:Inter,Arial,sans-serif;font-size:21px;fill:var(--color-ink, #20291e)}
+    svg.article-diagram.replay-comparison .title {font-size:28px;font-weight:600}
+    svg.article-diagram.replay-comparison .small {font-size:19px;fill:var(--color-muted, #677061)}
+    svg.article-diagram.replay-comparison .value {font-family:Consolas,monospace;font-size:20px}
+    svg.article-diagram.replay-comparison .value.v1 {fill:#20291e}
+    svg.article-diagram.replay-comparison .value.v2 {fill:var(--color-paper, #f8f9f5)}
+    svg.article-diagram.replay-comparison .operator {font-family:Consolas,monospace;font-size:20px}
+    @media (prefers-color-scheme:dark) {:root.article-diagram {--color-paper:#151c17;--color-ink:#e5eadf;--color-moss:#a6c991;--color-muted:#a6b19f;--color-leaf:#222f24;--color-line:#344136;--color-diagram-panel:#1d261f}}
+  </style>
+  <rect width="800" height="480" fill="var(--color-paper, #f8f9f5)" />
+  <text x="32" y="48" class="title" text-anchor="start">
+    What happens when subscribers return?
+  </text>
+  <text x="270" y="96" class="small" text-anchor="middle">Cached response</text>
+  <text x="620" y="96" class="small" text-anchor="middle">Fresh response</text>
+  <path
+    d="M270 112v340"
+    fill="none"
+    stroke="var(--color-line, #dce1d6)"
+    stroke-width="2"
+    stroke-dasharray="4 6"
+  />
+  <path
+    d="M620 112v340"
+    fill="none"
+    stroke="var(--color-line, #dce1d6)"
+    stroke-width="2"
+    stroke-dasharray="4 6"
+  />
+  <text x="32" y="167" class="operator" text-anchor="start">share()</text>
+  <path
+    d="M240 160H665"
+    fill="none"
+    stroke="var(--color-moss, #3a643f)"
+    stroke-width="2"
+  />
+  <circle
+    cx="620"
+    cy="160"
+    r="19"
+    fill="var(--color-moss, #3a643f)"
+    stroke="var(--color-moss, #3a643f)"
+    stroke-width="2"
+  />
+  <text x="620" y="167" class="value v2" text-anchor="middle">v2</text>
+  <path
+    d="M665 146v28"
+    fill="none"
+    stroke="var(--color-ink, #20291e)"
+    stroke-width="2"
+  />
+  <text x="32" y="257" class="operator" text-anchor="start">shareReplay</text>
+  <path
+    d="M240 250H320"
+    fill="none"
+    stroke="var(--color-moss, #3a643f)"
+    stroke-width="2"
+  />
+  <circle
+    cx="270"
+    cy="250"
+    r="19"
+    fill="var(--share-last-v1, #dcb671)"
+    stroke="var(--share-last-v1, #dcb671)"
+    stroke-width="2"
+    stroke-dasharray="4 3"
+  />
+  <text x="270" y="257" class="value v1" text-anchor="middle">v1</text>
+  <path
+    d="M320 236v28"
+    fill="none"
+    stroke="var(--color-ink, #20291e)"
+    stroke-width="2"
+  />
+  <text x="32" y="347" class="operator" text-anchor="start">
+    share + replay
+  </text>
+  <path
+    d="M240 340H665"
+    fill="none"
+    stroke="var(--color-moss, #3a643f)"
+    stroke-width="2"
+  />
+  <circle
+    cx="620"
+    cy="340"
+    r="19"
+    fill="var(--color-moss, #3a643f)"
+    stroke="var(--color-moss, #3a643f)"
+    stroke-width="2"
+  />
+  <text x="620" y="347" class="value v2" text-anchor="middle">v2</text>
+  <path
+    d="M665 326v28"
+    fill="none"
+    stroke="var(--color-ink, #20291e)"
+    stroke-width="2"
+  />
+  <text x="32" y="437" class="operator" text-anchor="start">shareLast()</text>
+  <path
+    d="M240 430H755"
+    fill="none"
+    stroke="var(--color-moss, #3a643f)"
+    stroke-width="2"
+    marker-end="url(#replay-comparison-arrow)"
+  />
+  <circle
+    cx="270"
+    cy="430"
+    r="19"
+    fill="var(--share-last-v1, #dcb671)"
+    stroke="var(--share-last-v1, #dcb671)"
+    stroke-width="2"
+    stroke-dasharray="4 3"
+  />
+  <text x="270" y="437" class="value v1" text-anchor="middle">v1</text>
+  <circle
+    cx="620"
+    cy="430"
+    r="19"
+    fill="var(--color-moss, #3a643f)"
+    stroke="var(--color-moss, #3a643f)"
+    stroke-width="2"
+  />
+  <text x="620" y="437" class="value v2" text-anchor="middle">v2</text>
+</svg>
