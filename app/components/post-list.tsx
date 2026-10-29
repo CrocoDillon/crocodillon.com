@@ -3,6 +3,7 @@ import { ArrowIcon } from '@/components/icons'
 import type { Post } from '@/lib/posts'
 import { formatDate } from '@/lib/site'
 import { PublicationStatusLabel } from '@/components/publication-status'
+import { TagLinks } from '@/components/tag-links'
 
 export function PostList({ posts }: { posts: Post[] }) {
   return (
@@ -33,6 +34,7 @@ export function PostList({ posts }: { posts: Post[] }) {
             </div>
             <ArrowIcon className="hidden size-5 self-center text-muted transition-transform group-hover:translate-x-1 group-hover:text-moss sm:block" />
           </Link>
+          <TagLinks slugs={post.tags} className="-mt-3 pb-7 sm:ml-36 sm:pb-8" />
         </li>
       ))}
     </ol>
