@@ -5,6 +5,7 @@ import { PostList } from '@/components/post-list'
 import { getPosts } from '@/lib/posts'
 import { formatDate } from '@/lib/site'
 import { PublicationStatusLabel } from '@/components/publication-status'
+import { TagLinks } from '@/components/tag-links'
 
 export const metadata: Metadata = { alternates: { canonical: '/' } }
 
@@ -53,20 +54,24 @@ export default async function Home() {
             <p className="mt-5 max-w-xl leading-relaxed text-muted">
               {latest.description}
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-              <span className="inline-flex items-center gap-3 text-sm font-medium">
-                Read the article{' '}
-                <ArrowIcon className="size-4 transition-transform group-hover:translate-x-1" />
-              </span>
-              <span className="font-mono text-[11px] text-muted">
-                <time dateTime={latest.publishedAt}>
-                  {formatDate(latest.publishedAt)}
-                </time>{' '}
-                · {latest.readingMinutes} min read
-              </span>
-              <PublicationStatusLabel status={latest.status} />
-            </div>
           </Link>
+          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <Link
+              href={`/blog/${latest.slug}`}
+              className="group inline-flex items-center gap-3 text-sm font-medium hover:text-moss"
+            >
+              Read the article{' '}
+              <ArrowIcon className="size-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+            <span className="font-mono text-[11px] text-muted">
+              <time dateTime={latest.publishedAt}>
+                {formatDate(latest.publishedAt)}
+              </time>{' '}
+              · {latest.readingMinutes} min read
+            </span>
+            <PublicationStatusLabel status={latest.status} />
+            <TagLinks slugs={latest.tags} />
+          </div>
         </div>
       </section>
       <section aria-labelledby="writing-heading" className="mt-16 sm:mt-20">
