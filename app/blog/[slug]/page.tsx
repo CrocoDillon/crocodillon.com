@@ -6,6 +6,8 @@ import { getPost, getPosts } from '@/lib/posts'
 import { formatDate, site } from '@/lib/site-server'
 import { PublicationStatusLabel } from '@/components/publication-status'
 import { formatPublicationDate, isArticlePreview } from '@/lib/publication'
+import { TagLinks } from '@/components/tag-links'
+import { tags } from '@/lib/tags'
 
 export const dynamicParams = false
 
@@ -33,6 +35,7 @@ export async function generateMetadata({
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
       authors: [site.author],
+      tags: post.tags.map(slug => tags[slug].name),
       images: [{ url: post.image, width: 2400, height: 1260, alt: post.title }],
     },
     twitter: {
@@ -93,6 +96,7 @@ export default async function Article({
             <span>{post.readingMinutes} min read</span>
             <PublicationStatusLabel status={post.status} />
           </div>
+          <TagLinks slugs={post.tags} className="mt-5" />
           {isArticlePreview && post.status !== 'published' ? (
             <p className="mt-6 rounded-sm border border-line bg-leaf p-4 text-sm leading-relaxed text-ink">
               {post.status === 'draft'

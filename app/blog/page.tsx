@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { PostList } from '@/components/post-list'
-import { getPosts } from '@/lib/posts'
+import { getPosts, getTags } from '@/lib/posts'
+import { TopicNav } from '@/components/topic-nav'
 
 export const metadata: Metadata = {
   title: 'Writing',
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 }
 
 export default async function Blog() {
-  const posts = await getPosts()
+  const [posts, topics] = await Promise.all([getPosts(), getTags()])
   const years = [...new Set(posts.map(post => post.publishedAt.slice(0, 4)))]
   const yearRange = years.length > 1 ? `${years.at(-1)}–${years[0]}` : years[0]
   return (
@@ -29,6 +30,7 @@ export default async function Blog() {
           {yearRange ? ` · ${yearRange}` : ''}
         </p>
       </header>
+      <TopicNav topics={topics} />
       {years.map(year => (
         <section key={year} aria-labelledby={`year-${year}`} className="mb-12">
           <h2

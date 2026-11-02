@@ -4,6 +4,7 @@ import path from 'node:path'
 import { cache } from 'react'
 import matter from 'gray-matter'
 import { isArticlePreview, type PublicationStatus } from '@/lib/publication'
+import { isTagSlug, tags, type TagSlug } from '@/lib/tags'
 
 export interface Post {
   slug: string
@@ -15,6 +16,7 @@ export interface Post {
   image: string
   readingMinutes: number
   status: PublicationStatus
+  tags: TagSlug[]
 }
 
 const directory = path.join(process.cwd(), 'content/articles')
@@ -66,6 +68,13 @@ export const getPosts = cache(async (): Promise<Post[]> => {
         }
         if (data.draft !== undefined && typeof data.draft !== 'boolean')
           throw new Error(`${entry.name}: draft must be a boolean`)
+        const postTags: unknown = data.tags === undefined ? [] : data.tags
+        if (!Array.isArray(postTags) || !postTags.every(isTagSlug))
+          throw new Error(
+            `${entry.name}: tags must be an array of known tag slugs`
+          )
+        if (new Set(postTags).size !== postTags.length)
+          throw new Error(`${entry.name}: duplicate tags`)
         const status: PublicationStatus =
           data.draft === true
             ? 'draft'
@@ -82,6 +91,7 @@ export const getPosts = cache(async (): Promise<Post[]> => {
           excerpt: data.excerpt,
           image: data.image ?? `/blog/${data.slug}/share.png`,
           status,
+          tags: postTags,
           readingMinutes: Math.max(
             1,
             Math.ceil(content.split(/\s+/).length / 220)
@@ -97,3 +107,15 @@ export const getPosts = cache(async (): Promise<Post[]> => {
 export async function getPost(slug: string) {
   return (await getPosts()).find(post => post.slug === slug)
 }
+
+export const getTags = cache(async () => {
+  const posts = await getPosts()
+  return (Object.keys(tags) as TagSlug[])
+    .map(slug => ({
+      slug,
+      ...tags[slug],
+      count: posts.filter(post => post.tags.includes(slug)).length,
+    }))
+    .filter(tag => tag.count > 0)
+    .sort((a, b) => a.name.localeCompare(b.name, 'en'))
+})
