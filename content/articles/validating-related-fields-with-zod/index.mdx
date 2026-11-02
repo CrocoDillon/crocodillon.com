@@ -1,0 +1,135 @@
+---
+slug: 'validating-related-fields-with-zod'
+title: 'Validating related fields with Zod'
+description: 'Validate dependent fields with Zod refinements, put useful errors next to the right input, and handle the antimeridian when checking geographical bounds.'
+publishedAt: '2026-11-05T04:00:00Z'
+excerpt: 'Two valid numbers don’t necessarily make a valid range. Object refinements let us check the relationship and put the error where someone can actually fix it.'
+tags: ['javascript']
+draft: false
+---
+
+<p className="intro">A minimum of 10 is a valid number. So is a maximum of 5. Put them together and we have a perfectly valid pair of numbers describing a fairly useless range.</p>
+
+Field validation tells us whether each value makes sense on its own. To check whether values make sense together, we need to validate the object. The examples below use Zod 4 and numeric inputs, such as a parsed JSON body.
+
+## A range with a useful error
+
+```ts title="range.ts"
+import { z } from 'zod';
+
+export const rangeSchema = z
+  .object({
+    min: z.number(),
+    max: z.number(),
+  })
+  .refine(({ min, max }) => min <= max, {
+    message: 'Maximum must be greater than or equal to minimum.',
+    path: ['max'],
+  });
+
+const result = rangeSchema.safeParse({ min: 10, max: 5 });
+
+if (!result.success) {
+  console.log(result.error.issues);
+  // [{ code: 'custom', path: ['max'], message: 'Maximum must be …' }]
+}
+```
+
+The refinement receives the parsed object, so it can compare both fields. I’ve allowed equal endpoints: `{ min: 5, max: 5 }` describes a single value. Use `<` if your application requires a non-empty interval with distinct endpoints.
+
+The `path` matters. Without it, the error belongs to the object itself. That can be appropriate for a summary, but a form usually needs a message beside an input. Here the maximum is the field I’m asking the user to change. If the range is nested under `price`, Zod prefixes that path, giving `['price', 'max']`.
+
+Don’t put the comparison in a refinement on `max` alone. That callback receives the maximum, not a reliable way to read a sibling field. Put relationships on the object that owns them.[^refinements]
+
+## More than one relationship
+
+A geographical bounding box gives us two pairs: south/north and west/east. First, define the individual limits. Latitude is between −90 and 90 degrees; longitude is between −180 and 180.
+
+For this example, the application accepts only positive-area boxes that **don’t cross the antimeridian**. That’s a deliberate restriction, not a universal definition of a bounding box.
+
+```ts title="bounds.ts"
+import { z } from 'zod';
+
+const latitude = z.number().min(-90).max(90);
+const longitude = z.number().min(-180).max(180);
+
+export const boundsSchema = z
+  .object({
+    north: latitude,
+    east: longitude,
+    south: latitude,
+    west: longitude,
+  })
+  .superRefine((bounds, ctx) => {
+    if (bounds.north <= bounds.south) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['north'],
+        message: 'North must be greater than south.',
+      });
+    }
+
+    if (bounds.east <= bounds.west) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['east'],
+        message: 'East must be greater than west; crossing 180° is not supported.',
+      });
+    }
+  });
+```
+
+Unlike a single `.refine()`, `.superRefine()` can add several issues in one pass. With `{ north: 10, south: 20, east: 5, west: 15 }`, both relationships fail. The user can fix both without submitting the form twice.
+
+Two separate `.refine()` calls would work too. I use `.superRefine()` when grouping the checks makes the relationship easier to read, or when one check needs to report several issues.
+
+To turn this object’s issues into field messages:
+
+```ts title="bounds.ts"
+const result = boundsSchema.safeParse({
+  north: 10,
+  south: 20,
+  east: 5,
+  west: 15,
+});
+
+if (!result.success) {
+  const { fieldErrors } = z.flattenError(result.error);
+  console.log(fieldErrors.north?.[0]);
+  // North must be greater than south.
+  console.log(fieldErrors.east?.[0]);
+  // East must be greater than west; crossing 180° is not supported.
+}
+```
+
+This flat error shape suits a flat object. For nested forms, preserve the complete issue paths or use `z.treeifyError()` instead of flattening everything into the first property.[^errors]
+
+## Longitude wraps around
+
+Here’s the catch: a box from 170° east to 170° west can be a perfectly reasonable box around the antimeridian. Its `west` value is `170` and its `east` value is `-170`. Numerically, east is smaller. Geographically, the box spans 20 degrees.[^geojson]
+
+If your application supports that, remove the `east <= west` restriction. For an eastward longitude span, this calculation handles wrapping:
+
+```ts title="longitude-span.ts"
+export function longitudeSpan(west: number, east: number): number {
+  return east >= west ? east - west : east + 360 - west;
+}
+
+longitudeSpan(170, -170); // 20
+longitudeSpan(-170, 170); // 340
+longitudeSpan(-180, 180); // 360
+```
+
+The inputs still need their individual longitude checks. Decide what equal endpoints mean as well. This function treats them as zero width, and represents the full world explicitly as `west: -180, east: 180`. Your map library and storage format need to agree on that convention.
+
+## When a refinement doesn’t run
+
+Object refinements don’t run after certain earlier failures, such as a missing required number or a string where a number is expected. Zod can’t safely call our comparison with values that haven’t passed those type checks. For partial forms, keep related fields in a small schema, or use Zod’s `when` option to control a refinement’s prerequisites.[^refinements]
+
+Finally, HTML inputs usually give you strings. Don’t reach for `z.coerce.number()` without deciding what an empty input means: JavaScript’s `Number('')` is `0`. Parse blank fields as missing, or reject them before coercion, so an empty coordinate doesn’t quietly become a point on the equator.
+
+[^refinements]: Zod documents [refinements and their execution conditions](https://zod.dev/api#refinements), including `path`, `when`, and `.superRefine()`.
+
+[^errors]: See Zod’s [error formatting utilities](https://zod.dev/error-formatting) for flat and nested error structures.
+
+[^geojson]: [RFC 7946, section 5.2](https://www.rfc-editor.org/rfc/rfc7946#section-5.2) gives an antimeridian-spanning bounding box with east numerically smaller than west.

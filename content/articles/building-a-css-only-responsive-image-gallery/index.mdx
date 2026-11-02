@@ -1,0 +1,202 @@
+---
+slug: 'building-a-css-only-responsive-image-gallery'
+title: 'Building a CSS-only responsive image gallery'
+description: 'Use aspect ratios, Flexbox, and responsive row breaks to build an image gallery with up to two rows and equal-height images. Includes a live example and CodePen.'
+publishedAt: '2026-11-03T04:00:00Z'
+excerpt: 'A gallery can show four, six, or eight images without measuring the viewport in JavaScript. The useful trick is letting each image’s aspect ratio determine its share of a row.'
+tags: ['css', 'react']
+draft: false
+---
+
+import demo from './demo/codepen.lock.json'
+
+<p className="intro">I wanted a gallery that worked with one image or a whole collection, without turning a page into an endless wall of photographs. At most two rows, more images when there’s room, and images in the same row sharing the same height.</p>
+
+I built [the original component](https://github.com/CrocoDillon/reeflings/blob/main/apps/web/app/components/gallery.tsx) in React, with Tailwind classes and Next.js images. But React doesn’t decide what fits when the window changes size. CSS does. The same layout works with another framework, a server-side template, or plain HTML.
+
+There are three decisions: how wide each image should be, where the row ends, and which images are visible. Let’s take them separately.
+
+## Try the gallery
+
+<ArticleDemo title="A CSS-only responsive image gallery" slug="building-a-css-only-responsive-image-gallery" penUrl={demo.editorUrl ?? undefined} />
+
+Change the number of photographs, then resize the browser or the CodePen preview. Below 640 pixels, the gallery shows at most four images. From 640 pixels it shows up to six, and from 1024 pixels it shows up to eight. Inside this article, those widths refer to the demo’s iframe viewport.
+
+The selector uses JavaScript to change the collection. Resizing doesn’t run any JavaScript. The +N badge represents photographs beyond the visible set; implementing a lightbox or the badge itself is outside this article’s scope.
+
+## Let the aspect ratio divide the row
+
+Suppose a row contains a landscape image with a 3:2 aspect ratio and a portrait image with a 2:3 aspect ratio. Equal widths would make them different heights. Instead, their widths need to be proportional to their aspect ratios.
+
+For a shared height `h`, each width is `h × ratio`. If the available row width, after spacing, is `W`, then:
+
+```text
+height = W / (ratio₁ + ratio₂ + …)
+widthᵢ = height × ratioᵢ
+```
+
+That’s what Flexbox can do for us. Give each image a zero flex basis and use its aspect ratio as its grow factor. Flexbox distributes the available width in those proportions.[^flex]
+
+```html title="index.html"
+<div class="gallery">
+  <div class="gallery-item" style="--ratio: 1.5">
+    <img src="lake.jpg" width="1500" height="1000" alt="A mountain lake" />
+  </div>
+  <div class="gallery-item" style="--ratio: 0.6666666667">
+    <img src="waterfall.jpg" width="1000" height="1500" alt="A forest waterfall" />
+  </div>
+</div>
+```
+
+```css title="index.css"
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -6px 0 0 -6px;
+}
+
+.gallery-item {
+  flex: calc(var(--ratio) * 100) 1 0px;
+  min-width: 0;
+  aspect-ratio: var(--ratio);
+  margin: 6px 0 0 6px;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.gallery-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+```
+
+`min-width: 0` lets an item shrink below the image’s intrinsic width. The dimensions in the markup supply the ratio before the image downloads; use the real dimensions, not a guessed landscape/portrait label. `object-fit: cover` handles tiny rounding differences without distorting the photograph.
+
+The original uses a small initial width and the default stretch alignment. Here I’ve made the proportional sizing explicit with a zero basis. That removes the small fixed-width contribution from the calculation. I also multiply every grow factor by 100: proportions stay the same, but a lone portrait or a row of narrow portraits won’t have a total grow factor below one and leave unused space. This assumes ordinary photographs with aspect ratios of at least 1:100.
+
+Why margins instead of `gap`? In a moment we’ll add an empty flex item to break a row. A row gap would also add space around that empty line. Margins on the photographs give us exactly one visible gutter, while the negative container margins cancel the outside spacing.
+
+## Choose the split before rendering
+
+We don’t need to measure anything to decide where a row should end. We know the number of images and the capacity at each breakpoint.
+
+```ts title="gallery.tsx"
+function splitIndex(total: number, capacity: number): number {
+  const visible = Math.min(total, capacity);
+  return visible <= capacity / 2
+    ? -1
+    : Math.floor(visible / 2) - 1;
+}
+```
+
+`-1` means there’s no split. With a capacity of six, one to three photographs stay on one row. Four become two and two; five become two and three; six become three and three. Extra photographs don’t change the split because they won’t be visible at that breakpoint.
+
+| Collection size | Capacity 4 | Capacity 6 | Capacity 8 |
+| --------------- | ---------- | ---------- | ---------- |
+| 1               | 1          | 1          | 1          |
+| 3               | 1 + 2      | 3          | 3          |
+| 5               | 2 + 2      | 2 + 3      | 2 + 3      |
+| 9               | 2 + 2      | 3 + 3      | 4 + 4      |
+
+The entries show the number of images on each row, not their widths. An odd collection puts the extra image on the second row. The two rows can have different heights; only images within a row share a height.
+
+For each capacity, insert a break after the calculated index. React is just generating markup here:
+
+```tsx title="gallery.tsx"
+import { Fragment, type CSSProperties } from 'react';
+
+type Photo = {
+  id: string;
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+};
+
+export function Gallery({ photos }: { photos: Photo[] }) {
+  if (photos.length === 0) return null;
+
+  return (
+    <div className="gallery" role="group" aria-label="Photographs">
+      {photos.slice(0, 8).map((photo, index) => (
+        <Fragment key={photo.id}>
+          <div
+            className="gallery-item"
+            data-position={index + 1}
+            style={{ '--ratio': photo.width / photo.height } as CSSProperties}
+          >
+            <img
+              src={photo.src}
+              alt={photo.alt}
+              width={photo.width}
+              height={photo.height}
+            />
+          </div>
+          {[4, 6, 8].map(capacity =>
+            index === splitIndex(photos.length, capacity) ? (
+              <span
+                key={capacity}
+                className={`gallery-break break-${capacity}`}
+                aria-hidden="true"
+              />
+            ) : null,
+          )}
+        </Fragment>
+      ))}
+    </div>
+  );
+}
+```
+
+Keep `splitIndex` in the same file as `Gallery`. The demo uses DOM methods instead of React to produce the same structure. A server-side template could emit it once and send no gallery JavaScript at all.
+
+## Let CSS choose the active layout
+
+An active break occupies the full main axis but has no height. That forces subsequent images onto the next line. Inactive breaks have `display: none`, so they don’t participate in layout.
+
+```css title="index.css"
+.gallery-break {
+  display: none;
+  flex: 0 0 100%;
+  height: 0;
+}
+
+.gallery-item[data-position='5'],
+.gallery-item[data-position='6'],
+.gallery-item[data-position='7'],
+.gallery-item[data-position='8'] {
+  display: none;
+}
+
+.break-4 { display: block; }
+
+@media (min-width: 640px) {
+  .gallery-item[data-position='5'],
+  .gallery-item[data-position='6'] { display: block; }
+  .break-4 { display: none; }
+  .break-6 { display: block; }
+}
+
+@media (min-width: 1024px) {
+  .gallery-item[data-position='7'],
+  .gallery-item[data-position='8'] { display: block; }
+  .break-6 { display: none; }
+  .break-8 { display: block; }
+}
+```
+
+I’m using `data-position` rather than `:nth-child()` because those row-break elements are siblings too. Counting every child would produce some fairly surprising selectors.
+
+Only one breakpoint’s break is active, and it only exists when we need a second row. That gives us the two-row limit without calculating image widths ourselves.
+
+## A few practical edges
+
+A single image fills the available width at its own aspect ratio. An unusually tall portrait can therefore make a tall gallery. If your design imposes a maximum height, you’ll need to choose between cropping and leaving space; that’s a separate layout policy.
+
+Hiding an image with CSS also doesn’t guarantee that its file won’t download. The example keeps the first eight images in the rendered markup, so use appropriately sized images and consider your loading strategy. The production component uses Next.js image optimization; neither that nor React is required for the layout.
+
+The production gallery links into a full collection. Keep that escape hatch if you hide photographs: a +N badge should lead somewhere useful, and keyboard users need an accessible way to reach the remaining images. The demo deliberately shows the layout and a non-interactive badge only.
+
+[^flex]: [MDN’s explanation of `flex-grow`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/flex-grow) describes how positive free space is divided. A zero basis is what makes that division apply to the whole usable row width here.
