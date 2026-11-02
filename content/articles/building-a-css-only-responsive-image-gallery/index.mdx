@@ -4,25 +4,27 @@ title: 'Building a CSS-only responsive image gallery'
 description: 'Use aspect ratios, Flexbox, and responsive row breaks to build an image gallery with up to two rows and equal-height images. Includes a live example and CodePen.'
 publishedAt: '2026-11-03T04:00:00Z'
 excerpt: 'A gallery can show four, six, or eight images without measuring the viewport in JavaScript. The useful trick is letting each image’s aspect ratio determine its share of a row.'
-tags: ['css', 'react']
+tags: ['css']
 draft: false
 ---
 
 import demo from './demo/codepen.lock.json'
 
-<p className="intro">I wanted a gallery that worked with one image or a whole collection, without turning a page into an endless wall of photographs. At most two rows, more images when there’s room, and images in the same row sharing the same height.</p>
+<p className="intro">For <a href="https://reeflings.com">Reeflings</a>, I wanted a gallery that worked with one image or a whole collection, without turning a page into an endless wall of photographs. At most two rows, more images when there’s room, and images in the same row sharing the same height.</p>
 
-I built [the original component](https://github.com/CrocoDillon/reeflings/blob/main/apps/web/app/components/gallery.tsx) in React, with Tailwind classes and Next.js images. But React doesn’t decide what fits when the window changes size. CSS does. The same layout works with another framework, a server-side template, or plain HTML.
+I built the original component in React, with Tailwind classes and Next.js images. But React doesn’t decide what fits when the window changes size. CSS does. The same layout works with another framework, a server-side template, or plain HTML.
 
 There are three decisions: how wide each image should be, where the row ends, and which images are visible. Let’s take them separately.
 
 ## Try the gallery
 
-<ArticleDemo title="A CSS-only responsive image gallery" slug="building-a-css-only-responsive-image-gallery" penUrl={demo.editorUrl ?? undefined} />
+<ArticleDemo title="A CSS-only responsive image gallery" slug="building-a-css-only-responsive-image-gallery" penUrl={demo.editorUrl ?? undefined} autoRun />
 
-Change the number of photographs, then resize the browser or the CodePen preview. Below 640 pixels, the gallery shows at most four images. From 640 pixels it shows up to six, and from 1024 pixels it shows up to eight. Inside this article, those widths refer to the demo’s iframe viewport.
+Change the number of photographs, then drag the gallery width slider. You can also focus it and use the arrow keys. Below 640 pixels, the gallery shows at most four images. From 640 pixels it shows up to six, and from 1024 pixels it shows up to eight. The slider uses a percentage of the available space; a wider browser or CodePen preview gives you more room to experiment.
 
-The selector uses JavaScript to change the collection. Resizing doesn’t run any JavaScript. The +N badge represents photographs beyond the visible set; implementing a lightbox or the badge itself is outside this article’s scope.
+Once JavaScript has rendered the component, CSS handles its responsive layout. The demo adds controls to render a different collection and set the available width; neither control calculates image sizes or rearranges the rows. The +N badge represents photographs beyond the visible set; implementing a lightbox or the badge itself is outside this article’s scope.
+
+The original uses viewport-based media queries, as do the snippets below. For the draggable demo, I’ve changed those to [CSS container queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Containment/Container_queries), so the breakpoints respond to the gallery’s available width even when the browser window stays the same size.
 
 ## Let the aspect ratio divide the row
 
@@ -190,6 +192,8 @@ An active break occupies the full main axis but has no height. That forces subse
 I’m using `data-position` rather than `:nth-child()` because those row-break elements are siblings too. Counting every child would produce some fairly surprising selectors.
 
 Only one breakpoint’s break is active, and it only exists when we need a second row. That gives us the two-row limit without calculating image widths ourselves.
+
+To make these rules respond to a resizable container, wrap the gallery in an element with `container: gallery / inline-size`, then replace `@media (min-width: 640px)` with `@container gallery (min-width: 640px)`, and likewise for 1024 pixels. That’s the version used in the demo. Its width slider changes only the wrapper’s width; CSS still chooses the visible images and active row break.
 
 ## A few practical edges
 

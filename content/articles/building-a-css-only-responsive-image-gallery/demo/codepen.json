@@ -1,7 +1,7 @@
 {
   "key": "css-responsive-gallery",
   "title": "A CSS-only responsive photo gallery — into the wild",
-  "description": "Nine landscapes. Two rows. No resize listener. Change the image count and resize the preview: CSS chooses up to four, six, or eight images, all with equal heights within each row. Photos: Unsplash (https://unsplash.com/license); individual source URLs are recorded in the HTML.",
+  "description": "Nine landscapes. Two rows. CSS-only layout. Change the image count and drag the gallery width slider: container queries choose up to four, six, or eight images, all with equal heights within each row. Photos: Unsplash (https://unsplash.com/license); individual source URLs are recorded in the HTML.",
   "tags": ["css", "flexbox", "gallery"],
   "files": ["index.html", "index.css", "index.ts"]
 }

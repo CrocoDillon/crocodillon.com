@@ -30,9 +30,46 @@
   padding: 8px 12px;
   border-radius: 6px;
 }
-select:focus-visible {
+select:focus-visible,
+input:focus-visible {
   outline: 2px solid var(--demo-moss);
   outline-offset: 3px;
+}
+.gallery-width-control {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 4ch;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 24px;
+  font-size: 13px;
+}
+.gallery-width-control input {
+  width: 100%;
+  min-width: 0;
+  height: 32px;
+  margin: 0;
+  cursor: ew-resize;
+  accent-color: var(--demo-moss);
+}
+.gallery-width-control output {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.gallery-width-control p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--demo-muted);
+}
+.gallery-stage {
+  container: gallery / inline-size;
+  width: var(--gallery-width, 100%);
+  margin-inline: auto;
+}
+.capacity {
+  margin: 16px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--demo-muted);
 }
 .gallery {
   display: flex;
@@ -101,7 +138,7 @@ select:focus-visible {
 .capacity::after {
   content: 'Up to 4 images · 2 per row';
 }
-@media (min-width: 640px) {
+@container gallery (min-width: 640px) {
   .gallery-item[data-position='5'],
   .gallery-item[data-position='6'] {
     display: block;
@@ -120,7 +157,7 @@ select:focus-visible {
     content: 'Up to 6 images · 3 per row';
   }
 }
-@media (min-width: 1024px) {
+@container gallery (min-width: 1024px) {
   .gallery-item[data-position='7'],
   .gallery-item[data-position='8'] {
     display: block;
