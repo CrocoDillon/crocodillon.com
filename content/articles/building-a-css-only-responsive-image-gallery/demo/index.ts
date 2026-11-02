@@ -1,6 +1,11 @@
 const gallery = document.querySelector<HTMLDivElement>('.gallery')!
 const template = document.querySelector<HTMLTemplateElement>('#photos')!
 const count = document.querySelector<HTMLSelectElement>('#image-count')!
+const stage = document.querySelector<HTMLDivElement>('.gallery-stage')!
+const width = document.querySelector<HTMLInputElement>('#gallery-width')!
+const widthValue = document.querySelector<HTMLOutputElement>(
+  '#gallery-width-value'
+)!
 
 function splitIndex(total: number, capacity: number): number {
   const visible = Math.min(total, capacity)
@@ -36,6 +41,13 @@ function render() {
   gallery.replaceChildren(fragment)
 }
 
-// Only the collection size changes in JavaScript. CSS handles every resize.
+// These controls change the demo inputs. CSS alone lays out the photographs.
 count.addEventListener('change', render)
+width.addEventListener('input', () => {
+  const percentage = `${width.value}%`
+  stage.style.setProperty('--gallery-width', percentage)
+  widthValue.value = percentage
+  width.setAttribute('aria-valuetext', `${width.value}% of available width`)
+})
+width.setAttribute('aria-valuetext', '100% of available width')
 render()
