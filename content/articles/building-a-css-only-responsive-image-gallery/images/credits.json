@@ -1,0 +1,60 @@
+{
+  "license": "https://unsplash.com/license",
+  "downloadedAt": "2026-11-02",
+  "photos": [
+    {
+      "file": "landscape-1.jpg",
+      "source": "https://images.unsplash.com/photo-1470770841072-f978cf4d019e",
+      "width": 1600,
+      "height": 1067
+    },
+    {
+      "file": "landscape-2.jpg",
+      "source": "https://images.unsplash.com/photo-1500534623283-312aade485b7",
+      "width": 1600,
+      "height": 1067
+    },
+    {
+      "file": "landscape-3.jpg",
+      "source": "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1",
+      "width": 1600,
+      "height": 1067
+    },
+    {
+      "file": "landscape-4.jpg",
+      "source": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
+      "width": 1600,
+      "height": 1066
+    },
+    {
+      "file": "landscape-5.jpg",
+      "source": "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
+      "width": 1600,
+      "height": 1067
+    },
+    {
+      "file": "landscape-6.jpg",
+      "source": "https://images.unsplash.com/photo-1519681393784-d120267933ba",
+      "width": 1600,
+      "height": 1068
+    },
+    {
+      "file": "landscape-7.jpg",
+      "source": "https://images.unsplash.com/photo-1433086966358-54859d0ed716",
+      "width": 1600,
+      "height": 2400
+    },
+    {
+      "file": "landscape-8.jpg",
+      "source": "https://images.unsplash.com/photo-1469474968028-56623f02e42e",
+      "width": 1600,
+      "height": 1063
+    },
+    {
+      "file": "landscape-9.jpg",
+      "source": "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d",
+      "width": 1600,
+      "height": 1067
+    }
+  ]
+}

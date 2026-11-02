@@ -1,0 +1,432 @@
+---
+slug: 'your-own-sso-provider-using-better-auth'
+title: 'Your own SSO provider using Better Auth'
+description: 'Build an OpenID Connect provider with Better Auth, use encrypted stateless client sessions across domains, and revalidate identity and permissions before writes.'
+publishedAt: '2026-11-04T04:00:00Z'
+excerpt: 'Single sign-on across different domains doesn’t need a shared cookie. It needs one identity authority, a redirect flow, and a clear distinction between a cached session and permission to write.'
+tags: ['node-js', 'javascript']
+draft: false
+---
+
+<p className="intro">We wanted one place to manage accounts, credentials, and access, while keeping the applications that used those accounts independent. Signing in to a second application shouldn’t mean creating another account—or giving that application its own copy of the identity database.</p>
+
+That led us to our own OpenID Connect provider with Better Auth. The useful part wasn’t inventing a login protocol. It was being able to keep identity and membership decisions in one service, with our own account experience, and connect applications through a standard protocol.
+
+Running the provider also makes us responsible for its availability, recovery, upgrades, and key management. A hosted provider can be a very sensible choice. In our case, owning that central service fit the architecture we wanted.
+
+The examples below use **Better Auth and `@better-auth/oauth-provider` 1.7.8**, Zod 4.5.4, MongoDB’s Node driver 7.6.0, and Next.js App Router on Node.js. They show a simplified integration, not the complete account product. Start with a working Better Auth account service and sign-in screen; email verification, recovery, MFA, operational tooling, and transaction hardening still need their own implementation and testing. Test the complete flow before using it in production.
+
+## Different domains, different cookies
+
+Let’s call the identity service `https://accounts.example.com` and the relying application `https://editor.example.net`. Those hosts can’t share an ordinary domain cookie. They don’t need to.
+
+The editor redirects the browser to the provider. The provider reads its own cookie, asks for a sign-in if necessary, and redirects back with a short-lived authorization code. The editor’s server exchanges that code using its client credentials and PKCE verifier, then establishes its own local session.
+
+The next application repeats the redirect. The provider already knows the browser, so the person doesn’t need to enter credentials again, subject to the provider’s consent and reauthentication policy. That’s the single sign-on part. It isn’t a third-party cookie trick.
+
+Keep the three credentials distinct:
+
+| Credential           | What it does                                                       |
+| -------------------- | ------------------------------------------------------------------ |
+| ID token             | Tells the client who authenticated, for that client and login flow |
+| Access token         | Authorizes access to a particular resource                         |
+| Local session cookie | Lets the application recognize a returning browser                 |
+
+An ID token isn’t an API credential. And a valid local session doesn’t prove that the user still has permission to change something.
+
+## Make the account service an OIDC provider
+
+The provider owns the database. The editor will have no identity or session database at all. Here’s the relevant provider configuration; merge it with your existing account service’s sign-in and recovery configuration.[^provider]
+
+```ts title="accounts/app/lib/auth.ts"
+import { betterAuth } from 'better-auth';
+import { mongodbAdapter } from 'better-auth/adapters/mongodb';
+import { jwt } from 'better-auth/plugins';
+import { oauthProvider } from '@better-auth/oauth-provider';
+import { MongoClient } from 'mongodb';
+
+const mongo = new MongoClient(process.env.MONGODB_URI!);
+const db = mongo.db('identity');
+const issuer = 'https://accounts.example.com';
+const editor = 'https://editor.example.net';
+const rolesClaim = 'https://example.com/roles';
+
+export const auth = betterAuth({
+  baseURL: issuer,
+  secret: process.env.BETTER_AUTH_SECRET!,
+  database: mongodbAdapter(db, { client: mongo }),
+  emailAndPassword: { enabled: true },
+  trustedOrigins: [issuer],
+  advanced: {
+    cookiePrefix: 'accounts',
+    useSecureCookies: true,
+  },
+  session: { cookieCache: { enabled: false } },
+  disabledPaths: ['/token', '/oauth2/create-client'],
+  plugins: [
+    jwt({
+      disableSettingJwtHeader: true,
+      jwt: { issuer, expirationTime: '15m' },
+    }),
+    oauthProvider({
+      loginPage: '/sign-in',
+      consentPage: '/consent',
+      scopes: ['openid', 'profile', 'email', 'offline_access'],
+      grantTypes: ['authorization_code', 'refresh_token'],
+      accessTokenExpiresIn: 15 * 60,
+      resources: [editor],
+      clientPrivileges: ({ user }) =>
+        Boolean(user && user.id === process.env.OAUTH_OPERATOR_ID),
+      resourcePrivileges: ({ user }) =>
+        Boolean(user && user.id === process.env.OAUTH_OPERATOR_ID),
+      extensions: [{
+        claims: {
+          userInfo: async ({ client, user }) => {
+            const membership = client && user
+              ? await db.collection<{
+                  clientId: string;
+                  userId: string;
+                  role: string;
+                }>('appMemberships').findOne({
+                  clientId: client.clientId,
+                  userId: user.id,
+                })
+              : null;
+            return {
+              [rolesClaim]: membership ? [membership.role] : [],
+            };
+          },
+        },
+      }],
+    }),
+  ],
+});
+```
+
+`OAUTH_OPERATOR_ID` identifies an existing operator account by its immutable user ID. It’s server configuration, not a field supplied during sign-up. This small example uses one membership per client and user; create a unique compound index on `appMemberships` for `{ clientId: 1, userId: 1 }`, and provision records through an operator-controlled path. Use the string IDs returned by Better Auth. A role of `editor` will allow the example write below.
+
+The important detail is that UserInfo reads membership **now**, using the authenticated requesting client. It doesn’t copy a role from an old token or accept an organization ID from the browser. A real multi-tenant service can bind clients to organizations and resolve membership through that binding instead.
+
+Mount Better Auth in both applications:
+
+```ts title="app/api/auth/[...all]/route.ts"
+import { toNextJsHandler } from 'better-auth/next-js';
+import { auth } from '@/lib/auth';
+
+export const { GET, POST } = toNextJsHandler(auth);
+```
+
+On the provider, expose discovery at the issuer URL used by the client:
+
+```ts title="accounts/app/.well-known/openid-configuration/route.ts"
+import { auth } from '@/lib/auth';
+
+export async function GET() {
+  return Response.json(await auth.api.getOpenIdConfig());
+}
+```
+
+If other consumers need OAuth authorization-server metadata, mount `auth.api.getOAuthServerConfig()` similarly at `/.well-known/oauth-authorization-server`. Verify the advertised issuer and endpoints against the deployed URL; don’t silently accept whatever issuer a misconfigured discovery document happens to return.
+
+Register the editor from an authenticated operator context on the account server:
+
+```ts title="accounts/app/lib/register-editor.ts"
+import { auth } from './auth';
+
+export async function registerEditor(operatorHeaders: Headers) {
+  const client = await auth.api.adminCreateOAuthClient({
+    headers: operatorHeaders,
+    body: {
+      client_name: 'Example editor',
+      redirect_uris: [
+        'https://editor.example.net/api/auth/callback/accounts',
+      ],
+      grant_types: ['authorization_code', 'refresh_token'],
+      scope: 'openid profile email offline_access',
+      token_endpoint_auth_method: 'client_secret_basic',
+      require_pkce: true,
+      skip_consent: true,
+    },
+  });
+
+  await auth.api.adminLinkClientResource({
+    headers: operatorHeaders,
+    params: {
+      client_id: client.client_id,
+      identifier: 'https://editor.example.net',
+    },
+  });
+  return client;
+}
+```
+
+Call this once through your protected provisioning code. Store the returned client ID and secret in the editor’s server environment as `AUTH_CLIENT_ID` and `AUTH_CLIENT_SECRET`; don’t log the response. If resource linking fails after creation, repair or remove that client before retrying. The example doesn’t wrap those two operations in a transaction.
+
+Skipping consent is a policy for this first-party client, not a default for arbitrary applications. The provider’s existing sign-in UI must preserve the authorization query and continue the pending OAuth flow after authentication, using the provider client plugin. A generic redirect to the homepage would lose that flow. Keep a consent screen if any registered client requires consent.[^provider]
+
+## Check the authority, not just the token’s shape
+
+Before configuring the editor, define how it asks the provider for current identity and membership. Introspection checks token activity and binding; UserInfo supplies the current profile and roles.
+
+```ts title="editor/app/lib/identity.ts"
+import { z } from 'zod';
+
+export const issuer = 'https://accounts.example.com';
+export const audience = 'https://editor.example.net';
+export const rolesClaim = 'https://example.com/roles';
+
+const tokenSchema = z.object({
+  active: z.literal(true),
+  iss: z.literal(issuer),
+  aud: z.union([z.string(), z.array(z.string())]),
+  client_id: z.string(),
+  sub: z.string().min(1),
+  exp: z.int(),
+  token_type: z.literal('Bearer'),
+});
+
+const profileSchema = z.object({
+  sub: z.string().min(1),
+  name: z.string(),
+  email: z.email(),
+  email_verified: z.boolean(),
+  picture: z.string().optional(),
+  [rolesClaim]: z.array(z.string()),
+});
+
+export async function freshIdentity(accessToken: string) {
+  if (!accessToken) throw new Error('Missing access token');
+  const clientId = process.env.AUTH_CLIENT_ID!;
+  const secret = process.env.AUTH_CLIENT_SECRET!;
+  const basic = Buffer.from(
+    `${encodeURIComponent(clientId)}:${encodeURIComponent(secret)}`,
+  ).toString('base64');
+
+  const checked = await fetch(`${issuer}/api/auth/oauth2/introspect`, {
+    method: 'POST',
+    headers: {
+      authorization: `Basic ${basic}`,
+      'content-type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      token: accessToken,
+      token_type_hint: 'access_token',
+    }),
+    cache: 'no-store',
+    redirect: 'error',
+    signal: AbortSignal.timeout(5000),
+  });
+  if (!checked.ok) throw new Error('Introspection failed');
+  const token = tokenSchema.parse(await checked.json());
+  const audiences = Array.isArray(token.aud) ? token.aud : [token.aud];
+  if (
+    token.client_id !== clientId ||
+    !audiences.includes(audience) ||
+    token.exp <= Math.floor(Date.now() / 1000)
+  ) throw new Error('Invalid token binding');
+
+  const response = await fetch(`${issuer}/api/auth/oauth2/userinfo`, {
+    headers: { authorization: `Bearer ${accessToken}` },
+    cache: 'no-store',
+    redirect: 'error',
+    signal: AbortSignal.timeout(5000),
+  });
+  if (!response.ok) throw new Error('UserInfo failed');
+  const profile = profileSchema.parse(await response.json());
+  if (profile.sub !== token.sub) throw new Error('Subject mismatch');
+  return profile;
+}
+```
+
+A response saying `active: true` isn’t enough. We also require the configured issuer, this client, our resource audience, an unexpired token, and the same subject in both responses. Missing or malformed claims fail closed. The namespaced roles claim avoids inventing a meaning for an unrelated standard claim.
+
+## Keep the relying application stateless
+
+Better Auth can keep a local session in an encrypted cookie and store the OAuth account credentials in a separate encrypted account cookie. Configure the client without a database. Give it its own secret, separate from the provider’s secret.[^sessions]
+
+```ts title="editor/app/lib/auth.ts"
+import { betterAuth } from 'better-auth';
+import { APIError, createAuthMiddleware } from 'better-auth/api';
+import { nextCookies } from 'better-auth/next-js';
+import { genericOAuth } from 'better-auth/plugins';
+import { z } from 'zod';
+import { audience, freshIdentity, issuer } from './identity';
+
+const idClaims = z.object({
+  iss: z.literal(issuer),
+  sub: z.string().min(1),
+  exp: z.int(),
+  iat: z.int(),
+});
+
+export const auth = betterAuth({
+  baseURL: audience,
+  secret: process.env.BETTER_AUTH_SECRET!,
+  trustedOrigins: [audience],
+  advanced: { cookiePrefix: 'editor', useSecureCookies: true },
+  account: {
+    accountLinking: { enabled: false },
+    storeAccountCookie: true,
+    storeStateStrategy: 'cookie',
+  },
+  session: {
+    expiresIn: 60 * 60,
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 60,
+      strategy: 'jwe',
+      refreshCache: false,
+    },
+  },
+  user: {
+    additionalFields: {
+      accountsSubject: { type: 'string', required: true, input: true },
+    },
+  },
+  disabledPaths: [
+    '/sign-up/email', '/link-social', '/unlink-account',
+    '/update-user', '/update-session',
+  ],
+  hooks: {
+    before: createAuthMiddleware(async ctx => {
+      if (ctx.path === '/sign-in/social' && ctx.body?.idToken) {
+        throw new APIError('BAD_REQUEST', {
+          message: 'Use the authorization code flow',
+        });
+      }
+    }),
+  },
+  plugins: [
+    genericOAuth({ config: [{
+      providerId: 'accounts',
+      clientId: process.env.AUTH_CLIENT_ID!,
+      clientSecret: process.env.AUTH_CLIENT_SECRET!,
+      discoveryUrl: `${issuer}/.well-known/openid-configuration`,
+      authorizationUrl: `${issuer}/api/auth/oauth2/authorize`,
+      tokenUrl: `${issuer}/api/auth/oauth2/token`,
+      authorizationUrlParams: { resource: audience },
+      tokenEndpointAuth: { method: 'client_secret_basic' },
+      pkce: true,
+      requireIdTokenVerification: true,
+      disableProviderLogout: true,
+      scopes: ['openid', 'profile', 'email', 'offline_access'],
+      getUserInfo: async tokens => {
+        // genericOAuth has already verified signature, audience, nonce,
+        // and the discovered issuer. Decoding alone is NOT verification.
+        if (!tokens.idToken) return null;
+        const claims = idClaims.parse(JSON.parse(
+          Buffer.from(tokens.idToken.split('.')[1]!, 'base64url').toString(),
+        ));
+        const now = Math.floor(Date.now() / 1000);
+        if (claims.exp <= now || claims.iat > now + 60) return null;
+        const profile = await freshIdentity(tokens.accessToken ?? '');
+        if (profile.sub !== claims.sub) return null;
+        return {
+          ...profile,
+          emailVerified: profile.email_verified,
+          image: profile.picture,
+        };
+      },
+      mapProfileToUser: profile => ({ accountsSubject: profile.sub as string }),
+    }] }),
+    nextCookies(),
+  ],
+});
+```
+
+In this version, the additional field accepts the provider mapping, while the local profile-writing endpoints are disabled. Don’t later enable a browser API that lets someone overwrite `accountsSubject`. That value binds the local session to the upstream identity.
+
+`requireIdTokenVerification` requires discovery metadata needed for verification. We additionally require the claims our policy depends on and bind the verified ID-token subject to introspection and UserInfo. No “decode the JWT and trust the JSON” shortcuts.[^client]
+
+The one-hour cache is a choice for this example. Ordinary reads can use that cached identity, but they may show an outdated name or remain locally signed in after upstream revocation. `refreshCache: false` avoids extending that local snapshot just because someone keeps reading. When it expires, send the browser through the normal sign-in flow again; an existing provider session can make that quick.
+
+Keep cookies host-only, Secure, HttpOnly, and SameSite=Lax. Don’t enable cross-subdomain cookies to solve a cross-domain problem, and don’t put the access or refresh token in localStorage. Start sign-in from the editor with Better Auth’s client:
+
+```ts title="editor/app/lib/auth-client.ts"
+import { createAuthClient } from 'better-auth/client';
+
+export const authClient = createAuthClient();
+
+// Call from your sign-in button:
+// await authClient.signIn.social({ provider: 'accounts', callbackURL: '/' });
+```
+
+## Refresh where the response can carry cookies
+
+A refresh token can rotate. Once the provider returns its successor, the application must save that successor in the browser’s account cookie. Calling a refresh-capable API while rendering a Server Component can consume the old token without persisting the new one. The first request works; a later one mysteriously doesn’t.
+
+Our fuller implementation resolves tokens before rendering and forwards updated cookies through the response. To keep this example small, refresh happens only in the write Route Handler below. Read-only pages use the local cached session. We don’t need to forward an access token through an internal request header at all.
+
+This handler demonstrates an authorized operation without changing real data:
+
+```ts title="editor/app/api/example/route.ts"
+import { auth } from '@/lib/auth';
+import { audience, freshIdentity, rolesClaim } from '@/lib/identity';
+
+export async function POST(request: Request) {
+  // This is our cookie-authenticated browser endpoint, not Better Auth's.
+  // Keep its own CSRF defense; CORS isn't a substitute.
+  if (request.headers.get('origin') !== audience) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  let tokenResponse: Response | undefined;
+  function reply(body: object, status: number) {
+    const response = Response.json(body, { status });
+    response.headers.set('cache-control', 'private, no-store');
+    for (const cookie of tokenResponse?.headers.getSetCookie() ?? []) {
+      response.headers.append('set-cookie', cookie);
+    }
+    return response;
+  }
+
+  try {
+    const session = await auth.api.getSession({ headers: request.headers });
+    if (!session) return reply({ error: 'Sign in again' }, 401);
+
+    tokenResponse = await auth.api.getAccessToken({
+      headers: request.headers,
+      body: { useAccountCookie: true },
+      asResponse: true,
+    });
+    if (!tokenResponse.ok) return reply({ error: 'Sign in again' }, 401);
+    const token: { accessToken?: unknown } = await tokenResponse.json();
+    if (typeof token.accessToken !== 'string') {
+      return reply({ error: 'Sign in again' }, 401);
+    }
+
+    const current = await freshIdentity(token.accessToken);
+    if (current.sub !== session.user.accountsSubject) {
+      return reply({ error: 'Sign in again' }, 401);
+    }
+    if (!current[rolesClaim].some(role => ['owner', 'editor'].includes(role))) {
+      return reply({ error: 'Forbidden' }, 403);
+    }
+
+    // Validate the command and authorize its specific resource here.
+    // Then perform the mutation, recording current.sub as the actor.
+    return reply({ accepted: true }, 200);
+  } catch {
+    // No fallback to cached permissions when the authority is unavailable.
+    return reply({ error: 'Unable to verify access' }, 503);
+  }
+}
+```
+
+Notice that we forward `Set-Cookie` even when a later permission check fails. A successful refresh followed by a 403 mustn’t throw away the replacement refresh token. The browser can call this endpoint with `fetch('/api/example', { method: 'POST' })`; its same-origin cookies accompany the request.
+
+Authorization here is current at the time of the check, not an atomic lock over every future operation. If removing membership must cancel an in-flight write, you need a stronger application-level consistency boundary. And don’t automatically replay a mutation after reauthentication: the first attempt might already have had an effect.
+
+## Decide what logout means
+
+Clearing the editor’s cookie signs out of the editor. It doesn’t necessarily sign out of the provider or another client. This example explicitly keeps provider logout separate. Revoking refresh tokens prevents future refreshes, but an already issued JWT can remain usable until its expiry, depending on the provider’s introspection and revocation policy.
+
+We wanted stronger session-bound revocation in the full service, so session removal also removes associated refresh grants. That behavior needs explicit hooks and transaction/race testing; it isn’t something this abbreviated configuration promises. The local read cache is another independent window.
+
+Before shipping, exercise the actual browser flow across both domains: first login, existing SSO, expired access tokens, expired local sessions, parallel refreshes, revoked membership, provider outages, and logout. Check wrong issuer/audience/client/subject rejection, callback state and nonce failures, cookie size limits, and signing-key rotation too. Type checking a configuration is useful. It doesn’t tell you whether a replacement cookie actually made it back to the browser.
+
+[^provider]: Better Auth’s [OAuth Provider documentation](https://better-auth.com/docs/plugins/oauth-provider) covers discovery, client provisioning, resource audiences, and continuing sign-in and consent flows. Match the documentation to your installed version.
+
+[^client]: The [Generic OAuth plugin](https://better-auth.com/docs/plugins/generic-oauth) provides the relying-party integration. The checks above supplement its OIDC verification; they don’t replace it.
+
+[^sessions]: See Better Auth’s [session management documentation](https://better-auth.com/docs/concepts/session-management) for stateless sessions, account cookies, and cookie-cache lifetimes. Session freshness for sensitive account operations is a separate setting from authorization freshness.
