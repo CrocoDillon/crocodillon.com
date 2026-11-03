@@ -8,21 +8,20 @@ tags: ['node-js', 'javascript']
 draft: false
 ---
 
-<p className="intro">We wanted one place to manage accounts, credentials, and access, while keeping the applications that used those accounts independent. Signing in to a second application shouldn’t mean creating another account—or giving that application its own copy of the identity database.</p>
+<p className="intro">We wanted a single SSO and OpenID Connect provider for a multi-tenant application. Each tenant could use its own domain, while accounts, credentials, and membership stayed in one central service.</p>
 
 That led us to our own OpenID Connect provider with Better Auth. The useful part wasn’t inventing a login protocol. It was being able to keep identity and membership decisions in one service, with our own account experience, and connect applications through a standard protocol.
 
-Running the provider also makes us responsible for its availability, recovery, upgrades, and key management. A hosted provider can be a very sensible choice. In our case, owning that central service fit the architecture we wanted.
+Running the provider makes us responsible for availability, recovery, upgrades, and key management. Hosted providers can be a sensible choice, but costs can rise quickly as the number of active users grows.[^pricing] Owning that central service fit the architecture we wanted.
 
-The examples below use **Better Auth and `@better-auth/oauth-provider` 1.7.8**, Zod 4.5.4, MongoDB’s Node driver 7.6.0, and Next.js App Router on Node.js. They show a simplified integration, not the complete account product. Start with a working Better Auth account service and sign-in screen; email verification, recovery, MFA, operational tooling, and transaction hardening still need their own implementation and testing. Test the complete flow before using it in production.
+These examples show a simplified integration. Make sure to test the complete authentication flow before using this in production.
 
 ## Different domains, different cookies
 
-Let’s call the identity service `https://accounts.example.com` and the relying application `https://editor.example.net`. Those hosts can’t share an ordinary domain cookie. They don’t need to.
+Let’s call the identity service `https://accounts.example.com`, with one tenant at `https://tenant.example.net`. Those hosts can’t share an ordinary domain cookie. They don’t need to.
+The tenant redirects the browser to the provider. The provider reads its own cookie, asks for a sign-in if necessary, and redirects back with a short-lived authorization code. The tenant’s server exchanges that code using its client credentials and PKCE verifier, then establishes its own local session.
 
-The editor redirects the browser to the provider. The provider reads its own cookie, asks for a sign-in if necessary, and redirects back with a short-lived authorization code. The editor’s server exchanges that code using its client credentials and PKCE verifier, then establishes its own local session.
-
-The next application repeats the redirect. The provider already knows the browser, so the person doesn’t need to enter credentials again, subject to the provider’s consent and reauthentication policy. That’s the single sign-on part. It isn’t a third-party cookie trick.
+The next tenant repeats the redirect. The provider already knows the browser, so the person doesn’t need to enter credentials again, subject to the provider’s consent and reauthentication policy. That’s the single sign-on part. It isn’t a third-party cookie trick.
 
 Keep the three credentials distinct:
 
@@ -36,7 +35,7 @@ An ID token isn’t an API credential. And a valid local session doesn’t prove
 
 ## Make the account service an OIDC provider
 
-The provider owns the database. The editor will have no identity or session database at all. Here’s the relevant provider configuration; merge it with your existing account service’s sign-in and recovery configuration.[^provider]
+The provider owns the database. The tenant will have no identity or session database at all. Here’s the relevant provider configuration; merge it with your existing account service’s sign-in and recovery configuration.[^provider]
 
 ```ts title="accounts/app/lib/auth.ts"
 import { betterAuth } from 'better-auth';
@@ -48,9 +47,8 @@ import { MongoClient } from 'mongodb';
 const mongo = new MongoClient(process.env.MONGODB_URI!);
 const db = mongo.db('identity');
 const issuer = 'https://accounts.example.com';
-const editor = 'https://editor.example.net';
+const tenant = 'https://tenant.example.net';
 const rolesClaim = 'https://example.com/roles';
-
 export const auth = betterAuth({
   baseURL: issuer,
   secret: process.env.BETTER_AUTH_SECRET!,
@@ -74,7 +72,7 @@ export const auth = betterAuth({
       scopes: ['openid', 'profile', 'email', 'offline_access'],
       grantTypes: ['authorization_code', 'refresh_token'],
       accessTokenExpiresIn: 15 * 60,
-      resources: [editor],
+      resources: [tenant],
       clientPrivileges: ({ user }) =>
         Boolean(user && user.id === process.env.OAUTH_OPERATOR_ID),
       resourcePrivileges: ({ user }) =>
@@ -92,6 +90,7 @@ export const auth = betterAuth({
                   userId: user.id,
                 })
               : null;
+
             return {
               [rolesClaim]: membership ? [membership.role] : [],
             };
@@ -128,18 +127,18 @@ export async function GET() {
 
 If other consumers need OAuth authorization-server metadata, mount `auth.api.getOAuthServerConfig()` similarly at `/.well-known/oauth-authorization-server`. Verify the advertised issuer and endpoints against the deployed URL; don’t silently accept whatever issuer a misconfigured discovery document happens to return.
 
-Register the editor from an authenticated operator context on the account server:
+Register the tenant from an authenticated operator context on the account server:
 
-```ts title="accounts/app/lib/register-editor.ts"
+```ts title="accounts/app/lib/register-tenant.ts"
 import { auth } from './auth';
 
-export async function registerEditor(operatorHeaders: Headers) {
+export async function registerTenant(operatorHeaders: Headers) {
   const client = await auth.api.adminCreateOAuthClient({
     headers: operatorHeaders,
     body: {
-      client_name: 'Example editor',
+      client_name: 'Example tenant',
       redirect_uris: [
-        'https://editor.example.net/api/auth/callback/accounts',
+        'https://tenant.example.net/api/auth/callback/accounts',
       ],
       grant_types: ['authorization_code', 'refresh_token'],
       scope: 'openid profile email offline_access',
@@ -153,28 +152,28 @@ export async function registerEditor(operatorHeaders: Headers) {
     headers: operatorHeaders,
     params: {
       client_id: client.client_id,
-      identifier: 'https://editor.example.net',
+      identifier: 'https://tenant.example.net',
     },
   });
+
   return client;
 }
 ```
 
-Call this once through your protected provisioning code. Store the returned client ID and secret in the editor’s server environment as `AUTH_CLIENT_ID` and `AUTH_CLIENT_SECRET`; don’t log the response. If resource linking fails after creation, repair or remove that client before retrying. The example doesn’t wrap those two operations in a transaction.
+Call this once through your protected provisioning code. Store the returned client ID and secret in the tenant’s server environment as `AUTH_CLIENT_ID` and `AUTH_CLIENT_SECRET`; don’t log the response. If resource linking fails after creation, repair or remove that client before retrying. The example doesn’t wrap those two operations in a transaction.
 
 Skipping consent is a policy for this first-party client, not a default for arbitrary applications. The provider’s existing sign-in UI must preserve the authorization query and continue the pending OAuth flow after authentication, using the provider client plugin. A generic redirect to the homepage would lose that flow. Keep a consent screen if any registered client requires consent.[^provider]
 
 ## Check the authority, not just the token’s shape
 
-Before configuring the editor, define how it asks the provider for current identity and membership. Introspection checks token activity and binding; UserInfo supplies the current profile and roles.
+Before configuring the tenant, define how it asks the provider for current identity and membership. Introspection checks token activity and binding; UserInfo supplies the current profile and roles.
 
-```ts title="editor/app/lib/identity.ts"
+```ts title="tenant/app/lib/identity.ts"
 import { z } from 'zod';
 
 export const issuer = 'https://accounts.example.com';
-export const audience = 'https://editor.example.net';
+export const audience = 'https://tenant.example.net';
 export const rolesClaim = 'https://example.com/roles';
-
 const tokenSchema = z.object({
   active: z.literal(true),
   iss: z.literal(issuer),
@@ -196,6 +195,7 @@ const profileSchema = z.object({
 
 export async function freshIdentity(accessToken: string) {
   if (!accessToken) throw new Error('Missing access token');
+
   const clientId = process.env.AUTH_CLIENT_ID!;
   const secret = process.env.AUTH_CLIENT_SECRET!;
   const basic = Buffer.from(
@@ -216,9 +216,12 @@ export async function freshIdentity(accessToken: string) {
     redirect: 'error',
     signal: AbortSignal.timeout(5000),
   });
+
   if (!checked.ok) throw new Error('Introspection failed');
+
   const token = tokenSchema.parse(await checked.json());
   const audiences = Array.isArray(token.aud) ? token.aud : [token.aud];
+
   if (
     token.client_id !== clientId ||
     !audiences.includes(audience) ||
@@ -231,9 +234,13 @@ export async function freshIdentity(accessToken: string) {
     redirect: 'error',
     signal: AbortSignal.timeout(5000),
   });
+
   if (!response.ok) throw new Error('UserInfo failed');
+
   const profile = profileSchema.parse(await response.json());
+
   if (profile.sub !== token.sub) throw new Error('Subject mismatch');
+
   return profile;
 }
 ```
@@ -244,7 +251,7 @@ A response saying `active: true` isn’t enough. We also require the configured 
 
 Better Auth can keep a local session in an encrypted cookie and store the OAuth account credentials in a separate encrypted account cookie. Configure the client without a database. Give it its own secret, separate from the provider’s secret.[^sessions]
 
-```ts title="editor/app/lib/auth.ts"
+```ts title="tenant/app/lib/auth.ts"
 import { betterAuth } from 'better-auth';
 import { APIError, createAuthMiddleware } from 'better-auth/api';
 import { nextCookies } from 'better-auth/next-js';
@@ -263,7 +270,7 @@ export const auth = betterAuth({
   baseURL: audience,
   secret: process.env.BETTER_AUTH_SECRET!,
   trustedOrigins: [audience],
-  advanced: { cookiePrefix: 'editor', useSecureCookies: true },
+  advanced: { cookiePrefix: 'tenant', useSecureCookies: true },
   account: {
     accountLinking: { enabled: false },
     storeAccountCookie: true,
@@ -314,13 +321,19 @@ export const auth = betterAuth({
         // genericOAuth has already verified signature, audience, nonce,
         // and the discovered issuer. Decoding alone is NOT verification.
         if (!tokens.idToken) return null;
+
         const claims = idClaims.parse(JSON.parse(
           Buffer.from(tokens.idToken.split('.')[1]!, 'base64url').toString(),
         ));
+
         const now = Math.floor(Date.now() / 1000);
+
         if (claims.exp <= now || claims.iat > now + 60) return null;
+
         const profile = await freshIdentity(tokens.accessToken ?? '');
+
         if (profile.sub !== claims.sub) return null;
+
         return {
           ...profile,
           emailVerified: profile.email_verified,
@@ -340,9 +353,9 @@ In this version, the additional field accepts the provider mapping, while the lo
 
 The one-hour cache is a choice for this example. Ordinary reads can use that cached identity, but they may show an outdated name or remain locally signed in after upstream revocation. `refreshCache: false` avoids extending that local snapshot just because someone keeps reading. When it expires, send the browser through the normal sign-in flow again; an existing provider session can make that quick.
 
-Keep cookies host-only, Secure, HttpOnly, and SameSite=Lax. Don’t enable cross-subdomain cookies to solve a cross-domain problem, and don’t put the access or refresh token in localStorage. Start sign-in from the editor with Better Auth’s client:
+Keep cookies host-only, Secure, HttpOnly, and SameSite=Lax. Don’t enable cross-subdomain cookies to solve a cross-domain problem, and don’t put the access or refresh token in localStorage. Start sign-in from the tenant with Better Auth’s client:
 
-```ts title="editor/app/lib/auth-client.ts"
+```ts title="tenant/app/lib/auth-client.ts"
 import { createAuthClient } from 'better-auth/client';
 
 export const authClient = createAuthClient();
@@ -359,7 +372,7 @@ Our fuller implementation resolves tokens before rendering and forwards updated 
 
 This handler demonstrates an authorized operation without changing real data:
 
-```ts title="editor/app/api/example/route.ts"
+```ts title="tenant/app/api/example/route.ts"
 import { auth } from '@/lib/auth';
 import { audience, freshIdentity, rolesClaim } from '@/lib/identity';
 
@@ -371,17 +384,21 @@ export async function POST(request: Request) {
   }
 
   let tokenResponse: Response | undefined;
+
   function reply(body: object, status: number) {
     const response = Response.json(body, { status });
     response.headers.set('cache-control', 'private, no-store');
+
     for (const cookie of tokenResponse?.headers.getSetCookie() ?? []) {
       response.headers.append('set-cookie', cookie);
     }
+
     return response;
   }
 
   try {
     const session = await auth.api.getSession({ headers: request.headers });
+
     if (!session) return reply({ error: 'Sign in again' }, 401);
 
     tokenResponse = await auth.api.getAccessToken({
@@ -389,16 +406,21 @@ export async function POST(request: Request) {
       body: { useAccountCookie: true },
       asResponse: true,
     });
+
     if (!tokenResponse.ok) return reply({ error: 'Sign in again' }, 401);
+
     const token: { accessToken?: unknown } = await tokenResponse.json();
+
     if (typeof token.accessToken !== 'string') {
       return reply({ error: 'Sign in again' }, 401);
     }
 
     const current = await freshIdentity(token.accessToken);
+
     if (current.sub !== session.user.accountsSubject) {
       return reply({ error: 'Sign in again' }, 401);
     }
+
     if (!current[rolesClaim].some(role => ['owner', 'editor'].includes(role))) {
       return reply({ error: 'Forbidden' }, 403);
     }
@@ -419,14 +441,13 @@ Authorization here is current at the time of the check, not an atomic lock over 
 
 ## Decide what logout means
 
-Clearing the editor’s cookie signs out of the editor. It doesn’t necessarily sign out of the provider or another client. This example explicitly keeps provider logout separate. Revoking refresh tokens prevents future refreshes, but an already issued JWT can remain usable until its expiry, depending on the provider’s introspection and revocation policy.
+Clearing the tenant’s cookie signs out of the tenant. It doesn’t necessarily sign out of the provider or another client. This example explicitly keeps provider logout separate. Revoking refresh tokens prevents future refreshes, but an already issued JWT can remain usable until its expiry, depending on the provider’s introspection and revocation policy.
 
 We wanted stronger session-bound revocation in the full service, so session removal also removes associated refresh grants. That behavior needs explicit hooks and transaction/race testing; it isn’t something this abbreviated configuration promises. The local read cache is another independent window.
 
 Before shipping, exercise the actual browser flow across both domains: first login, existing SSO, expired access tokens, expired local sessions, parallel refreshes, revoked membership, provider outages, and logout. Check wrong issuer/audience/client/subject rejection, callback state and nonce failures, cookie size limits, and signing-key rotation too. Type checking a configuration is useful. It doesn’t tell you whether a replacement cookie actually made it back to the browser.
 
 [^provider]: Better Auth’s [OAuth Provider documentation](https://better-auth.com/docs/plugins/oauth-provider) covers discovery, client provisioning, resource audiences, and continuing sign-in and consent flows. Match the documentation to your installed version.
-
 [^client]: The [Generic OAuth plugin](https://better-auth.com/docs/plugins/generic-oauth) provides the relying-party integration. The checks above supplement its OIDC verification; they don’t replace it.
-
 [^sessions]: See Better Auth’s [session management documentation](https://better-auth.com/docs/concepts/session-management) for stateless sessions, account cookies, and cookie-cache lifetimes. Session freshness for sensitive account operations is a separate setting from authorization freshness.
+[^pricing]: Hosted pricing often scales with monthly active users; see [Auth0’s pricing](https://auth0.com/pricing) for one example.
