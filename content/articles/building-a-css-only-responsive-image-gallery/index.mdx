@@ -20,11 +20,11 @@ There are three decisions: how wide each image should be, where the row ends, an
 
 <ArticleDemo title="A CSS-only responsive image gallery" slug="building-a-css-only-responsive-image-gallery" penUrl={demo.editorUrl ?? undefined} autoRun />
 
-Change the number of photographs, then drag the gallery width slider. You can also focus it and use the arrow keys. Below 640 pixels, the gallery shows at most four images. From 640 pixels it shows up to six, and from 1024 pixels it shows up to eight. The slider uses a percentage of the available space; a wider browser or CodePen preview gives you more room to experiment.
+Change the number of photographs and drag the width slider to try different layouts.
 
-Once JavaScript has rendered the component, CSS handles its responsive layout. The demo adds controls to render a different collection and set the available width; neither control calculates image sizes or rearranges the rows. The +N badge represents photographs beyond the visible set; implementing a lightbox or the badge itself is outside this article’s scope.
+JavaScript renders the gallery; CSS handles its responsive layout. The +N badge and lightbox implementation are outside this article’s scope.
 
-The original uses viewport-based media queries, as do the snippets below. For the draggable demo, I’ve changed those to [CSS container queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Containment/Container_queries), so the breakpoints respond to the gallery’s available width even when the browser window stays the same size.
+The snippets use viewport-based media queries; the resizable demo uses container queries.[^containers]
 
 ## Let the aspect ratio divide the row
 
@@ -76,7 +76,7 @@ That’s what Flexbox can do for us. Give each image a zero flex basis and use i
 
 `min-width: 0` lets an item shrink below the image’s intrinsic width. The dimensions in the markup supply the ratio before the image downloads; use the real dimensions, not a guessed landscape/portrait label. `object-fit: cover` handles tiny rounding differences without distorting the photograph.
 
-The original uses a small initial width and the default stretch alignment. Here I’ve made the proportional sizing explicit with a zero basis. That removes the small fixed-width contribution from the calculation. I also multiply every grow factor by 100: proportions stay the same, but a lone portrait or a row of narrow portraits won’t have a total grow factor below one and leave unused space. This assumes ordinary photographs with aspect ratios of at least 1:100.
+Multiplying the grow factors by 100 preserves their proportions while letting the images fill the row.
 
 Why margins instead of `gap`? In a moment we’ll add an empty flex item to break a row. A row gap would also add space around that empty line. Margins on the photographs give us exactly one visible gutter, while the negative container margins cancel the outside spacing.
 
@@ -102,7 +102,7 @@ function splitIndex(total: number, capacity: number): number {
 | 5               | 2 + 2      | 2 + 3      | 2 + 3      |
 | 9               | 2 + 2      | 3 + 3      | 4 + 4      |
 
-The entries show the number of images on each row, not their widths. An odd collection puts the extra image on the second row. The two rows can have different heights; only images within a row share a height.
+With an odd number of images, I put the extra image on the second row to give the first row’s photographs more prominence. Images share a height within each row; the rows can have different heights.
 
 For each capacity, insert a break after the calculated index. React is just generating markup here:
 
@@ -197,10 +197,12 @@ To make these rules respond to a resizable container, wrap the gallery in an ele
 
 ## A few practical edges
 
-A single image fills the available width at its own aspect ratio. An unusually tall portrait can therefore make a tall gallery. If your design imposes a maximum height, you’ll need to choose between cropping and leaving space; that’s a separate layout policy.
+A single image fills the available width at its own aspect ratio.
 
 Hiding an image with CSS also doesn’t guarantee that its file won’t download. The example keeps the first eight images in the rendered markup, so use appropriately sized images and consider your loading strategy. The production component uses Next.js image optimization; neither that nor React is required for the layout.
 
 The production gallery links into a full collection. Keep that escape hatch if you hide photographs: a +N badge should lead somewhere useful, and keyboard users need an accessible way to reach the remaining images. The demo deliberately shows the layout and a non-interactive badge only.
 
 [^flex]: [MDN’s explanation of `flex-grow`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/flex-grow) describes how positive free space is divided. A zero basis is what makes that division apply to the whole usable row width here.
+
+[^containers]: [CSS container queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Containment/Container_queries) let the demo respond to the gallery’s available width.
